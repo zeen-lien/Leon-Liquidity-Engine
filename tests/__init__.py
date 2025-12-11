@@ -1,0 +1,1 @@
+# Test suite untuk aplikasi trading signal
