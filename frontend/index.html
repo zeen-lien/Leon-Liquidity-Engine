@@ -297,8 +297,8 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--neon-green);
-      box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+      background: var(--neon-lime);
+      box-shadow: 0 0 10px var(--neon-lime), 0 0 20px var(--neon-lime);
       animation: statusPulse 1.5s ease-in-out infinite;
     }
 
@@ -309,7 +309,7 @@
 
     .status-text {
       font-size: 11px;
-      color: var(--neon-green);
+      color: var(--neon-lime);
       font-weight: 600;
     }
 
@@ -347,11 +347,10 @@
       font-family: 'Orbitron', sans-serif;
       font-size: 28px;
       font-weight: 700;
-      background: var(--gradient-neon);
+      background: var(--gradient-fire);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-size: 200% auto;
-      animation: textShine 3s linear infinite;
       margin-bottom: 8px;
     }
 
@@ -433,37 +432,33 @@
             <div class="stat-value" id="stat-total-signals">0</div>
             <div class="stat-label">TOTAL SIGNALS</div>
           </div>
-          <div class="stat-glow cyan"></div>
         </div>
         <div class="stat-card cyber">
-          <div class="stat-icon green">
+          <div class="stat-icon">
             <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value green" id="stat-win-rate">0%</div>
+            <div class="stat-value" id="stat-win-rate">0%</div>
             <div class="stat-label">WIN RATE</div>
           </div>
-          <div class="stat-glow green"></div>
         </div>
         <div class="stat-card cyber">
-          <div class="stat-icon magenta">
+          <div class="stat-icon">
             <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value magenta" id="stat-avg-pnl">+0%</div>
+            <div class="stat-value" id="stat-avg-pnl">+0%</div>
             <div class="stat-label">AVG P&L</div>
           </div>
-          <div class="stat-glow magenta"></div>
         </div>
         <div class="stat-card cyber">
-          <div class="stat-icon purple">
+          <div class="stat-icon">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value purple" id="stat-active-pairs">10</div>
+            <div class="stat-value" id="stat-active-pairs">10</div>
             <div class="stat-label">ACTIVE PAIRS</div>
           </div>
-          <div class="stat-glow purple"></div>
         </div>
       </div>
 
@@ -669,8 +664,6 @@
         </div>
       </div>
     </section>
-""
-
 
     <!-- ============ BACKTEST PAGE ============ -->
     <section class="page" id="page-backtest">
@@ -779,7 +772,13 @@
           </div>
           <div class="form-group">
             <label class="form-label">CSV FILE</label>
-            <input type="file" class="form-input cyber-input" id="upload-file" accept=".csv" />
+            <div class="file-input-wrapper">
+              <input type="file" id="upload-file" accept=".csv" onchange="updateFileName(this)" />
+              <div class="file-input-display">
+                <span class="file-btn">BROWSE</span>
+                <span class="file-name" id="file-name-display">No file selected</span>
+              </div>
+            </div>
           </div>
           <button class="btn-cyber primary full" onclick="uploadCSV()">
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -987,13 +986,13 @@
       left: 0;
       right: 0;
       height: 3px;
-      background: var(--neon-cyan);
-      box-shadow: 0 0 20px var(--neon-cyan);
+      background: var(--neon-orange);
+      box-shadow: 0 0 20px var(--neon-orange);
     }
 
-    .stat-glow.green { background: var(--neon-green); box-shadow: 0 0 20px var(--neon-green); }
-    .stat-glow.magenta { background: var(--neon-magenta); box-shadow: 0 0 20px var(--neon-magenta); }
-    .stat-glow.purple { background: var(--neon-purple); box-shadow: 0 0 20px var(--neon-purple); }
+    .stat-glow.green { background: var(--neon-lime); box-shadow: 0 0 20px var(--neon-lime); }
+    .stat-glow.cyan { background: var(--neon-cyan); box-shadow: 0 0 20px var(--neon-cyan); }
+    .stat-glow.pink { background: var(--neon-pink); box-shadow: 0 0 20px var(--neon-pink); }
 
     /* ============ PRICE GRID ============ */
     .price-grid {
@@ -1137,6 +1136,18 @@
       background-position: right 16px center;
     }
 
+    .cyber-select option {
+      background: #0a0a0a;
+      color: #ffffff;
+      padding: 12px;
+    }
+
+    .cyber-select option:hover,
+    .cyber-select option:checked {
+      background: linear-gradient(90deg, #ff6b00, #ff073a);
+      color: #ffffff;
+    }
+
     .cyber-select.large { padding: 16px; font-size: 16px; }
 
     .input-group {
@@ -1145,6 +1156,70 @@
     }
 
     .input-group .cyber-select { flex: 1; }
+
+    /* ============ FILE INPUT CUSTOM ============ */
+    .file-input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .file-input-display {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: transparent;
+      border: 1px solid rgba(255, 230, 0, 0.4);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .file-input-wrapper:hover .file-input-display {
+      border-color: var(--neon-yellow);
+      box-shadow: 0 0 15px rgba(255, 230, 0, 0.3);
+    }
+
+    .file-btn {
+      background: transparent;
+      border: 1px solid var(--neon-orange);
+      border-radius: 6px;
+      padding: 8px 16px;
+      color: var(--neon-orange);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .file-input-wrapper:hover .file-btn {
+      background: rgba(255, 107, 0, 0.2);
+      box-shadow: var(--glow-orange);
+    }
+
+    .file-name {
+      color: var(--text-secondary);
+      font-size: 13px;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-name.has-file {
+      color: var(--neon-lime);
+    }
 
     /* ============ INFO BOX ============ */
     .info-box {
@@ -1231,8 +1306,8 @@
       color: var(--neon-cyan);
     }
 
-    .comparison-card.ai .comparison-list li::before { color: var(--neon-purple); }
-    .comparison-card.live .comparison-list li::before { color: var(--neon-green); }
+    .comparison-card.ai .comparison-list li::before { color: var(--neon-pink); }
+    .comparison-card.live .comparison-list li::before { color: var(--neon-lime); }
 
     /* ============ STATS MINI GRID ============ */
     .stats-mini-grid {
@@ -1260,7 +1335,7 @@
       color: var(--neon-cyan);
     }
 
-    .stat-mini.green .stat-mini-value { color: var(--neon-green); }
+    .stat-mini.green .stat-mini-value { color: var(--neon-lime); }
     .stat-mini.red .stat-mini-value { color: var(--neon-red); }
 
     .stat-mini-label {
@@ -1288,26 +1363,148 @@
     }
 
     .cyber-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 7, 58, 0.2);
-      border-top-color: var(--neon-red);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+      width: 50px;
+      height: 50px;
+      position: relative;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .cyber-spinner::before,
+    .cyber-spinner::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid transparent;
+    }
+
+    .cyber-spinner::before {
+      border-top-color: var(--neon-red);
+      border-right-color: var(--neon-orange);
+      animation: spinGlow 1s linear infinite;
+      filter: drop-shadow(0 0 8px var(--neon-red));
+    }
+
+    .cyber-spinner::after {
+      border-bottom-color: var(--neon-cyan);
+      border-left-color: var(--neon-lime);
+      animation: spinGlow 1.5s linear infinite reverse;
+      filter: drop-shadow(0 0 8px var(--neon-cyan));
+    }
+
+    @keyframes spinGlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
     .loading-cyber span {
       font-family: 'Orbitron', sans-serif;
-      font-size: 10px;
-      color: var(--neon-orange);
-      letter-spacing: 2px;
+      font-size: 11px;
+      color: var(--neon-cyan);
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px var(--neon-cyan);
+      animation: textPulse 1.5s ease-in-out infinite;
     }
 
-    @keyframes textBlink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+    @keyframes textPulse {
+      0%, 100% { opacity: 1; text-shadow: 0 0 10px var(--neon-cyan); }
+      50% { opacity: 0.6; text-shadow: 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan); }
+    }
+
+    @keyframes dotPulse {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+      40% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 15px currentColor; }
+    }
+
+    /* ============ SWEETALERT2 CYBERPUNK THEME ============ */
+    .swal2-popup {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(10, 10, 20, 0.98)) !important;
+      border: 2px solid var(--neon-cyan) !important;
+      border-radius: 16px !important;
+      box-shadow: 0 0 30px rgba(0, 255, 247, 0.3), inset 0 0 60px rgba(0, 255, 247, 0.05) !important;
+    }
+
+    .swal2-title {
+      font-family: 'Orbitron', sans-serif !important;
+      color: var(--neon-cyan) !important;
+      text-shadow: 0 0 20px var(--neon-cyan) !important;
+      letter-spacing: 2px !important;
+    }
+
+    .swal2-html-container {
+      color: var(--text-secondary) !important;
+    }
+
+    .swal2-input, .swal2-textarea, .swal2-select {
+      background: transparent !important;
+      border: 2px solid var(--neon-yellow) !important;
+      border-radius: 8px !important;
+      color: #fff !important;
+      font-family: 'Rajdhani', sans-serif !important;
+      font-size: 14px !important;
+      box-shadow: 0 0 15px rgba(255, 230, 0, 0.2) !important;
+    }
+
+    .swal2-input:focus, .swal2-textarea:focus, .swal2-select:focus {
+      border-color: var(--neon-orange) !important;
+      box-shadow: 0 0 25px rgba(255, 107, 0, 0.4) !important;
+      outline: none !important;
+    }
+
+    .swal2-input::placeholder {
+      color: var(--text-muted) !important;
+    }
+
+    .swal2-confirm {
+      background: transparent !important;
+      border: 2px solid var(--neon-lime) !important;
+      color: var(--neon-lime) !important;
+      font-family: 'Orbitron', sans-serif !important;
+      font-weight: 600 !important;
+      letter-spacing: 1px !important;
+      padding: 12px 30px !important;
+      border-radius: 8px !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .swal2-confirm:hover {
+      background: rgba(57, 255, 20, 0.2) !important;
+      box-shadow: 0 0 25px rgba(57, 255, 20, 0.5) !important;
+    }
+
+    .swal2-cancel {
+      background: transparent !important;
+      border: 2px solid var(--neon-red) !important;
+      color: var(--neon-red) !important;
+      font-family: 'Orbitron', sans-serif !important;
+      font-weight: 600 !important;
+      letter-spacing: 1px !important;
+      padding: 12px 30px !important;
+      border-radius: 8px !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .swal2-cancel:hover {
+      background: rgba(255, 7, 58, 0.2) !important;
+      box-shadow: 0 0 25px rgba(255, 7, 58, 0.5) !important;
+    }
+
+    .swal2-timer-progress-bar {
+      background: linear-gradient(90deg, var(--neon-red), var(--neon-orange), var(--neon-yellow)) !important;
+    }
+
+    .swal2-toast {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(10, 10, 20, 0.98)) !important;
+      border: 1px solid var(--neon-cyan) !important;
+      box-shadow: 0 0 20px rgba(0, 255, 247, 0.3) !important;
+    }
+
+    .swal2-toast .swal2-title {
+      font-family: 'Rajdhani', sans-serif !important;
+      font-size: 14px !important;
+      letter-spacing: 1px !important;
     }
 
     .empty-state {
@@ -1360,8 +1557,8 @@
       background: rgba(0, 240, 255, 0.03);
     }
 
-    .signal-buy { color: var(--neon-green); font-weight: 700; }
-    .signal-sell { color: var(--neon-red); font-weight: 700; }
+    .signal-buy { color: var(--neon-lime); font-weight: 700; text-shadow: 0 0 10px var(--neon-lime); }
+    .signal-sell { color: var(--neon-red); font-weight: 700; text-shadow: 0 0 10px var(--neon-red); }
 
     /* ============ PREDICTION BOX ============ */
     .prediction-box {
@@ -1607,12 +1804,20 @@
     function showLoading(title = 'PROCESSING...') {
       Swal.fire({
         title: title,
-        html: '<div class="cyber-spinner" style="margin: 20px auto;"></div>',
+        html: `
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px;">
+            <div class="cyber-spinner"></div>
+            <div style="display: flex; gap: 4px;">
+              <span class="loading-dot" style="width: 8px; height: 8px; background: var(--neon-red); border-radius: 50%; animation: dotPulse 1.4s ease-in-out infinite;"></span>
+              <span class="loading-dot" style="width: 8px; height: 8px; background: var(--neon-orange); border-radius: 50%; animation: dotPulse 1.4s ease-in-out 0.2s infinite;"></span>
+              <span class="loading-dot" style="width: 8px; height: 8px; background: var(--neon-yellow); border-radius: 50%; animation: dotPulse 1.4s ease-in-out 0.4s infinite;"></span>
+              <span class="loading-dot" style="width: 8px; height: 8px; background: var(--neon-lime); border-radius: 50%; animation: dotPulse 1.4s ease-in-out 0.6s infinite;"></span>
+              <span class="loading-dot" style="width: 8px; height: 8px; background: var(--neon-cyan); border-radius: 50%; animation: dotPulse 1.4s ease-in-out 0.8s infinite;"></span>
+            </div>
+          </div>
+        `,
         showConfirmButton: false,
-        allowOutsideClick: false,
-        background: '#0a0a12',
-        color: '#00f0ff',
-        customClass: { popup: 'cyber-modal' }
+        allowOutsideClick: false
       });
     }
 
@@ -1878,11 +2083,8 @@
         input: 'text',
         inputPlaceholder: 'Folder name (e.g., BTC, ETH)',
         showCancelButton: true,
-        background: '#0a0a12',
-        color: '#00f0ff',
-        confirmButtonColor: '#00f0ff',
-        cancelButtonColor: '#ff0044',
-        customClass: { popup: 'cyber-modal', input: 'cyber-input' }
+        confirmButtonText: 'CREATE',
+        cancelButtonText: 'CANCEL'
       });
       
       if (name) {
@@ -1903,6 +2105,17 @@
         } catch (err) {
           showError('Failed to create folder');
         }
+      }
+    }
+
+    function updateFileName(input) {
+      const display = document.getElementById('file-name-display');
+      if (input.files && input.files[0]) {
+        display.textContent = input.files[0].name;
+        display.classList.add('has-file');
+      } else {
+        display.textContent = 'No file selected';
+        display.classList.remove('has-file');
       }
     }
 
@@ -1937,6 +2150,8 @@
           const data = await res.json();
           showSuccess(`Upload complete: ${data.jumlah_baris} rows`);
           fileInput.value = '';
+          document.getElementById('file-name-display').textContent = 'No file selected';
+          document.getElementById('file-name-display').classList.remove('has-file');
         } else {
           const err = await res.text();
           showError(err);
