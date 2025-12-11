@@ -976,6 +976,226 @@ def _generate_recommendation(prediction: dict) -> dict:
 from datetime import datetime
 
 
+# ============================================================================
+# ENDPOINT HYBRID SIGNAL (TECHNICAL + LSTM)
+# ============================================================================
+
+@aplikasi.post("/hybrid/analyze/{symbol}")
+async def analisis_hybrid(
+    symbol: str,
+    mode_trading: str = Query("santai", description="Mode: aktif, santai, pasif"),
+    interval: str = Query("1h", description="Interval: 1h, 4h"),
+    limit: int = Query(100, ge=50, le=500, description="Jumlah candle untuk analisis")
+):
+    """
+    HYBRID SIGNAL: Gabungan analisis Technical Indicators + LSTM AI Prediction.
+    
+    Sistem ini menggabungkan:
+    1. Technical Analysis (RSI, EMA, ATR, S/R, Divergence)
+    2. LSTM Deep Learning Prediction
+    
+    Confidence dihitung dari kombinasi keduanya untuk sinyal yang lebih akurat.
+    
+    Parameters:
+    -----------
+    symbol: str - Trading pair (e.g., "BTCUSDT")
+    mode_trading: str - Mode trading (aktif, santai, pasif)
+    interval: str - Timeframe untuk analisis
+    limit: int - Jumlah candle untuk analisis
+    """
+    from .services.praproses_data import tambah_indikator_ke_df
+    from .services.generator_sinyal_unified import scan_sinyal_honest, TRADING_STYLES
+    
+    if mode_trading not in TRADING_STYLES:
+        raise HTTPException(status_code=400, detail=f"Mode trading tidak valid. Pilih dari: {list(TRADING_STYLES.keys())}")
+    
+    try:
+        # 1. Ambil data dari Binance
+        klines = await binance_fetcher.get_klines(symbol.upper(), interval, limit)
+        
+        if not klines:
+            raise HTTPException(status_code=404, detail="Tidak ada data dari Binance")
+        
+        # 2. Convert ke DataFrame
+        df = pd.DataFrame(klines)
+        df['open_time'] = pd.to_datetime(df['open_time'], unit='ms')
+        
+        # 3. Tambah indikator
+        df_dengan_indikator = tambah_indikator_ke_df(df)
+        
+        # 4. Get Technical Signal
+        sinyal_teknikal = scan_sinyal_honest(
+            df=df_dengan_indikator,
+            pair=symbol.upper(),
+            mode_trading=mode_trading,
+            confidence_minimum=0.50  # Lower threshold untuk hybrid
+        )
+        
+        # 5. Get LSTM Prediction
+        lstm_prediction = get_prediction_for_symbol(df_dengan_indikator, symbol.upper())
+        
+        # 6. Ambil harga terkini
+        harga_terkini = await binance_fetcher.get_ticker_price(symbol.upper())
+        current_price = float(harga_terkini["price"])
+        
+        # 7. HYBRID ANALYSIS - Gabungkan Technical + LSTM
+        hybrid_signals = []
+        
+        # Ambil sinyal teknikal terbaru (jika ada)
+        latest_technical = sinyal_teknikal[-1] if sinyal_teknikal else None
+        
+        # Analisis LSTM
+        lstm_direction = lstm_prediction.get("direction", "NEUTRAL")
+        lstm_confidence = lstm_prediction.get("confidence", 0.5)
+        
+        # Hitung HYBRID CONFIDENCE
+        if latest_technical:
+            tech_confidence = latest_technical.get("confidence", 0.5)
+            tech_type = latest_technical.get("tipe", "NEUTRAL")
+            
+            # Cek apakah Technical dan LSTM sejalan
+            tech_direction = "UP" if tech_type == "BELI" else "DOWN" if tech_type == "JUAL" else "NEUTRAL"
+            
+            if tech_direction == lstm_direction:
+                # CONFLUENCE! Technical dan LSTM sejalan
+                # Hybrid confidence = weighted average + bonus
+                hybrid_confidence = (tech_confidence * 0.5) + (lstm_confidence * 0.5) + 0.10
+                hybrid_confidence = min(0.95, hybrid_confidence)  # Cap at 95%
+                confluence_status = "STRONG"
+                confluence_bonus = 0.10
+            else:
+                # DIVERGENCE - Technical dan LSTM berbeda
+                # Ambil yang lebih kuat, tapi kurangi confidence
+                if tech_confidence > lstm_confidence:
+                    hybrid_confidence = tech_confidence * 0.8
+                    dominant = "TECHNICAL"
+                else:
+                    hybrid_confidence = lstm_confidence * 0.8
+                    dominant = "LSTM"
+                confluence_status = "WEAK"
+                confluence_bonus = -0.10
+            
+            # Generate hybrid signal
+            if hybrid_confidence >= 0.60:
+                # Tentukan arah berdasarkan confluence
+                if confluence_status == "STRONG":
+                    final_direction = tech_direction
+                else:
+                    final_direction = tech_direction if tech_confidence > lstm_confidence else lstm_direction
+                
+                final_type = "BELI" if final_direction == "UP" else "JUAL"
+                
+                # Calculate SL/TP dari technical signal
+                entry = current_price
+                atr = df_dengan_indikator['atr_14'].iloc[-1] if 'atr_14' in df_dengan_indikator.columns else current_price * 0.02
+                
+                if final_type == "BELI":
+                    stop_loss = entry - (atr * 1.5)
+                    take_profit = entry + (atr * 3.0)
+                else:
+                    stop_loss = entry + (atr * 1.5)
+                    take_profit = entry - (atr * 3.0)
+                
+                hybrid_signal = {
+                    "tipe": final_type,
+                    "entry": round(entry, 2),
+                    "stop_loss": round(stop_loss, 2),
+                    "take_profit": round(take_profit, 2),
+                    "confidence": round(hybrid_confidence, 4),
+                    "confluence_status": confluence_status,
+                    "technical_signal": tech_type,
+                    "technical_confidence": round(tech_confidence, 4),
+                    "lstm_direction": lstm_direction,
+                    "lstm_confidence": round(lstm_confidence, 4),
+                    "alasan": f"[HYBRID {confluence_status}] Technical: {tech_type} ({tech_confidence*100:.0f}%), LSTM: {lstm_direction} ({lstm_confidence*100:.0f}%)",
+                    "timestamp": datetime.now().isoformat()
+                }
+                hybrid_signals.append(hybrid_signal)
+        
+        else:
+            # Tidak ada sinyal teknikal, gunakan LSTM saja
+            if lstm_confidence >= 0.65:
+                final_type = "BELI" if lstm_direction == "UP" else "JUAL" if lstm_direction == "DOWN" else None
+                
+                if final_type:
+                    entry = current_price
+                    atr = df_dengan_indikator['atr_14'].iloc[-1] if 'atr_14' in df_dengan_indikator.columns else current_price * 0.02
+                    
+                    if final_type == "BELI":
+                        stop_loss = entry - (atr * 1.5)
+                        take_profit = entry + (atr * 3.0)
+                    else:
+                        stop_loss = entry + (atr * 1.5)
+                        take_profit = entry - (atr * 3.0)
+                    
+                    hybrid_signal = {
+                        "tipe": final_type,
+                        "entry": round(entry, 2),
+                        "stop_loss": round(stop_loss, 2),
+                        "take_profit": round(take_profit, 2),
+                        "confidence": round(lstm_confidence * 0.9, 4),  # Slight penalty for LSTM-only
+                        "confluence_status": "LSTM_ONLY",
+                        "technical_signal": "NONE",
+                        "technical_confidence": 0,
+                        "lstm_direction": lstm_direction,
+                        "lstm_confidence": round(lstm_confidence, 4),
+                        "alasan": f"[LSTM ONLY] Prediksi {lstm_direction} dengan confidence {lstm_confidence*100:.0f}%",
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    hybrid_signals.append(hybrid_signal)
+        
+        # 8. Generate recommendation
+        if hybrid_signals:
+            best_signal = hybrid_signals[0]
+            recommendation = {
+                "aksi": best_signal["tipe"],
+                "kekuatan": "SANGAT KUAT" if best_signal["confluence_status"] == "STRONG" else "KUAT" if best_signal["confidence"] >= 0.70 else "SEDANG",
+                "entry": best_signal["entry"],
+                "stop_loss": best_signal["stop_loss"],
+                "take_profit": best_signal["take_profit"],
+                "alasan": best_signal["alasan"]
+            }
+        else:
+            recommendation = {
+                "aksi": "TUNGGU",
+                "kekuatan": "LEMAH",
+                "entry": None,
+                "stop_loss": None,
+                "take_profit": None,
+                "alasan": "Tidak ada sinyal yang cukup kuat dari Technical maupun LSTM"
+            }
+        
+        return {
+            "status": "sukses",
+            "symbol": symbol.upper(),
+            "mode_trading": mode_trading,
+            "interval": interval,
+            "harga_terkini": current_price,
+            "jumlah_candle": len(df_dengan_indikator),
+            "hybrid_signals": hybrid_signals,
+            "technical_analysis": {
+                "jumlah_sinyal": len(sinyal_teknikal),
+                "sinyal_terbaru": sinyal_teknikal[-1] if sinyal_teknikal else None
+            },
+            "lstm_prediction": lstm_prediction,
+            "rekomendasi": recommendation,
+            "indikator_terkini": {
+                "rsi_6": round(df_dengan_indikator['rsi_6'].iloc[-1], 2) if 'rsi_6' in df_dengan_indikator.columns else None,
+                "rsi_14": round(df_dengan_indikator['rsi_14'].iloc[-1], 2) if 'rsi_14' in df_dengan_indikator.columns else None,
+                "ema_20": round(df_dengan_indikator['ema_20'].iloc[-1], 2) if 'ema_20' in df_dengan_indikator.columns else None,
+                "ema_50": round(df_dengan_indikator['ema_50'].iloc[-1], 2) if 'ema_50' in df_dengan_indikator.columns else None,
+                "ema_200": round(df_dengan_indikator['ema_200'].iloc[-1], 2) if 'ema_200' in df_dengan_indikator.columns else None,
+                "atr_14": round(df_dengan_indikator['atr_14'].iloc[-1], 2) if 'atr_14' in df_dengan_indikator.columns else None,
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"Gagal analisis hybrid: {err}")
+
+
 # FastAPI standar tetap membutuhkan variabel bernama `app`.
 # Kita map `app` ke `aplikasi` agar uvicorn bisa menjalankan backend ini.
 app = aplikasi

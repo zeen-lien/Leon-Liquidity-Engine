@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -176,6 +176,7 @@
       font-weight: 700;
       background: var(--gradient-fire);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -539,17 +540,23 @@
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">&nbsp;</label>
-            <button class="btn-cyber primary full" onclick="generateLiveSignal()">
-              <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              <span>GENERATE SIGNAL</span>
-            </button>
+            <label class="form-label">SIGNAL TYPE</label>
+            <select class="form-select cyber-select" id="live-signal-type">
+              <option value="hybrid" selected>HYBRID (Technical + AI)</option>
+              <option value="technical">TECHNICAL ONLY</option>
+            </select>
           </div>
         </div>
-        <div class="info-box">
+        <div class="form-group" style="margin-top: 16px;">
+          <button class="btn-cyber primary full" onclick="generateLiveSignal()">
+            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span>GENERATE SIGNAL</span>
+          </button>
+        </div>
+        <div class="info-box" style="margin-top: 16px;">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
           <div>
-            <strong>Live Signals</strong> menganalisis data real-time dari Binance API menggunakan indikator teknikal (RSI, EMA, ATR) untuk menghasilkan sinyal BELI/JUAL dengan Entry, Stop Loss, dan Take Profit.
+            <strong>HYBRID Signal</strong> menggabungkan analisis Technical (RSI, EMA, ATR) + AI Prediction (LSTM) untuk sinyal yang lebih akurat. Jika keduanya sejalan, confidence meningkat!
           </div>
         </div>
       </div>
@@ -1048,6 +1055,32 @@
       font-family: 'Orbitron', sans-serif;
       font-size: 13px;
       font-weight: 700;
+      transition: all 0.3s ease;
+    }
+    
+    .price-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+    
+    .price-value.flash-up {
+      animation: flashUp 0.5s ease;
+    }
+    
+    .price-value.flash-down {
+      animation: flashDown 0.5s ease;
+    }
+    
+    @keyframes flashUp {
+      0% { background: rgba(57, 255, 20, 0.4); transform: scale(1.05); }
+      100% { background: transparent; transform: scale(1); }
+    }
+    
+    @keyframes flashDown {
+      0% { background: rgba(255, 7, 58, 0.4); transform: scale(1.05); }
+      100% { background: transparent; transform: scale(1); }
     }
 
     /* ============ GRIDS ============ */
@@ -1846,33 +1879,84 @@
       document.getElementById('overlay').classList.toggle('active');
     }
 
-    // ============ REAL-TIME PRICES ============
+    // ============ REAL-TIME PRICES (WebSocket) ============
+    const CRYPTO_COLORS = {'BTC':'#ff9500','ETH':'#00d4ff','BNB':'#f0b90b','SOL':'#14f195','XRP':'#00aae4','DOGE':'#ffcc00','ADA':'#ff1493','AVAX':'#e84142','DOT':'#e6007a','MATIC':'#8247e5','PEPE':'#39ff14','MANTA':'#00fff7','BCH':'#8dc351','ZEC':'#f4b728'};
+    const WS_SYMBOLS = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT','ADAUSDT','AVAXUSDT','DOTUSDT','MATICUSDT'];
+    let priceWS = null;
+    let lastPrices = {};
+    
     async function loadRealtimePrices() {
       const container = document.getElementById('realtime-prices');
-      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>FETCHING MARKET DATA...</span></div>';
-      
+      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>CONNECTING TO BINANCE...</span></div>';
       try {
         const res = await fetch('/binance/prices');
         const data = await res.json();
-        
         if (data.status === 'sukses' && data.data) {
           let html = '';
           data.data.forEach(item => {
             const symbol = item.symbol.replace('USDT', '');
             const price = parseFloat(item.price);
             const formatted = price >= 1 ? price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : price.toFixed(6);
-            const color = {'BTC':'#ff9500','ETH':'#00d4ff','BNB':'#f0b90b','SOL':'#14f195','XRP':'#00aae4','DOGE':'#ffcc00','ADA':'#ff1493','AVAX':'#e84142','DOT':'#e6007a','MATIC':'#8247e5'}[symbol]||'#fff';
-            html += `<div class="price-card" style="border-color:${color}60"><span class="price-symbol" style="color:${color};text-shadow:0 0 10px ${color}">${symbol}</span><span class="price-value" style="color:${color}">$${formatted}</span></div>`;
+            const color = CRYPTO_COLORS[symbol] || '#fff';
+            lastPrices[symbol] = price;
+            html += `<div class="price-card" data-symbol="${symbol}" style="border-color:${color}60"><span class="price-symbol" style="color:${color};text-shadow:0 0 10px ${color}">${symbol}</span><div class="price-info"><span class="price-value" style="color:${color}">${formatted}</span><span class="price-change" style="font-size:10px;color:var(--text-muted)">--</span></div></div>`;
           });
           container.innerHTML = html;
-          showSuccess('Market data updated');
+          connectPriceWS();
+          showSuccess('Market data connected');
         }
       } catch (err) {
         container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Failed to load prices</p></div>`;
         showError('Failed to fetch market data');
       }
     }
-
+    
+    function connectPriceWS() {
+      if (priceWS) priceWS.close();
+      const streams = WS_SYMBOLS.map(s => `${s.toLowerCase()}@ticker`).join('/');
+      priceWS = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+      priceWS.onopen = () => { console.log('WS connected'); updateConnStatus(true); };
+      priceWS.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg.data) {
+            const t = msg.data;
+            updatePriceCard(t.s.replace('USDT',''), parseFloat(t.c), parseFloat(t.P));
+          }
+        } catch(err) {}
+      };
+      priceWS.onerror = () => updateConnStatus(false);
+      priceWS.onclose = () => { updateConnStatus(false); setTimeout(connectPriceWS, 5000); };
+    }
+    
+    function updatePriceCard(symbol, newPrice, change24h) {
+      const card = document.querySelector(`.price-card[data-symbol="${symbol}"]`);
+      if (!card) return;
+      const priceEl = card.querySelector('.price-value');
+      const changeEl = card.querySelector('.price-change');
+      const oldPrice = lastPrices[symbol] || newPrice;
+      const formatted = newPrice >= 1 ? newPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : newPrice.toFixed(6);
+      const dir = newPrice > oldPrice ? 'up' : newPrice < oldPrice ? 'down' : 'same';
+      if (dir !== 'same') { priceEl.classList.remove('flash-up','flash-down'); void priceEl.offsetWidth; priceEl.classList.add(dir === 'up' ? 'flash-up' : 'flash-down'); }
+      priceEl.textContent = formatted;
+      if (changeEl) {
+        const isPositive = change24h >= 0;
+        const changeColor = isPositive ? 'var(--neon-cyan)' : 'var(--neon-orange)';
+        const changeIcon = isPositive ? '+' : '-';
+        const changeValue = Math.abs(change24h).toFixed(2);
+        changeEl.innerHTML = `<span style="color:${changeColor};font-weight:600;text-shadow:0 0 8px ${changeColor}">${changeIcon}${changeValue}%</span>`;
+      }
+      lastPrices[symbol] = newPrice;
+    }
+    
+    function updateConnStatus(connected) {
+      const dot = document.querySelector('.status-dot');
+      const txt = document.querySelector('.status-text');
+      if (dot && txt) {
+        if (connected) { dot.style.background = 'var(--neon-lime)'; dot.style.boxShadow = '0 0 10px var(--neon-lime), 0 0 20px var(--neon-lime)'; txt.textContent = 'LIVE CONNECTED'; txt.style.color = 'var(--neon-lime)'; }
+        else { dot.style.background = 'var(--neon-orange)'; dot.style.boxShadow = '0 0 10px var(--neon-orange)'; txt.textContent = 'RECONNECTING...'; txt.style.color = 'var(--neon-orange)'; }
+      }
+    }
     // ============ AI PREDICTION ============
     async function getAIPrediction() {
       const symbol = document.getElementById('ai-symbol').value;
@@ -1927,36 +2011,72 @@
       }
     }
 
-    // ============ LIVE SIGNALS ============
+    // ============ LIVE SIGNALS (HYBRID) ============
     async function generateLiveSignal() {
       const symbol = document.getElementById('live-symbol').value;
       const mode = document.getElementById('live-mode').value;
+      const signalType = document.getElementById('live-signal-type')?.value || 'technical';
       const container = document.getElementById('live-signals-table');
-      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>GENERATING SIGNALS...</span></div>';
+      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>ANALYZING...</span></div>';
       
       try {
-        const res = await fetch(`/binance/analyze/${symbol}?mode_trading=${mode}`, { method: 'POST' });
+        const endpoint = signalType === 'hybrid' ? `/hybrid/analyze/${symbol}?mode_trading=${mode}` : `/binance/analyze/${symbol}?mode_trading=${mode}`;
+        const res = await fetch(endpoint, { method: 'POST' });
         const data = await res.json();
         
         if (data.status === 'sukses') {
-          let html = `
-            <div class="info-box" style="margin-bottom: 16px;">
-              <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
-              <div>
-                <strong>${symbol}</strong> | RSI: ${data.indikator_terkini?.rsi_14 || '-'} | EMA20: ${data.indikator_terkini?.ema_20 || '-'} | Price: <strong style="color: var(--neon-green);">$${data.harga_terkini?.toLocaleString() || '-'}</strong>
-              </div>
-            </div>
-          `;
+          const ind = data.indikator_terkini || {};
+          const price = data.harga_terkini ? data.harga_terkini.toLocaleString('en-US', {minimumFractionDigits: 2}) : '-';
           
-          if (data.sinyal && data.sinyal.length > 0) {
+          let html = `<div class="info-box" style="margin-bottom: 16px;"><svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg><div><strong>${symbol}</strong> | RSI: ${ind.rsi_14 || '-'} | EMA20: ${ind.ema_20 || '-'} | ATR: ${ind.atr_14 || '-'} | Price: <strong style="color: var(--neon-lime);">${price}</strong></div></div>`;
+          
+          // Handle HYBRID response
+          if (signalType === 'hybrid' && data.hybrid_signals && data.hybrid_signals.length > 0) {
+            const lstm = data.lstm_prediction || {};
+            const rekom = data.rekomendasi || {};
+            
+            // LSTM Info Box
+            html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+              <div class="info-box" style="border-color:rgba(255,20,147,0.4);">
+                <svg viewBox="0 0 24 24" style="stroke:var(--neon-pink)"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+                <div><strong style="color:var(--neon-pink)">LSTM AI:</strong> ${lstm.direction || '-'} (${lstm.confidence ? (lstm.confidence*100).toFixed(0)+'%' : '-'})</div>
+              </div>
+              <div class="info-box" style="border-color:rgba(57,255,20,0.4);">
+                <svg viewBox="0 0 24 24" style="stroke:var(--neon-lime)"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <div><strong style="color:var(--neon-lime)">Rekomendasi:</strong> ${rekom.aksi || '-'} (${rekom.kekuatan || '-'})</div>
+              </div>
+            </div>`;
+            
+            // Hybrid Signals Table
+            html += '<table class="cyber-table"><thead><tr><th>SIGNAL</th><th>CONFLUENCE</th><th>ENTRY</th><th>SL</th><th>TP</th><th>CONF</th><th>TECH</th><th>LSTM</th></tr></thead><tbody>';
+            data.hybrid_signals.forEach(s => {
+              const confColor = s.confluence_status === 'STRONG' ? 'var(--neon-lime)' : s.confluence_status === 'WEAK' ? 'var(--neon-orange)' : 'var(--neon-cyan)';
+              const confIcon = s.confluence_status === 'STRONG' ? '★★' : s.confluence_status === 'WEAK' ? '★☆' : '☆';
+              html += `<tr>
+                <td class="${s.tipe === 'BELI' ? 'signal-buy' : 'signal-sell'}">${s.tipe}</td>
+                <td style="color:${confColor};font-weight:700;">${confIcon} ${s.confluence_status}</td>
+                <td>${s.entry?.toFixed(2) || '-'}</td>
+                <td style="color:var(--neon-red)">${s.stop_loss?.toFixed(2) || '-'}</td>
+                <td style="color:var(--neon-lime)">${s.take_profit?.toFixed(2) || '-'}</td>
+                <td style="font-weight:700;color:${s.confidence >= 0.7 ? 'var(--neon-lime)' : 'var(--neon-yellow)'}">${(s.confidence*100).toFixed(0)}%</td>
+                <td style="font-size:11px">${s.technical_signal} (${(s.technical_confidence*100).toFixed(0)}%)</td>
+                <td style="font-size:11px">${s.lstm_direction} (${(s.lstm_confidence*100).toFixed(0)}%)</td>
+              </tr>`;
+            });
+            html += '</tbody></table>';
+            html += `<div style="margin-top:12px;font-size:11px;color:var(--text-muted);text-align:center;">${data.hybrid_signals[0]?.alasan || ''}</div>`;
+            showSuccess('Hybrid signal generated');
+          }
+          // Handle TECHNICAL response (fallback)
+          else if (data.sinyal && data.sinyal.length > 0) {
             html += '<table class="cyber-table"><thead><tr><th>PAIR</th><th>SIGNAL</th><th>ENTRY</th><th>SL</th><th>TP</th><th>CONF</th><th>REASON</th></tr></thead><tbody>';
             data.sinyal.forEach(s => {
               html += `<tr>
                 <td><strong>${s.pair || symbol}</strong></td>
                 <td class="${s.tipe === 'BELI' ? 'signal-buy' : 'signal-sell'}">${s.tipe}</td>
-                <td>$${s.entry?.toFixed(2) || '-'}</td>
-                <td>$${s.stop_loss?.toFixed(2) || '-'}</td>
-                <td>$${s.take_profit?.toFixed(2) || '-'}</td>
+                <td>${s.entry?.toFixed(2) || '-'}</td>
+                <td>${s.stop_loss?.toFixed(2) || '-'}</td>
+                <td>${s.take_profit?.toFixed(2) || '-'}</td>
                 <td>${s.confidence ? (s.confidence * 100).toFixed(0) + '%' : '-'}</td>
                 <td style="font-size: 11px; color: var(--text-secondary);">${s.alasan || '-'}</td>
               </tr>`;
@@ -1964,18 +2084,17 @@
             html += '</tbody></table>';
             showSuccess(`${data.sinyal.length} signals generated`);
           } else {
-            html += '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><p>No signals match criteria. Try different mode or wait for better conditions.</p></div>';
-            showInfo('No signals found');
+            html += '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><p>Tidak ada sinyal yang memenuhi kriteria. Coba mode lain atau tunggu kondisi lebih baik.</p></div>';
+            showInfo('Tidak ada sinyal');
           }
           container.innerHTML = html;
         }
       } catch (err) {
-        container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Signal generation failed</p></div>`;
-        showError('Signal generation failed');
+        container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Gagal generate sinyal</p></div>`;
+        showError('Gagal generate sinyal');
       }
     }
 
-    // ============ BACKTEST ============
     async function runBacktest() {
       const folder = document.getElementById('backtest-folder').value;
       const mode = document.getElementById('backtest-mode').value;
@@ -2278,3 +2397,5 @@
   </script>
 </body>
 </html>
+
+
