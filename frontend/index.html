@@ -3,529 +3,441 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Leon Liquidity Engine</title>
+  <title>Leon Liquidity Engine - Cyberpunk Trading</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root {
-      --bg-primary: #000000;
-      --bg-secondary: #050505;
-      --bg-panel: #0a0a0a;
-      --bg-panel-hover: #111111;
+      --bg-void: #000000;
+      --bg-deep: #030308;
+      --bg-panel: #0a0a12;
+      --bg-card: #0d0d18;
+      --bg-hover: #12121f;
+      
+      --neon-cyan: #00f0ff;
+      --neon-magenta: #ff00ff;
+      --neon-green: #00ff88;
+      --neon-purple: #bf00ff;
+      --neon-blue: #0066ff;
+      --neon-pink: #ff0080;
+      --neon-orange: #ff6600;
+      --neon-red: #ff0044;
+      --neon-yellow: #ffff00;
+      
+      --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.3);
+      --glow-magenta: 0 0 20px rgba(255, 0, 255, 0.5), 0 0 40px rgba(255, 0, 255, 0.3);
+      --glow-green: 0 0 20px rgba(0, 255, 136, 0.5), 0 0 40px rgba(0, 255, 136, 0.3);
+      
       --text-primary: #ffffff;
-      --text-secondary: #b0b0b0;
-      --text-muted: #666666;
-      --accent-green: #00ff88;
-      --accent-cyan: #00d9ff;
-      --accent-purple: #8b5cf6;
-      --accent-red: #ef4444;
-      --accent-orange: #f59e0b;
-      --border-color: rgba(255, 255, 255, 0.08);
-      --glow-green: rgba(0, 255, 136, 0.3);
-      --glow-cyan: rgba(0, 217, 255, 0.3);
+      --text-secondary: #a0a0b0;
+      --text-muted: #505060;
+      
+      --border-glow: rgba(0, 240, 255, 0.3);
+      --gradient-cyber: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-purple));
+      --gradient-neon: linear-gradient(90deg, var(--neon-green), var(--neon-cyan), var(--neon-magenta));
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-primary);
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--bg-void);
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
+      overflow-x: hidden;
     }
 
-    /* ============ SIDEBAR ============ */
-    .sidebar {
-      width: 240px;
-      background: var(--bg-primary);
-      border-right: 1px solid var(--border-color);
-      padding: 20px 12px;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      height: 100vh;
-      z-index: 100;
-      transition: transform 0.3s ease;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      margin-bottom: 24px;
-    }
-
-    .logo-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 14px;
-      color: #000;
-    }
-
-    .logo-text {
-      font-size: 15px;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .nav-section {
-      margin-bottom: 20px;
-    }
-
-    .nav-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
-      padding: 0 12px;
-      margin-bottom: 8px;
-    }
-
-    .nav-btn {
-      width: 100%;
-      padding: 10px 12px;
-      background: transparent;
-      border: none;
-      border-radius: 8px;
-      color: var(--text-secondary);
-      font-size: 13px;
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.2s ease;
-      margin-bottom: 2px;
-    }
-
-    .nav-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-    }
-
-    .nav-btn.active {
-      background: rgba(0, 255, 136, 0.1);
-      color: var(--accent-green);
-    }
-
-    .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
-
-    .sidebar-footer {
-      margin-top: auto;
-      padding: 12px;
-      font-size: 10px;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border-color);
-    }
-
-    /* ============ MAIN CONTENT ============ */
-    .main {
-      flex: 1;
-      margin-left: 240px;
-      padding: 24px;
-      min-height: 100vh;
-      transition: margin-left 0.3s ease;
-    }
-
-    .page { display: none; }
-    .page.active { display: block; }
-
-    .page-header {
-      margin-bottom: 24px;
-    }
-
-    .page-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .page-subtitle {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    /* ============ CARDS & PANELS ============ */
-    .card {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .badge {
-      font-size: 9px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      background: rgba(0, 255, 136, 0.15);
-      color: var(--accent-green);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .badge.purple { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
-    .badge.cyan { background: rgba(0, 217, 255, 0.15); color: var(--accent-cyan); }
-
-    /* ============ GRID LAYOUTS ============ */
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-
-    /* ============ STAT CARDS ============ */
-    .stat-card {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 16px;
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--accent-green);
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    /* ============ BUTTONS ============ */
-    .btn {
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: none;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
-      color: #000;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px var(--glow-green);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-    .btn svg { width: 16px; height: 16px; }
-
-    /* ============ FORM ELEMENTS ============ */
-    .form-group { margin-bottom: 16px; }
-
-    .form-label {
-      display: block;
-      font-size: 11px;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-    }
-
-    .form-input, .form-select {
-      width: 100%;
-      padding: 10px 14px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-size: 13px;
-      outline: none;
-      transition: border-color 0.2s ease;
-    }
-
-    .form-input:focus, .form-select:focus {
-      border-color: var(--accent-green);
-    }
-
-    .form-select {
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-    }
-
-    /* ============ TABLES ============ */
-    .table-container {
-      overflow-x: auto;
-      margin-top: 12px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-
-    th, td {
-      padding: 10px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    th {
-      font-size: 10px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    /* ============ PRICE CARDS ============ */
-    .price-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 10px;
-    }
-
-    .price-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .price-symbol {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--accent-cyan);
-    }
-
-    .price-value {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent-green);
-    }
-
-    /* ============ PREDICTION CARD ============ */
-    .prediction-box {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 217, 255, 0.1));
-      border: 1px solid rgba(139, 92, 246, 0.3);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .prediction-direction {
-      font-size: 48px;
-      font-weight: 800;
-      margin: 12px 0;
-    }
-
-    .prediction-direction.up { color: var(--accent-green); }
-    .prediction-direction.down { color: var(--accent-red); }
-
-    /* ============ CHART CONTAINERS ============ */
-    .chart-container {
-      position: relative;
-      height: 200px;
-    }
-
-    /* ============ STATUS INDICATORS ============ */
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 6px;
-    }
-
-    .status-dot.online { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
-    .status-dot.offline { background: var(--accent-red); }
-
-    /* ============ MOBILE NAV BUTTON ============ */
-    .mobile-nav-btn {
-      display: none;
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
-      border: none;
-      border-radius: 50%;
-      color: #000;
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 200;
-      box-shadow: 0 4px 20px var(--glow-green);
-      transition: transform 0.2s ease;
-    }
-
-    .mobile-nav-btn:hover {
-      transform: scale(1.1);
-    }
-
-    /* ============ OVERLAY ============ */
-    .overlay {
-      display: none;
+    /* Animated Background */
+    body::before {
+      content: '';
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 90;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(255, 0, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(0, 255, 136, 0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      animation: bgPulse 8s ease-in-out infinite;
     }
 
-    .overlay.active { display: block; }
+    @keyframes bgPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
 
-    /* ============ LOADING ============ */
-    .loading {
+    /* Grid Lines Background */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ============ SCROLLBAR CYBERPUNK ============ */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-deep); }
+    ::-webkit-scrollbar-thumb { 
+      background: linear-gradient(180deg, var(--neon-cyan), var(--neon-magenta));
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover { 
+      box-shadow: var(--glow-cyan);
+    }
+
+    /* ============ SIDEBAR ============ */
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-panel) 100%);
+      border-right: 1px solid var(--border-glow);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--neon-cyan), var(--neon-magenta), var(--neon-purple));
+      animation: borderGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes borderGlow {
+      0%, 100% { opacity: 1; filter: brightness(1); }
+      50% { opacity: 0.6; filter: brightness(1.5); }
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      margin-bottom: 32px;
+      background: rgba(0, 240, 255, 0.05);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent, var(--neon-cyan), transparent 30%);
+      animation: logoRotate 4s linear infinite;
+      opacity: 0.3;
+    }
+
+    @keyframes logoRotate {
+      to { transform: rotate(360deg); }
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-cyber);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px;
-      color: var(--text-muted);
+      position: relative;
+      z-index: 1;
+      animation: iconPulse 2s ease-in-out infinite;
     }
 
-    .spinner {
+    @keyframes iconPulse {
+      0%, 100% { box-shadow: var(--glow-cyan); }
+      50% { box-shadow: var(--glow-magenta); }
+    }
+
+    .logo-icon svg {
       width: 24px;
       height: 24px;
-      border: 3px solid var(--border-color);
-      border-top-color: var(--accent-green);
+      fill: none;
+      stroke: #000;
+      stroke-width: 2;
+    }
+
+    .logo-text {
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      background: var(--gradient-neon);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: textShine 3s linear infinite;
+    }
+
+    @keyframes textShine {
+      to { background-position: 200% center; }
+    }
+
+    .logo-subtitle {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Navigation */
+    .nav-section {
+      margin-bottom: 24px;
+    }
+
+    .nav-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--neon-cyan);
+      padding: 0 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--neon-cyan), transparent);
+    }
+
+    .nav-btn {
+      width: 100%;
+      padding: 12px 16px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+      margin-bottom: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-btn::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--gradient-cyber);
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(0, 240, 255, 0.08);
+      border-color: rgba(0, 240, 255, 0.3);
+      color: var(--neon-cyan);
+      transform: translateX(4px);
+    }
+
+    .nav-btn:hover::before {
+      transform: scaleY(1);
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(90deg, rgba(0, 240, 255, 0.15), rgba(255, 0, 255, 0.1));
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+      box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.1);
+    }
+
+    .nav-btn.active::before {
+      transform: scaleY(1);
+    }
+
+    .nav-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.5;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover svg,
+    .nav-btn.active svg {
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+
+    /* Sidebar Footer */
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px;
+      background: rgba(0, 240, 255, 0.03);
+      border: 1px solid rgba(0, 240, 255, 0.1);
+      border-radius: 8px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-right: 10px;
+      background: var(--neon-green);
+      box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+      animation: statusPulse 1.5s ease-in-out infinite;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ============ RESPONSIVE ============ */
-    @media (max-width: 1024px) {
-      .grid-4 { grid-template-columns: repeat(2, 1fr); }
-      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.2); }
     }
 
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-        width: 260px;
-      }
-
-      .sidebar.open { transform: translateX(0); }
-
-      .main {
-        margin-left: 0;
-        padding: 16px;
-      }
-
-      .mobile-nav-btn { display: flex; align-items: center; justify-content: center; }
-      
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-      
-      .page-title { font-size: 20px; }
-      
-      .price-grid { grid-template-columns: repeat(2, 1fr); }
+    .status-text {
+      font-size: 11px;
+      color: var(--neon-green);
+      font-weight: 600;
     }
 
-    @media (max-width: 480px) {
-      .main { padding: 12px; }
-      .card { padding: 16px; }
-      .stat-value { font-size: 24px; }
+    .version-text {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: 'Orbitron', sans-serif;
     }
 
-    /* ============ SIGNAL COLORS ============ */
-    .signal-buy { color: var(--accent-green); }
-    .signal-sell { color: var(--accent-red); }
-    .signal-hold { color: var(--accent-orange); }
+    /* ============ MAIN CONTENT ============ */
+    .main {
+      flex: 1;
+      margin-left: 260px;
+      padding: 28px;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+      transition: margin-left 0.4s ease;
+    }
 
-    /* ============ SCROLLBAR ============ */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-primary); }
-    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-  </style>
+    .page { display: none; }
+    .page.active { display: block; animation: pageIn 0.5s ease; }
+
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      background: var(--gradient-neon);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: textShine 3s linear infinite;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+</style>
 </head>
 <body>
-  <!-- Overlay for mobile -->
   <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="logo">
-      <div class="logo-icon">LE</div>
-      <span class="logo-text">Leon Engine</span>
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="logo-text">
+        <div class="logo-title">LEON ENGINE</div>
+        <div class="logo-subtitle">Liquidity Protocol</div>
+      </div>
     </div>
 
     <nav class="nav-section">
       <div class="nav-label">Live Trading</div>
       <button class="nav-btn active" onclick="showPage('dashboard')">
-        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Dashboard
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Dashboard</span>
       </button>
       <button class="nav-btn" onclick="showPage('live-signals')">
         <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-        Live Signals
+        <span>Live Signals</span>
       </button>
       <button class="nav-btn" onclick="showPage('ai-prediction')">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        AI Prediction
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/><path d="M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+        <span>AI Prediction</span>
       </button>
     </nav>
 
     <nav class="nav-section">
-      <div class="nav-label">Backtest & Research</div>
+      <div class="nav-label">Research Lab</div>
       <button class="nav-btn" onclick="showPage('backtest')">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Backtest (CSV)
+        <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        <span>Backtest Engine</span>
       </button>
       <button class="nav-btn" onclick="showPage('data-manager')">
-        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-        Data Manager
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <span>Data Manager</span>
       </button>
     </nav>
 
     <div class="sidebar-footer">
-      <div style="display: flex; align-items: center; margin-bottom: 8px;">
-        <span class="status-dot online"></span>
-        <span>Server Online</span>
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        <span class="status-text">SYSTEM ONLINE</span>
       </div>
-      <div>Leon Liquidity Engine v2.1</div>
+      <div class="version-text">v2.1 CYBERPUNK</div>
     </div>
   </aside>
 
@@ -535,65 +447,93 @@
     <!-- ============ DASHBOARD PAGE ============ -->
     <section class="page active" id="page-dashboard">
       <div class="page-header">
-        <h1 class="page-title">Dashboard</h1>
-        <p class="page-subtitle">Real-time market overview dan trading signals</p>
+        <h1 class="page-title">COMMAND CENTER</h1>
+        <p class="page-subtitle">Real-time market intelligence dan trading signals</p>
       </div>
 
       <!-- Stats Row -->
-      <div class="grid-4" style="margin-bottom: 20px;">
-        <div class="stat-card">
-          <div class="stat-value" id="stat-total-signals">0</div>
-          <div class="stat-label">Total Signals</div>
+      <div class="stats-grid">
+        <div class="stat-card cyber">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="stat-total-signals">0</div>
+            <div class="stat-label">TOTAL SIGNALS</div>
+          </div>
+          <div class="stat-glow cyan"></div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" style="color: var(--accent-green);" id="stat-win-rate">0%</div>
-          <div class="stat-label">Win Rate</div>
+        <div class="stat-card cyber">
+          <div class="stat-icon green">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value green" id="stat-win-rate">0%</div>
+            <div class="stat-label">WIN RATE</div>
+          </div>
+          <div class="stat-glow green"></div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" style="color: var(--accent-cyan);" id="stat-avg-pnl">0%</div>
-          <div class="stat-label">Avg P&L</div>
+        <div class="stat-card cyber">
+          <div class="stat-icon magenta">
+            <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value magenta" id="stat-avg-pnl">+0%</div>
+            <div class="stat-label">AVG P&L</div>
+          </div>
+          <div class="stat-glow magenta"></div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" style="color: var(--accent-purple);" id="stat-active-pairs">10</div>
-          <div class="stat-label">Active Pairs</div>
+        <div class="stat-card cyber">
+          <div class="stat-icon purple">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value purple" id="stat-active-pairs">10</div>
+            <div class="stat-label">ACTIVE PAIRS</div>
+          </div>
+          <div class="stat-glow purple"></div>
         </div>
       </div>
 
       <!-- Real-time Prices -->
-      <div class="card">
+      <div class="card cyber-card">
         <div class="card-header">
           <div class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            Real-Time Prices
-            <span class="badge">LIVE</span>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span>REAL-TIME PRICES</span>
+            <span class="badge live">LIVE</span>
           </div>
-          <button class="btn btn-secondary" onclick="loadRealtimePrices()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Refresh
+          <button class="btn-cyber" onclick="loadRealtimePrices()">
+            <svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>REFRESH</span>
           </button>
         </div>
         <div class="price-grid" id="realtime-prices">
-          <div class="loading"><div class="spinner"></div>Memuat harga...</div>
+          <div class="loading-cyber"><div class="cyber-spinner"></div><span>LOADING MARKET DATA...</span></div>
         </div>
       </div>
 
       <!-- Charts Row -->
       <div class="grid-2">
-        <div class="card">
+        <div class="card cyber-card">
           <div class="card-header">
-            <div class="card-title">Distribusi Hasil <span class="badge">PIE CHART</span></div>
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+              <span>DISTRIBUSI HASIL</span>
+              <span class="badge">ANALYTICS</span>
+            </div>
           </div>
-          <div class="chart-container">
-            <canvas id="chartPie"></canvas>
-          </div>
+          <div class="chart-container"><canvas id="chartPie"></canvas></div>
         </div>
-        <div class="card">
+        <div class="card cyber-card">
           <div class="card-header">
-            <div class="card-title">Equity Curve <span class="badge cyan">GROWTH</span></div>
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              <span>EQUITY CURVE</span>
+              <span class="badge green">GROWTH</span>
+            </div>
           </div>
-          <div class="chart-container">
-            <canvas id="chartEquity"></canvas>
-          </div>
+          <div class="chart-container"><canvas id="chartEquity"></canvas></div>
         </div>
       </div>
     </section>
@@ -601,18 +541,21 @@
     <!-- ============ LIVE SIGNALS PAGE ============ -->
     <section class="page" id="page-live-signals">
       <div class="page-header">
-        <h1 class="page-title">Live Signals</h1>
-        <p class="page-subtitle">Trading signals real-time dari analisis AI</p>
+        <h1 class="page-title">LIVE SIGNALS</h1>
+        <p class="page-subtitle">Real-time trading signals dari analisis teknikal Binance API</p>
       </div>
 
-      <div class="card">
+      <div class="card cyber-card">
         <div class="card-header">
-          <div class="card-title">Generate Signal</div>
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>SIGNAL GENERATOR</span>
+          </div>
         </div>
-        <div class="grid-3" style="margin-bottom: 16px;">
+        <div class="form-grid-3">
           <div class="form-group">
-            <label class="form-label">Symbol</label>
-            <select class="form-select" id="live-symbol">
+            <label class="form-label">SYMBOL</label>
+            <select class="form-select cyber-select" id="live-symbol">
               <option value="BTCUSDT">BTC/USDT</option>
               <option value="ETHUSDT">ETH/USDT</option>
               <option value="BNBUSDT">BNB/USDT</option>
@@ -621,29 +564,41 @@
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Mode Trading</label>
-            <select class="form-select" id="live-mode">
-              <option value="aktif">Aktif (1-4H)</option>
-              <option value="santai" selected>Santai (4-12H)</option>
-              <option value="pasif">Pasif (12-24H)</option>
+            <label class="form-label">MODE TRADING</label>
+            <select class="form-select cyber-select" id="live-mode">
+              <option value="aktif">AKTIF (1-4H)</option>
+              <option value="santai" selected>SANTAI (4-12H)</option>
+              <option value="pasif">PASIF (12-24H)</option>
             </select>
           </div>
           <div class="form-group">
             <label class="form-label">&nbsp;</label>
-            <button class="btn btn-primary" style="width: 100%;" onclick="generateLiveSignal()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              Generate Signal
+            <button class="btn-cyber primary full" onclick="generateLiveSignal()">
+              <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              <span>GENERATE SIGNAL</span>
             </button>
+          </div>
+        </div>
+        <div class="info-box">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>Live Signals</strong> menganalisis data real-time dari Binance API menggunakan indikator teknikal (RSI, EMA, ATR) untuk menghasilkan sinyal BELI/JUAL dengan Entry, Stop Loss, dan Take Profit.
           </div>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card cyber-card">
         <div class="card-header">
-          <div class="card-title">Latest Signals</div>
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>SIGNAL OUTPUT</span>
+          </div>
         </div>
-        <div class="table-container" id="live-signals-table">
-          <div class="loading"><div class="spinner"></div>Belum ada signal. Klik Generate untuk memulai.</div>
+        <div id="live-signals-table">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <p>Klik GENERATE SIGNAL untuk memulai analisis</p>
+          </div>
         </div>
       </div>
     </section>
@@ -651,17 +606,21 @@
     <!-- ============ AI PREDICTION PAGE ============ -->
     <section class="page" id="page-ai-prediction">
       <div class="page-header">
-        <h1 class="page-title">AI Prediction</h1>
-        <p class="page-subtitle">Prediksi arah harga menggunakan LSTM Deep Learning</p>
+        <h1 class="page-title">AI PREDICTION</h1>
+        <p class="page-subtitle">Deep Learning LSTM untuk prediksi arah harga cryptocurrency</p>
       </div>
 
       <div class="grid-2">
-        <div class="card">
+        <div class="card cyber-card">
           <div class="card-header">
-            <div class="card-title">Select Symbol</div>
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+              <span>SELECT TARGET</span>
+            </div>
           </div>
           <div class="form-group">
-            <select class="form-select" id="ai-symbol" style="font-size: 16px; padding: 14px;">
+            <label class="form-label">CRYPTOCURRENCY</label>
+            <select class="form-select cyber-select large" id="ai-symbol">
               <option value="BTCUSDT">BTC/USDT - Bitcoin</option>
               <option value="ETHUSDT">ETH/USDT - Ethereum</option>
               <option value="BNBUSDT">BNB/USDT - Binance Coin</option>
@@ -672,106 +631,150 @@
               <option value="AVAXUSDT">AVAX/USDT - Avalanche</option>
             </select>
           </div>
-          <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="getAIPrediction()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
-            Get AI Prediction
+          <button class="btn-cyber primary full" onclick="getAIPrediction()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+            <span>ANALYZE WITH AI</span>
           </button>
+          <div class="info-box" style="margin-top: 16px;">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <div>
+              <strong>AI Prediction</strong> menggunakan model LSTM (Long Short-Term Memory) untuk memprediksi arah harga (NAIK/TURUN) berdasarkan pola historis dan indikator teknikal.
+            </div>
+          </div>
         </div>
 
-        <div class="card">
+        <div class="card cyber-card">
           <div class="card-header">
-            <div class="card-title">Prediction Result <span class="badge purple">LSTM</span></div>
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              <span>PREDICTION RESULT</span>
+              <span class="badge purple">LSTM</span>
+            </div>
           </div>
           <div id="ai-prediction-result">
-            <div class="loading">Pilih symbol dan klik "Get AI Prediction"</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Tentang AI Prediction</div>
-        </div>
-        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.7;">
-          <p><strong>LSTM (Long Short-Term Memory)</strong> adalah jenis neural network yang sangat baik untuk menganalisis data time-series seperti harga cryptocurrency.</p>
-          <br>
-          <p>Model ini menganalisis:</p>
-          <ul style="margin-left: 20px; margin-top: 8px;">
-            <li>Pola harga historis (OHLCV)</li>
-            <li>Indikator teknikal (RSI, EMA, ATR)</li>
-            <li>Volume dan momentum</li>
-          </ul>
-          <br>
-          <p style="color: var(--accent-orange);">⚠️ Disclaimer: Prediksi AI bukan jaminan profit. Selalu gunakan risk management yang baik.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ BACKTEST PAGE ============ -->
-    <section class="page" id="page-backtest">
-      <div class="page-header">
-        <h1 class="page-title">Backtest (CSV)</h1>
-        <p class="page-subtitle">Test strategi trading dengan data historis</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Generate Backtest Signal</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Pilih Folder Data</label>
-            <select class="form-select" id="backtest-folder">
-              <option value="">-- Pilih Folder --</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Mode Trading</label>
-            <select class="form-select" id="backtest-mode">
-              <option value="aktif">Aktif - RSI 6, EMA 9/20/50</option>
-              <option value="santai" selected>Santai - RSI 8, EMA 20/50/200</option>
-              <option value="pasif">Pasif - RSI 14, EMA 50/100/200</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" style="width: 100%;" onclick="runBacktest()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Run Backtest
-          </button>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Backtest Statistics</div>
-          </div>
-          <div id="backtest-stats">
-            <div class="grid-2" style="gap: 12px;">
-              <div class="stat-card">
-                <div class="stat-value" id="bt-total">0</div>
-                <div class="stat-label">Total Signals</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value" style="color: var(--accent-green);" id="bt-winrate">0%</div>
-                <div class="stat-label">Win Rate</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value" style="color: var(--accent-green);" id="bt-tp">0</div>
-                <div class="stat-label">HIT TP</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-value" style="color: var(--accent-red);" id="bt-sl">0</div>
-                <div class="stat-label">HIT SL</div>
-              </div>
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+              <p>Pilih cryptocurrency dan klik ANALYZE WITH AI</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card cyber-card">
         <div class="card-header">
-          <div class="card-title">Backtest Results</div>
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <span>PERBEDAAN AI PREDICTION vs LIVE SIGNALS</span>
+          </div>
         </div>
-        <div class="table-container" id="backtest-results">
-          <div class="loading">Pilih folder dan klik "Run Backtest" untuk memulai</div>
+        <div class="comparison-grid">
+          <div class="comparison-card ai">
+            <div class="comparison-header">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+              <span>AI PREDICTION</span>
+            </div>
+            <ul class="comparison-list">
+              <li>Menggunakan Deep Learning (LSTM Neural Network)</li>
+              <li>Memprediksi ARAH harga: NAIK atau TURUN</li>
+              <li>Output: Direction + Confidence Score</li>
+              <li>Cocok untuk analisis jangka menengah-panjang</li>
+              <li>Belajar dari pola historis kompleks</li>
+            </ul>
+          </div>
+          <div class="comparison-card live">
+            <div class="comparison-header">
+              <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              <span>LIVE SIGNALS</span>
+            </div>
+            <ul class="comparison-list">
+              <li>Menggunakan Indikator Teknikal (RSI, EMA, ATR)</li>
+              <li>Menghasilkan SINYAL trading: BELI atau JUAL</li>
+              <li>Output: Entry, Stop Loss, Take Profit, Confidence</li>
+              <li>Cocok untuk trading aktif dengan target jelas</li>
+              <li>Berbasis rules dan confluence indicators</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+""
+
+
+    <!-- ============ BACKTEST PAGE ============ -->
+    <section class="page" id="page-backtest">
+      <div class="page-header">
+        <h1 class="page-title">BACKTEST ENGINE</h1>
+        <p class="page-subtitle">Test strategi trading dengan data historis CSV</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card cyber-card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>RUN BACKTEST</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">DATA FOLDER</label>
+            <select class="form-select cyber-select" id="backtest-folder">
+              <option value="">-- SELECT FOLDER --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">TRADING MODE</label>
+            <select class="form-select cyber-select" id="backtest-mode">
+              <option value="aktif">AKTIF - RSI 6, EMA 9/20/50</option>
+              <option value="santai" selected>SANTAI - RSI 8, EMA 20/50/200</option>
+              <option value="pasif">PASIF - RSI 14, EMA 50/100/200</option>
+            </select>
+          </div>
+          <button class="btn-cyber primary full" onclick="runBacktest()">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>EXECUTE BACKTEST</span>
+          </button>
+        </div>
+
+        <div class="card cyber-card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+              <span>PERFORMANCE METRICS</span>
+            </div>
+          </div>
+          <div class="stats-mini-grid">
+            <div class="stat-mini">
+              <div class="stat-mini-value" id="bt-total">0</div>
+              <div class="stat-mini-label">SIGNALS</div>
+            </div>
+            <div class="stat-mini green">
+              <div class="stat-mini-value" id="bt-winrate">0%</div>
+              <div class="stat-mini-label">WIN RATE</div>
+            </div>
+            <div class="stat-mini cyan">
+              <div class="stat-mini-value" id="bt-tp">0</div>
+              <div class="stat-mini-label">HIT TP</div>
+            </div>
+            <div class="stat-mini red">
+              <div class="stat-mini-value" id="bt-sl">0</div>
+              <div class="stat-mini-label">HIT SL</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>BACKTEST RESULTS</span>
+          </div>
+        </div>
+        <div id="backtest-results">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+            <p>Select folder dan klik EXECUTE BACKTEST</p>
+          </div>
         </div>
       </div>
     </section>
@@ -779,74 +782,894 @@
     <!-- ============ DATA MANAGER PAGE ============ -->
     <section class="page" id="page-data-manager">
       <div class="page-header">
-        <h1 class="page-title">Data Manager</h1>
+        <h1 class="page-title">DATA MANAGER</h1>
         <p class="page-subtitle">Upload dan kelola data CSV untuk backtest</p>
       </div>
 
       <div class="grid-2">
-        <div class="card">
+        <div class="card cyber-card">
           <div class="card-header">
-            <div class="card-title">Upload CSV</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Pilih Folder Tujuan</label>
-            <div style="display: flex; gap: 8px;">
-              <select class="form-select" id="upload-folder" style="flex: 1;">
-                <option value="">-- Pilih Folder --</option>
-              </select>
-              <button class="btn btn-secondary" onclick="createFolder()">+ Folder</button>
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>UPLOAD CSV</span>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">File CSV</label>
-            <input type="file" class="form-input" id="upload-file" accept=".csv" />
-          </div>
-          <button class="btn btn-primary" style="width: 100%;" onclick="uploadCSV()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Upload
-          </button>
-          <div id="upload-status" style="margin-top: 12px; font-size: 12px;"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Pra-Proses Data</div>
+            <label class="form-label">TARGET FOLDER</label>
+            <div class="input-group">
+              <select class="form-select cyber-select" id="upload-folder">
+                <option value="">-- SELECT FOLDER --</option>
+              </select>
+              <button class="btn-cyber" onclick="createFolder()">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+            </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Pilih Folder untuk Diproses</label>
-            <select class="form-select" id="process-folder">
-              <option value="">-- Pilih Folder --</option>
+            <label class="form-label">CSV FILE</label>
+            <input type="file" class="form-input cyber-input" id="upload-file" accept=".csv" />
+          </div>
+          <button class="btn-cyber primary full" onclick="uploadCSV()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>UPLOAD FILE</span>
+          </button>
+        </div>
+
+        <div class="card cyber-card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>PROCESS DATA</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">SELECT FOLDER</label>
+            <select class="form-select cyber-select" id="process-folder">
+              <option value="">-- SELECT FOLDER --</option>
             </select>
           </div>
-          <button class="btn btn-primary" style="width: 100%;" onclick="processData()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            Proses Indikator
+          <button class="btn-cyber primary full" onclick="processData()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+            <span>PROCESS INDICATORS</span>
           </button>
-          <div id="process-status" style="margin-top: 12px; font-size: 12px;"></div>
+          <div class="info-box" style="margin-top: 16px;">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <div>Proses akan menambahkan indikator RSI, EMA, dan ATR ke data CSV.</div>
+          </div>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card cyber-card">
         <div class="card-header">
-          <div class="card-title">Daftar Folder</div>
-          <button class="btn btn-secondary" onclick="loadFolders()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/></svg>
-            Refresh
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>DATA FOLDERS</span>
+          </div>
+          <button class="btn-cyber" onclick="loadFolders()">
+            <svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>REFRESH</span>
           </button>
         </div>
         <div id="folder-list">
-          <div class="loading"><div class="spinner"></div>Memuat folder...</div>
+          <div class="loading-cyber"><div class="cyber-spinner"></div><span>SCANNING FOLDERS...</span></div>
         </div>
       </div>
     </section>
   </main>
 
   <!-- Mobile Nav Button -->
-  <button class="mobile-nav-btn" onclick="toggleSidebar()">☰</button>
-select>label></div>div>div></div>div>div></div>""
+  <button class="mobile-nav-btn" id="mobileNavBtn" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+
+
+  <style>
+    /* ============ CARDS & PANELS ============ */
+    .card { margin-bottom: 20px; }
+    
+    .cyber-card {
+      background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-panel) 100%);
+      border: 1px solid var(--border-glow);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .cyber-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--gradient-neon);
+      background-size: 200% auto;
+      animation: borderShine 3s linear infinite;
+    }
+
+    @keyframes borderShine {
+      to { background-position: 200% center; }
+    }
+
+    .cyber-card:hover {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.15), inset 0 0 30px rgba(0, 240, 255, 0.03);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+    }
+
+    .card-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 1px;
+    }
+
+    .card-title svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--neon-cyan);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .badge {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 8px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .badge.live {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--neon-green);
+      border-color: rgba(0, 255, 136, 0.3);
+      animation: badgePulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.5); }
+      50% { box-shadow: 0 0 15px rgba(0, 255, 136, 0.8); }
+    }
+
+    .badge.green { background: rgba(0, 255, 136, 0.15); color: var(--neon-green); border-color: rgba(0, 255, 136, 0.3); }
+    .badge.purple { background: rgba(191, 0, 255, 0.15); color: var(--neon-purple); border-color: rgba(191, 0, 255, 0.3); }
+
+    /* ============ STATS GRID ============ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-panel) 100%);
+      border: 1px solid var(--border-glow);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--neon-cyan);
+    }
+
+    .stat-card .stat-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .stat-card .stat-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--neon-cyan);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .stat-card .stat-icon.green { background: rgba(0, 255, 136, 0.1); border-color: rgba(0, 255, 136, 0.3); }
+    .stat-card .stat-icon.green svg { stroke: var(--neon-green); }
+    .stat-card .stat-icon.magenta { background: rgba(255, 0, 255, 0.1); border-color: rgba(255, 0, 255, 0.3); }
+    .stat-card .stat-icon.magenta svg { stroke: var(--neon-magenta); }
+    .stat-card .stat-icon.purple { background: rgba(191, 0, 255, 0.1); border-color: rgba(191, 0, 255, 0.3); }
+    .stat-card .stat-icon.purple svg { stroke: var(--neon-purple); }
+
+    .stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      margin-bottom: 4px;
+    }
+
+    .stat-value.green { color: var(--neon-green); }
+    .stat-value.magenta { color: var(--neon-magenta); }
+    .stat-value.purple { color: var(--neon-purple); }
+
+    .stat-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    .stat-glow {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 20px var(--neon-cyan);
+    }
+
+    .stat-glow.green { background: var(--neon-green); box-shadow: 0 0 20px var(--neon-green); }
+    .stat-glow.magenta { background: var(--neon-magenta); box-shadow: 0 0 20px var(--neon-magenta); }
+    .stat-glow.purple { background: var(--neon-purple); box-shadow: 0 0 20px var(--neon-purple); }
+
+    /* ============ PRICE GRID ============ */
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .price-card {
+      background: rgba(0, 240, 255, 0.03);
+      border: 1px solid rgba(0, 240, 255, 0.15);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .price-card:hover {
+      background: rgba(0, 240, 255, 0.08);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .price-symbol {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--neon-cyan);
+    }
+
+    .price-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--neon-green);
+    }
+
+    /* ============ GRIDS ============ */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+
+    /* ============ BUTTONS ============ */
+    .btn-cyber {
+      padding: 10px 20px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      border-radius: 8px;
+      color: var(--neon-cyan);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-cyber::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-cyber:hover::before {
+      left: 100%;
+    }
+
+    .btn-cyber:hover {
+      background: rgba(0, 240, 255, 0.2);
+      border-color: var(--neon-cyan);
+      box-shadow: var(--glow-cyan);
+      transform: translateY(-2px);
+    }
+
+    .btn-cyber svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .btn-cyber.primary {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 255, 0.2));
+      border-color: var(--neon-cyan);
+    }
+
+    .btn-cyber.primary:hover {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.3), rgba(255, 0, 255, 0.3));
+      box-shadow: var(--glow-cyan), var(--glow-magenta);
+    }
+
+    .btn-cyber.full { width: 100%; justify-content: center; }
+
+    /* ============ FORM ELEMENTS ============ */
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      color: var(--neon-cyan);
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .cyber-select, .cyber-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-deep);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .cyber-select:focus, .cyber-input:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(0, 240, 255, 0.05);
+    }
+
+    .cyber-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300f0ff' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+    }
+
+    .cyber-select.large { padding: 16px; font-size: 16px; }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-group .cyber-select { flex: 1; }
+
+    /* ============ INFO BOX ============ */
+    .info-box {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(0, 240, 255, 0.05);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .info-box svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--neon-cyan);
+      fill: none;
+      stroke-width: 1.5;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .info-box strong { color: var(--neon-cyan); }
+
+    /* ============ COMPARISON GRID ============ */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .comparison-card {
+      background: rgba(0, 240, 255, 0.03);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .comparison-card.ai { border-color: rgba(191, 0, 255, 0.3); background: rgba(191, 0, 255, 0.03); }
+    .comparison-card.live { border-color: rgba(0, 255, 136, 0.3); background: rgba(0, 255, 136, 0.03); }
+
+    .comparison-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .comparison-card.ai .comparison-header { color: var(--neon-purple); }
+    .comparison-card.ai .comparison-header svg { stroke: var(--neon-purple); }
+    .comparison-card.live .comparison-header { color: var(--neon-green); }
+    .comparison-card.live .comparison-header svg { stroke: var(--neon-green); }
+
+    .comparison-header svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .comparison-list {
+      list-style: none;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .comparison-list li {
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .comparison-list li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--neon-cyan);
+    }
+
+    .comparison-card.ai .comparison-list li::before { color: var(--neon-purple); }
+    .comparison-card.live .comparison-list li::before { color: var(--neon-green); }
+
+    /* ============ STATS MINI GRID ============ */
+    .stats-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-mini {
+      background: rgba(0, 240, 255, 0.05);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-mini.green { border-color: rgba(0, 255, 136, 0.3); }
+    .stat-mini.cyan { border-color: rgba(0, 240, 255, 0.3); }
+    .stat-mini.red { border-color: rgba(255, 0, 68, 0.3); }
+
+    .stat-mini-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--neon-cyan);
+    }
+
+    .stat-mini.green .stat-mini-value { color: var(--neon-green); }
+    .stat-mini.red .stat-mini-value { color: var(--neon-red); }
+
+    .stat-mini-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 8px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* ============ CHART CONTAINER ============ */
+    .chart-container {
+      position: relative;
+      height: 220px;
+    }
+
+    /* ============ LOADING & EMPTY STATES ============ */
+    .loading-cyber {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      gap: 16px;
+    }
+
+    .cyber-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(0, 240, 255, 0.2);
+      border-top-color: var(--neon-cyan);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-cyber span {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      color: var(--neon-cyan);
+      letter-spacing: 2px;
+      animation: textBlink 1s ease-in-out infinite;
+    }
+
+    @keyframes textBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 50px;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      stroke: var(--text-muted);
+      fill: none;
+      stroke-width: 1;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ============ TABLES ============ */
+    .cyber-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .cyber-table th {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      color: var(--neon-cyan);
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+      letter-spacing: 1px;
+    }
+
+    .cyber-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+
+    .cyber-table tr:hover td {
+      background: rgba(0, 240, 255, 0.03);
+    }
+
+    .signal-buy { color: var(--neon-green); font-weight: 700; }
+    .signal-sell { color: var(--neon-red); font-weight: 700; }
+
+    /* ============ PREDICTION BOX ============ */
+    .prediction-box {
+      background: linear-gradient(135deg, rgba(191, 0, 255, 0.1), rgba(0, 240, 255, 0.1));
+      border: 1px solid rgba(191, 0, 255, 0.3);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .prediction-symbol {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .prediction-direction {
+      font-size: 64px;
+      font-weight: 800;
+      margin: 16px 0;
+      text-shadow: 0 0 30px currentColor;
+    }
+
+    .prediction-direction.up { color: var(--neon-green); }
+    .prediction-direction.down { color: var(--neon-red); }
+
+    .prediction-text {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .prediction-confidence {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .prediction-confidence strong {
+      color: var(--neon-cyan);
+    }
+
+    .prediction-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .prediction-detail {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .prediction-detail-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .prediction-detail-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .prediction-indicators {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .indicator-tag {
+      font-size: 10px;
+      padding: 4px 10px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 4px;
+      color: var(--neon-cyan);
+    }
+
+    /* ============ FOLDER GRID ============ */
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .folder-card {
+      background: rgba(0, 240, 255, 0.03);
+      border: 1px solid rgba(0, 240, 255, 0.15);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .folder-card:hover {
+      background: rgba(0, 240, 255, 0.08);
+      border-color: var(--neon-cyan);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);
+    }
+
+    .folder-card svg {
+      width: 32px;
+      height: 32px;
+      stroke: var(--neon-cyan);
+      fill: none;
+      stroke-width: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .folder-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ============ MOBILE NAV BUTTON ============ */
+    .mobile-nav-btn {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 200;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.5), 0 0 60px rgba(255, 0, 255, 0.3);
+      transition: all 0.3s ease;
+      animation: floatBtn 3s ease-in-out infinite;
+    }
+
+    @keyframes floatBtn {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .mobile-nav-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 40px rgba(0, 240, 255, 0.7), 0 0 80px rgba(255, 0, 255, 0.5);
+    }
+
+    .mobile-nav-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke: #000;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 90;
+    }
+
+    .overlay.active { display: block; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 1024px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .form-grid-3 { grid-template-columns: 1fr; }
+      .comparison-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+      }
+
+      .sidebar.open { transform: translateX(0); }
+
+      .main {
+        margin-left: 0;
+        padding: 20px 16px;
+      }
+
+      .mobile-nav-btn { display: flex; align-items: center; justify-content: center; }
+      
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .stat-value { font-size: 22px; }
+      
+      .page-title { font-size: 22px; }
+      
+      .price-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .main { padding: 16px 12px; }
+      .cyber-card { padding: 16px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .price-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 
 
   <script>
+    // ============ SWEETALERT2 CONFIG ============
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      background: '#0a0a12',
+      color: '#fff',
+      iconColor: '#00f0ff',
+      customClass: {
+        popup: 'cyber-toast'
+      }
+    });
+
+    function showSuccess(message) {
+      Toast.fire({ icon: 'success', title: message, iconColor: '#00ff88' });
+    }
+
+    function showError(message) {
+      Toast.fire({ icon: 'error', title: message, iconColor: '#ff0044' });
+    }
+
+    function showInfo(message) {
+      Toast.fire({ icon: 'info', title: message });
+    }
+
+    function showLoading(title = 'PROCESSING...') {
+      Swal.fire({
+        title: title,
+        html: '<div class="cyber-spinner" style="margin: 20px auto;"></div>',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        background: '#0a0a12',
+        color: '#00f0ff',
+        customClass: { popup: 'cyber-modal' }
+      });
+    }
+
+    function hideLoading() {
+      Swal.close();
+    }
+
     // ============ NAVIGATION ============
     function showPage(pageId) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -857,7 +1680,6 @@ select>label></div>div>div></div>div>div></div>""
       
       event.target.closest('.nav-btn')?.classList.add('active');
       
-      // Close sidebar on mobile
       if (window.innerWidth <= 768) {
         document.getElementById('sidebar').classList.remove('open');
         document.getElementById('overlay').classList.remove('active');
@@ -872,7 +1694,7 @@ select>label></div>div>div></div>div>div></div>""
     // ============ REAL-TIME PRICES ============
     async function loadRealtimePrices() {
       const container = document.getElementById('realtime-prices');
-      container.innerHTML = '<div class="loading"><div class="spinner"></div>Memuat harga...</div>';
+      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>FETCHING MARKET DATA...</span></div>';
       
       try {
         const res = await fetch('/binance/prices');
@@ -887,9 +1709,11 @@ select>label></div>div>div></div>div>div></div>""
             html += `<div class="price-card"><span class="price-symbol">${symbol}</span><span class="price-value">$${formatted}</span></div>`;
           });
           container.innerHTML = html;
+          showSuccess('Market data updated');
         }
       } catch (err) {
-        container.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Error: ${err.message}</div>`;
+        container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Failed to load prices</p></div>`;
+        showError('Failed to fetch market data');
       }
     }
 
@@ -897,7 +1721,7 @@ select>label></div>div>div></div>div>div></div>""
     async function getAIPrediction() {
       const symbol = document.getElementById('ai-symbol').value;
       const container = document.getElementById('ai-prediction-result');
-      container.innerHTML = '<div class="loading"><div class="spinner"></div>Menganalisis...</div>';
+      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>ANALYZING WITH LSTM...</span></div>';
       
       try {
         const res = await fetch(`/lstm/predict/${symbol}`);
@@ -911,27 +1735,39 @@ select>label></div>div>div></div>div>div></div>""
           
           const dirClass = dir === 'UP' ? 'up' : 'down';
           const dirIcon = dir === 'UP' ? '↑' : dir === 'DOWN' ? '↓' : '→';
-          const dirText = dir === 'UP' ? 'NAIK' : dir === 'DOWN' ? 'TURUN' : 'NETRAL';
+          const dirText = dir === 'UP' ? 'BULLISH' : dir === 'DOWN' ? 'BEARISH' : 'NEUTRAL';
           const rekom = data.rekomendasi?.aksi || (dir === 'UP' ? 'BELI' : dir === 'DOWN' ? 'JUAL' : 'TUNGGU');
           
           container.innerHTML = `
             <div class="prediction-box">
-              <div style="font-size: 12px; color: var(--text-muted);">${symbol.replace('USDT', '/USDT')}</div>
+              <div class="prediction-symbol">${symbol.replace('USDT', '/USDT')}</div>
               <div class="prediction-direction ${dirClass}">${dirIcon}</div>
-              <div style="font-size: 18px; font-weight: 700; color: ${dir === 'UP' ? 'var(--accent-green)' : 'var(--accent-red)'};">${dirText}</div>
-              <div style="margin-top: 12px; font-size: 13px;">Confidence: <strong>${conf}%</strong></div>
-              <div style="margin-top: 8px; font-size: 13px;">Harga: <strong>$${price}</strong></div>
-              ${pred.rsi ? `<div style="margin-top: 8px; font-size: 11px; color: var(--text-secondary);">RSI: ${pred.rsi} | EMA20: ${pred.ema_20} | EMA50: ${pred.ema_50}</div>` : ''}
-              <div style="margin-top: 16px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
-                <div style="font-size: 11px; color: var(--text-muted);">Rekomendasi</div>
-                <div style="font-size: 18px; font-weight: 700; color: ${rekom === 'BELI' ? 'var(--accent-green)' : rekom === 'JUAL' ? 'var(--accent-red)' : 'var(--accent-orange)'};">${rekom}</div>
-                ${data.rekomendasi?.alasan ? `<div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${data.rekomendasi.alasan}</div>` : ''}
+              <div class="prediction-text" style="color: ${dir === 'UP' ? 'var(--neon-green)' : 'var(--neon-red)'};">${dirText}</div>
+              <div class="prediction-confidence">Confidence: <strong>${conf}%</strong></div>
+              <div class="prediction-details">
+                <div class="prediction-detail">
+                  <div class="prediction-detail-label">CURRENT PRICE</div>
+                  <div class="prediction-detail-value" style="color: var(--neon-green);">$${price}</div>
+                </div>
+                <div class="prediction-detail">
+                  <div class="prediction-detail-label">RECOMMENDATION</div>
+                  <div class="prediction-detail-value" style="color: ${rekom === 'BELI' ? 'var(--neon-green)' : rekom === 'JUAL' ? 'var(--neon-red)' : 'var(--neon-orange)'};">${rekom}</div>
+                </div>
               </div>
+              ${pred.rsi ? `
+              <div class="prediction-indicators">
+                <span class="indicator-tag">RSI: ${pred.rsi}</span>
+                <span class="indicator-tag">EMA20: ${pred.ema_20}</span>
+                <span class="indicator-tag">EMA50: ${pred.ema_50}</span>
+              </div>
+              ` : ''}
             </div>
           `;
+          showSuccess('AI Analysis complete');
         }
       } catch (err) {
-        container.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Error: ${err.message}</div>`;
+        container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Analysis failed</p></div>`;
+        showError('AI Analysis failed');
       }
     }
 
@@ -940,50 +1776,46 @@ select>label></div>div>div></div>div>div></div>""
       const symbol = document.getElementById('live-symbol').value;
       const mode = document.getElementById('live-mode').value;
       const container = document.getElementById('live-signals-table');
-      container.innerHTML = '<div class="loading"><div class="spinner"></div>Generating signal...</div>';
+      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>GENERATING SIGNALS...</span></div>';
       
       try {
-        // Get real-time data and analyze
         const res = await fetch(`/binance/analyze/${symbol}?mode_trading=${mode}`, { method: 'POST' });
         const data = await res.json();
         
         if (data.status === 'sukses') {
-          // Show current indicators
           let html = `
-            <div style="margin-bottom: 16px; padding: 12px; background: var(--bg-secondary); border-radius: 8px;">
-              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Indikator Terkini - ${symbol}</div>
-              <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px;">
-                <span>RSI: <strong style="color: var(--accent-cyan);">${data.indikator_terkini?.rsi_14 || '-'}</strong></span>
-                <span>EMA20: <strong>${data.indikator_terkini?.ema_20 || '-'}</strong></span>
-                <span>EMA50: <strong>${data.indikator_terkini?.ema_50 || '-'}</strong></span>
-                <span>Harga: <strong style="color: var(--accent-green);">$${data.harga_terkini?.toLocaleString() || '-'}</strong></span>
+            <div class="info-box" style="margin-bottom: 16px;">
+              <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+              <div>
+                <strong>${symbol}</strong> | RSI: ${data.indikator_terkini?.rsi_14 || '-'} | EMA20: ${data.indikator_terkini?.ema_20 || '-'} | Price: <strong style="color: var(--neon-green);">$${data.harga_terkini?.toLocaleString() || '-'}</strong>
               </div>
             </div>
           `;
           
           if (data.sinyal && data.sinyal.length > 0) {
-            html += '<table><thead><tr><th>Pair</th><th>Signal</th><th>Entry</th><th>SL</th><th>TP</th><th>Confidence</th><th>Alasan</th></tr></thead><tbody>';
+            html += '<table class="cyber-table"><thead><tr><th>PAIR</th><th>SIGNAL</th><th>ENTRY</th><th>SL</th><th>TP</th><th>CONF</th><th>REASON</th></tr></thead><tbody>';
             data.sinyal.forEach(s => {
               html += `<tr>
                 <td><strong>${s.pair || symbol}</strong></td>
-                <td class="${s.tipe === 'BELI' ? 'signal-buy' : 'signal-sell'}"><strong>${s.tipe}</strong></td>
+                <td class="${s.tipe === 'BELI' ? 'signal-buy' : 'signal-sell'}">${s.tipe}</td>
                 <td>$${s.entry?.toFixed(2) || '-'}</td>
                 <td>$${s.stop_loss?.toFixed(2) || '-'}</td>
                 <td>$${s.take_profit?.toFixed(2) || '-'}</td>
                 <td>${s.confidence ? (s.confidence * 100).toFixed(0) + '%' : '-'}</td>
-                <td style="font-size: 11px;">${s.alasan || '-'}</td>
+                <td style="font-size: 11px; color: var(--text-secondary);">${s.alasan || '-'}</td>
               </tr>`;
             });
             html += '</tbody></table>';
+            showSuccess(`${data.sinyal.length} signals generated`);
           } else {
-            html += '<div style="padding: 20px; color: var(--text-muted); text-align: center;">Tidak ada signal yang memenuhi kriteria saat ini. Coba mode trading lain atau tunggu kondisi market yang lebih baik.</div>';
+            html += '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><p>No signals match criteria. Try different mode or wait for better conditions.</p></div>';
+            showInfo('No signals found');
           }
           container.innerHTML = html;
-        } else {
-          container.innerHTML = '<div style="padding: 20px; color: var(--text-muted);">Tidak ada signal yang memenuhi kriteria saat ini.</div>';
         }
       } catch (err) {
-        container.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Error: ${err.message}</div>`;
+        container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Signal generation failed</p></div>`;
+        showError('Signal generation failed');
       }
     }
 
@@ -993,12 +1825,12 @@ select>label></div>div>div></div>div>div></div>""
       const mode = document.getElementById('backtest-mode').value;
       
       if (!folder) {
-        alert('Pilih folder terlebih dahulu!');
+        showError('Please select a folder first');
         return;
       }
       
       const container = document.getElementById('backtest-results');
-      container.innerHTML = '<div class="loading"><div class="spinner"></div>Running backtest...</div>';
+      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>EXECUTING BACKTEST...</span></div>';
       
       try {
         const res = await fetch('/sinyal/generate', {
@@ -1009,40 +1841,46 @@ select>label></div>div>div></div>div>div></div>""
         
         const data = await res.json();
         
-        // Update stats
         if (data.backtest_statistics) {
           const stats = data.backtest_statistics;
           document.getElementById('bt-total').textContent = stats.total_signals || 0;
           document.getElementById('bt-winrate').textContent = (stats.win_rate || 0) + '%';
           document.getElementById('bt-tp').textContent = stats.hit_tp || 0;
           document.getElementById('bt-sl').textContent = stats.hit_sl || 0;
+          
+          // Update dashboard stats
+          document.getElementById('stat-total-signals').textContent = stats.total_signals || 0;
+          document.getElementById('stat-win-rate').textContent = (stats.win_rate || 0) + '%';
+          document.getElementById('stat-avg-pnl').textContent = (stats.avg_pnl > 0 ? '+' : '') + (stats.avg_pnl || 0) + '%';
         }
         
-        // Show signals
         if (data.sinyal && data.sinyal.length > 0) {
-          let html = '<table><thead><tr><th>Pair</th><th>Tipe</th><th>Entry</th><th>SL</th><th>TP</th><th>Conf</th><th>Result</th><th>P&L</th></tr></thead><tbody>';
+          let html = '<div style="max-height: 400px; overflow-y: auto;"><table class="cyber-table"><thead><tr><th>PAIR</th><th>TYPE</th><th>ENTRY</th><th>SL</th><th>TP</th><th>CONF</th><th>RESULT</th><th>P&L</th></tr></thead><tbody>';
           data.sinyal.forEach(s => {
-            const resultColor = s.backtest_result === 'HIT_TP' ? 'var(--accent-green)' : s.backtest_result === 'HIT_SL' ? 'var(--accent-red)' : 'var(--text-muted)';
+            const resultColor = s.backtest_result === 'HIT_TP' ? 'var(--neon-green)' : s.backtest_result === 'HIT_SL' ? 'var(--neon-red)' : 'var(--text-muted)';
             const pnl = s.pnl_percent || 0;
-            const pnlColor = pnl > 0 ? 'var(--accent-green)' : pnl < 0 ? 'var(--accent-red)' : 'var(--text-muted)';
+            const pnlColor = pnl > 0 ? 'var(--neon-green)' : pnl < 0 ? 'var(--neon-red)' : 'var(--text-muted)';
             html += `<tr>
               <td>${s.pair || '-'}</td>
-              <td class="${s.tipe === 'BELI' ? 'signal-buy' : 'signal-sell'}"><strong>${s.tipe}</strong></td>
+              <td class="${s.tipe === 'BELI' ? 'signal-buy' : 'signal-sell'}">${s.tipe}</td>
               <td>${s.entry?.toFixed(4) || '-'}</td>
               <td>${s.stop_loss?.toFixed(4) || '-'}</td>
               <td>${s.take_profit?.toFixed(4) || '-'}</td>
               <td>${(s.confidence * 100).toFixed(0)}%</td>
-              <td style="color: ${resultColor};"><strong>${s.backtest_result || '-'}</strong></td>
-              <td style="color: ${pnlColor};">${pnl > 0 ? '+' : ''}${pnl.toFixed(2)}%</td>
+              <td style="color: ${resultColor}; font-weight: 700;">${s.backtest_result || '-'}</td>
+              <td style="color: ${pnlColor}; font-weight: 600;">${pnl > 0 ? '+' : ''}${pnl.toFixed(2)}%</td>
             </tr>`;
           });
-          html += '</tbody></table>';
+          html += '</tbody></table></div>';
           container.innerHTML = html;
+          showSuccess(`Backtest complete: ${data.sinyal.length} signals`);
         } else {
-          container.innerHTML = '<div style="padding: 20px; color: var(--text-muted);">Tidak ada signal yang ditemukan.</div>';
+          container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg><p>No signals found in backtest</p></div>';
+          showInfo('No signals found');
         }
       } catch (err) {
-        container.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Error: ${err.message}</div>`;
+        container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Backtest failed</p></div>`;
+        showError('Backtest execution failed');
       }
     }
 
@@ -1054,80 +1892,87 @@ select>label></div>div>div></div>div>div></div>""
         
         const folders = data.folder || [];
         
-        // Update all folder selects
-        const selects = ['upload-folder', 'process-folder', 'backtest-folder'];
-        selects.forEach(id => {
+        ['upload-folder', 'process-folder', 'backtest-folder'].forEach(id => {
           const select = document.getElementById(id);
           if (select) {
-            select.innerHTML = '<option value="">-- Pilih Folder --</option>';
+            select.innerHTML = '<option value="">-- SELECT FOLDER --</option>';
             folders.forEach(f => {
               select.innerHTML += `<option value="${f}">${f}</option>`;
             });
           }
         });
         
-        // Update folder list
         const listContainer = document.getElementById('folder-list');
         if (folders.length > 0) {
-          let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">';
+          let html = '<div class="folder-grid">';
           folders.forEach(f => {
-            html += `<div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
-              <div style="font-size: 24px; margin-bottom: 4px;">📁</div>
-              <div style="font-size: 13px; font-weight: 600;">${f}</div>
+            html += `<div class="folder-card">
+              <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              <div class="folder-name">${f}</div>
             </div>`;
           });
           html += '</div>';
           listContainer.innerHTML = html;
         } else {
-          listContainer.innerHTML = '<div style="padding: 20px; color: var(--text-muted); text-align: center;">Belum ada folder. Buat folder baru untuk memulai.</div>';
+          listContainer.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><p>No folders found. Create one to start.</p></div>';
         }
       } catch (err) {
-        console.error('Error loading folders:', err);
+        showError('Failed to load folders');
       }
     }
 
     async function createFolder() {
-      const name = prompt('Nama folder baru (contoh: BTC, ETH):');
-      if (!name) return;
+      const { value: name } = await Swal.fire({
+        title: 'CREATE NEW FOLDER',
+        input: 'text',
+        inputPlaceholder: 'Folder name (e.g., BTC, ETH)',
+        showCancelButton: true,
+        background: '#0a0a12',
+        color: '#00f0ff',
+        confirmButtonColor: '#00f0ff',
+        cancelButtonColor: '#ff0044',
+        customClass: { popup: 'cyber-modal', input: 'cyber-input' }
+      });
       
-      try {
-        const res = await fetch('/folder/buat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nama_folder: name })
-        });
-        
-        if (res.ok) {
-          loadFolders();
-          alert('Folder berhasil dibuat!');
-        } else {
-          const err = await res.text();
-          alert('Error: ' + err);
+      if (name) {
+        try {
+          const res = await fetch('/folder/buat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nama_folder: name })
+          });
+          
+          if (res.ok) {
+            loadFolders();
+            showSuccess('Folder created successfully');
+          } else {
+            const err = await res.text();
+            showError(err);
+          }
+        } catch (err) {
+          showError('Failed to create folder');
         }
-      } catch (err) {
-        alert('Error: ' + err.message);
       }
     }
 
     async function uploadCSV() {
       const folder = document.getElementById('upload-folder').value;
       const fileInput = document.getElementById('upload-file');
-      const status = document.getElementById('upload-status');
       
       if (!folder) {
-        status.innerHTML = '<span style="color: var(--accent-red);">Pilih folder terlebih dahulu!</span>';
+        showError('Please select a folder first');
         return;
       }
       
       if (!fileInput.files[0]) {
-        status.innerHTML = '<span style="color: var(--accent-red);">Pilih file CSV!</span>';
+        showError('Please select a CSV file');
         return;
       }
       
+      showLoading('UPLOADING FILE...');
+      
       const formData = new FormData();
       formData.append('berkas', fileInput.files[0]);
-      
-      status.innerHTML = '<span style="color: var(--accent-cyan);">Uploading...</span>';
       
       try {
         const res = await fetch(`/unggah-csv/?folder=${encodeURIComponent(folder)}`, {
@@ -1135,29 +1980,31 @@ select>label></div>div>div></div>div>div></div>""
           body: formData
         });
         
+        hideLoading();
+        
         if (res.ok) {
           const data = await res.json();
-          status.innerHTML = `<span style="color: var(--accent-green);">✓ Upload berhasil! ${data.jumlah_baris} baris data.</span>`;
+          showSuccess(`Upload complete: ${data.jumlah_baris} rows`);
           fileInput.value = '';
         } else {
           const err = await res.text();
-          status.innerHTML = `<span style="color: var(--accent-red);">Error: ${err}</span>`;
+          showError(err);
         }
       } catch (err) {
-        status.innerHTML = `<span style="color: var(--accent-red);">Error: ${err.message}</span>`;
+        hideLoading();
+        showError('Upload failed');
       }
     }
 
     async function processData() {
       const folder = document.getElementById('process-folder').value;
-      const status = document.getElementById('process-status');
       
       if (!folder) {
-        status.innerHTML = '<span style="color: var(--accent-red);">Pilih folder terlebih dahulu!</span>';
+        showError('Please select a folder first');
         return;
       }
       
-      status.innerHTML = '<span style="color: var(--accent-cyan);">Processing...</span>';
+      showLoading('PROCESSING INDICATORS...');
       
       try {
         const res = await fetch('/pra-proses/indikator/', {
@@ -1166,15 +2013,18 @@ select>label></div>div>div></div>div>div></div>""
           body: JSON.stringify({ folder })
         });
         
+        hideLoading();
+        
         if (res.ok) {
           const data = await res.json();
-          status.innerHTML = `<span style="color: var(--accent-green);">✓ Berhasil memproses ${data.jumlah_berkas} file!</span>`;
+          showSuccess(`Processed ${data.jumlah_berkas} files`);
         } else {
           const err = await res.text();
-          status.innerHTML = `<span style="color: var(--accent-red);">Error: ${err}</span>`;
+          showError(err);
         }
       } catch (err) {
-        status.innerHTML = `<span style="color: var(--accent-red);">Error: ${err.message}</span>`;
+        hideLoading();
+        showError('Processing failed');
       }
     }
 
@@ -1183,7 +2033,6 @@ select>label></div>div>div></div>div>div></div>""
     let chartEquity = null;
 
     function initCharts() {
-      // Pie Chart
       const ctxPie = document.getElementById('chartPie');
       if (ctxPie) {
         chartPie = new Chart(ctxPie, {
@@ -1192,19 +2041,24 @@ select>label></div>div>div></div>div>div></div>""
             labels: ['HIT TP', 'HIT SL', 'TIMEOUT'],
             datasets: [{
               data: [65, 25, 10],
-              backgroundColor: ['rgba(0, 255, 136, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(102, 102, 102, 0.8)'],
-              borderWidth: 0
+              backgroundColor: ['rgba(0, 255, 136, 0.8)', 'rgba(255, 0, 68, 0.8)', 'rgba(80, 80, 96, 0.8)'],
+              borderColor: ['#00ff88', '#ff0044', '#505060'],
+              borderWidth: 2
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { color: '#b0b0b0', font: { size: 11 } } } }
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { color: '#a0a0b0', font: { family: 'Orbitron', size: 10 }, padding: 16 }
+              }
+            }
           }
         });
       }
 
-      // Equity Chart
       const ctxEquity = document.getElementById('chartEquity');
       if (ctxEquity) {
         const labels = ['Start', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10'];
@@ -1217,11 +2071,14 @@ select>label></div>div>div></div>div>div></div>""
             datasets: [{
               label: 'Equity',
               data: data,
-              borderColor: 'rgba(0, 255, 136, 1)',
+              borderColor: '#00ff88',
               backgroundColor: 'rgba(0, 255, 136, 0.1)',
               fill: true,
               tension: 0.4,
-              pointRadius: 2
+              pointRadius: 3,
+              pointBackgroundColor: '#00ff88',
+              pointBorderColor: '#000',
+              pointBorderWidth: 2
             }]
           },
           options: {
@@ -1229,8 +2086,8 @@ select>label></div>div>div></div>div>div></div>""
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666', font: { size: 10 } } },
-              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666', font: { size: 10 } } }
+              x: { grid: { color: 'rgba(0, 240, 255, 0.05)' }, ticks: { color: '#505060', font: { family: 'Orbitron', size: 9 } } },
+              y: { grid: { color: 'rgba(0, 240, 255, 0.05)' }, ticks: { color: '#505060', font: { family: 'Orbitron', size: 9 } } }
             }
           }
         });
@@ -1243,7 +2100,6 @@ select>label></div>div>div></div>div>div></div>""
       loadFolders();
       initCharts();
       
-      // Update stats from localStorage if available
       const stats = JSON.parse(localStorage.getItem('backtestStatistics') || '{}');
       if (stats.total_signals) {
         document.getElementById('stat-total-signals').textContent = stats.total_signals;
