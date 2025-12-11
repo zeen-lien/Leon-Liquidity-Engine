@@ -1775,6 +1775,11 @@
     }
 
     @media (max-width: 768px) {
+      html, body {
+        overflow-x: hidden;
+        width: 100%;
+      }
+      
       .sidebar {
         transform: translateX(-100%);
         width: 280px;
@@ -1785,6 +1790,10 @@
       .main {
         margin-left: 0;
         padding: 20px 16px;
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+        box-sizing: border-box;
       }
 
       .mobile-nav-btn { display: flex; align-items: center; justify-content: center; }
@@ -1795,13 +1804,26 @@
       .page-title { font-size: 22px; }
       
       .price-grid { grid-template-columns: repeat(2, 1fr); }
+      
+      .cyber-card {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+      }
+      
+      .chart-container {
+        width: 100%;
+        max-width: 100%;
+      }
     }
 
     @media (max-width: 480px) {
-      .main { padding: 16px 12px; }
-      .cyber-card { padding: 16px; }
+      .main { padding: 12px 10px; }
+      .cyber-card { padding: 14px; }
       .stats-grid { grid-template-columns: 1fr; }
       .price-grid { grid-template-columns: 1fr; }
+      .page-title { font-size: 18px; }
+      .card-title { font-size: 11px; }
     }
   </style>
 
