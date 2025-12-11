@@ -27,6 +27,11 @@ from .services.praproses_data import (
     PERIODE_ATR,
 )
 from .services.generator_sinyal_unified import generate_sinyal_dari_folder_honest
+from .services.binance_realtime import (
+    binance_fetcher,
+    SUPPORTED_SYMBOLS,
+)
+from .services.lstm_predictor import lstm_predictor, get_prediction_for_symbol
 
 # Folder tujuan penyimpanan berkas historis (struktur: data/uploads/<folder>/...)
 FOLDER_DATA_BASE = Path("data") / "uploads"
@@ -695,6 +700,280 @@ async def generate_sinyal(perintah: PermintaanGenerateSinyal):
         }
     except Exception as err:  # pragma: no cover
         raise HTTPException(status_code=500, detail=f"Gagal generate sinyal: {err}") from err
+
+
+# ============================================================================
+# ENDPOINT BINANCE REAL-TIME DATA
+# ============================================================================
+
+@aplikasi.get("/binance/symbols")
+async def daftar_symbols():
+    """
+    Mengembalikan daftar symbols yang didukung untuk real-time data.
+    """
+    return {
+        "symbols": SUPPORTED_SYMBOLS,
+        "jumlah": len(SUPPORTED_SYMBOLS),
+        "pesan": "Symbols yang didukung untuk real-time data dari Binance."
+    }
+
+
+@aplikasi.get("/binance/price/{symbol}")
+async def harga_terkini(symbol: str):
+    """
+    Ambil harga terkini untuk symbol tertentu dari Binance.
+    
+    Parameters:
+    -----------
+    symbol: str - Trading pair (e.g., "BTCUSDT")
+    """
+    try:
+        data = await binance_fetcher.get_ticker_price(symbol.upper())
+        return {
+            "status": "sukses",
+            "data": data
+        }
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"Gagal mengambil harga: {err}")
+
+
+@aplikasi.get("/binance/prices")
+async def semua_harga():
+    """
+    Ambil harga terkini untuk semua symbols yang didukung.
+    """
+    try:
+        data = await binance_fetcher.get_multiple_tickers(SUPPORTED_SYMBOLS)
+        return {
+            "status": "sukses",
+            "jumlah": len(data),
+            "data": data
+        }
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"Gagal mengambil harga: {err}")
+
+
+@aplikasi.get("/binance/ticker24h/{symbol}")
+async def statistik_24h(symbol: str):
+    """
+    Ambil statistik 24 jam untuk symbol tertentu.
+    
+    Parameters:
+    -----------
+    symbol: str - Trading pair (e.g., "BTCUSDT")
+    """
+    try:
+        data = await binance_fetcher.get_24h_ticker(symbol.upper())
+        return {
+            "status": "sukses",
+            "data": data
+        }
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"Gagal mengambil statistik 24h: {err}")
+
+
+@aplikasi.get("/binance/klines/{symbol}")
+async def ambil_klines(
+    symbol: str,
+    interval: str = Query("1h", description="Interval: 1m, 5m, 15m, 1h, 4h, 1d"),
+    limit: int = Query(100, ge=1, le=1000, description="Jumlah candle (max 1000)")
+):
+    """
+    Ambil data klines (candlestick) dari Binance.
+    
+    Parameters:
+    -----------
+    symbol: str - Trading pair (e.g., "BTCUSDT")
+    interval: str - Timeframe ("1m", "5m", "15m", "1h", "4h", "1d")
+    limit: int - Jumlah candle (max 1000)
+    """
+    valid_intervals = ["1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "6h", "8h", "12h", "1d", "3d", "1w", "1M"]
+    if interval not in valid_intervals:
+        raise HTTPException(status_code=400, detail=f"Interval tidak valid. Pilih dari: {valid_intervals}")
+    
+    try:
+        data = await binance_fetcher.get_klines(symbol.upper(), interval, limit)
+        return {
+            "status": "sukses",
+            "symbol": symbol.upper(),
+            "interval": interval,
+            "jumlah": len(data),
+            "data": data
+        }
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"Gagal mengambil klines: {err}")
+
+
+@aplikasi.post("/binance/analyze/{symbol}")
+async def analisis_realtime(
+    symbol: str,
+    mode_trading: str = Query("santai", description="Mode: aktif, santai, pasif"),
+    interval: str = Query("1h", description="Interval: 1h, 4h"),
+    limit: int = Query(100, ge=50, le=500, description="Jumlah candle untuk analisis")
+):
+    """
+    Analisis real-time: Ambil data dari Binance, proses indikator, dan generate sinyal.
+    
+    Parameters:
+    -----------
+    symbol: str - Trading pair (e.g., "BTCUSDT")
+    mode_trading: str - Mode trading (aktif, santai, pasif)
+    interval: str - Timeframe untuk analisis
+    limit: int - Jumlah candle untuk analisis
+    """
+    from .services.praproses_data import tambah_indikator_ke_df
+    from .services.generator_sinyal_unified import scan_sinyal_honest, TRADING_STYLES
+    
+    if mode_trading not in TRADING_STYLES:
+        raise HTTPException(status_code=400, detail=f"Mode trading tidak valid. Pilih dari: {list(TRADING_STYLES.keys())}")
+    
+    try:
+        # 1. Ambil data dari Binance
+        klines = await binance_fetcher.get_klines(symbol.upper(), interval, limit)
+        
+        if not klines:
+            raise HTTPException(status_code=404, detail="Tidak ada data dari Binance")
+        
+        # 2. Convert ke DataFrame
+        df = pd.DataFrame(klines)
+        df['open_time'] = pd.to_datetime(df['open_time'], unit='ms')
+        
+        # 3. Tambah indikator
+        df_dengan_indikator = tambah_indikator_ke_df(df)
+        
+        # 4. Generate sinyal
+        sinyal_list = scan_sinyal_honest(
+            df=df_dengan_indikator,
+            pair=symbol.upper(),
+            mode_trading=mode_trading,
+            confidence_minimum=0.60
+        )
+        
+        # 5. Ambil harga terkini
+        harga_terkini = await binance_fetcher.get_ticker_price(symbol.upper())
+        
+        return {
+            "status": "sukses",
+            "symbol": symbol.upper(),
+            "mode_trading": mode_trading,
+            "interval": interval,
+            "harga_terkini": harga_terkini["price"],
+            "jumlah_candle": len(df_dengan_indikator),
+            "jumlah_sinyal": len(sinyal_list),
+            "sinyal": sinyal_list[-5:] if sinyal_list else [],  # 5 sinyal terbaru
+            "indikator_terkini": {
+                "rsi_6": round(df_dengan_indikator['rsi_6'].iloc[-1], 2) if 'rsi_6' in df_dengan_indikator.columns else None,
+                "rsi_14": round(df_dengan_indikator['rsi_14'].iloc[-1], 2) if 'rsi_14' in df_dengan_indikator.columns else None,
+                "ema_9": round(df_dengan_indikator['ema_9'].iloc[-1], 2) if 'ema_9' in df_dengan_indikator.columns else None,
+                "ema_20": round(df_dengan_indikator['ema_20'].iloc[-1], 2) if 'ema_20' in df_dengan_indikator.columns else None,
+                "ema_50": round(df_dengan_indikator['ema_50'].iloc[-1], 2) if 'ema_50' in df_dengan_indikator.columns else None,
+                "ema_200": round(df_dengan_indikator['ema_200'].iloc[-1], 2) if 'ema_200' in df_dengan_indikator.columns else None,
+            },
+            "timestamp": harga_terkini["timestamp"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"Gagal analisis real-time: {err}")
+
+
+# ============================================================================
+# ENDPOINT LSTM PREDICTION
+# ============================================================================
+
+@aplikasi.get("/lstm/predict/{symbol}")
+async def prediksi_lstm(
+    symbol: str,
+    interval: str = Query("1h", description="Interval: 1h, 4h"),
+    limit: int = Query(100, ge=50, le=500, description="Jumlah candle untuk analisis")
+):
+    """
+    Prediksi arah harga menggunakan LSTM atau simulasi.
+    
+    Parameters:
+    -----------
+    symbol: str - Trading pair (e.g., "BTCUSDT")
+    interval: str - Timeframe untuk analisis
+    limit: int - Jumlah candle untuk analisis
+    """
+    from .services.praproses_data import tambah_indikator_ke_df
+    
+    try:
+        # 1. Ambil data dari Binance
+        klines = await binance_fetcher.get_klines(symbol.upper(), interval, limit)
+        
+        if not klines:
+            raise HTTPException(status_code=404, detail="Tidak ada data dari Binance")
+        
+        # 2. Convert ke DataFrame
+        df = pd.DataFrame(klines)
+        df['open_time'] = pd.to_datetime(df['open_time'], unit='ms')
+        
+        # 3. Tambah indikator
+        df_dengan_indikator = tambah_indikator_ke_df(df)
+        
+        # 4. Get prediction
+        prediction = get_prediction_for_symbol(df_dengan_indikator, symbol.upper())
+        
+        # 5. Ambil harga terkini
+        harga_terkini = await binance_fetcher.get_ticker_price(symbol.upper())
+        
+        return {
+            "status": "sukses",
+            "symbol": symbol.upper(),
+            "interval": interval,
+            "harga_terkini": harga_terkini["price"],
+            "prediksi": prediction,
+            "rekomendasi": _generate_recommendation(prediction),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"Gagal prediksi LSTM: {err}")
+
+
+def _generate_recommendation(prediction: dict) -> dict:
+    """Generate trading recommendation berdasarkan prediksi."""
+    direction = prediction.get("direction", "NEUTRAL")
+    confidence = prediction.get("confidence", 0.5)
+    
+    if direction == "UP" and confidence >= 0.7:
+        return {
+            "aksi": "BELI",
+            "kekuatan": "KUAT",
+            "alasan": f"Prediksi NAIK dengan confidence {confidence*100:.1f}%"
+        }
+    elif direction == "UP" and confidence >= 0.6:
+        return {
+            "aksi": "BELI",
+            "kekuatan": "SEDANG",
+            "alasan": f"Prediksi NAIK dengan confidence {confidence*100:.1f}%"
+        }
+    elif direction == "DOWN" and confidence >= 0.7:
+        return {
+            "aksi": "JUAL",
+            "kekuatan": "KUAT",
+            "alasan": f"Prediksi TURUN dengan confidence {confidence*100:.1f}%"
+        }
+    elif direction == "DOWN" and confidence >= 0.6:
+        return {
+            "aksi": "JUAL",
+            "kekuatan": "SEDANG",
+            "alasan": f"Prediksi TURUN dengan confidence {confidence*100:.1f}%"
+        }
+    else:
+        return {
+            "aksi": "TUNGGU",
+            "kekuatan": "LEMAH",
+            "alasan": f"Sinyal tidak cukup kuat (confidence {confidence*100:.1f}%)"
+        }
+
+
+# Import datetime untuk timestamp
+from datetime import datetime
 
 
 # FastAPI standar tetap membutuhkan variabel bernama `app`.

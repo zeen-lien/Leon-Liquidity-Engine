@@ -1,3438 +1,1256 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Leon Liquidity Engine - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leon Liquidity Engine</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      /* Pure Black Theme - Item Pekat */
       --bg-primary: #000000;
-      --bg-secondary: #0a0a0a;
-      --bg-tertiary: #121212;
-      --bg-panel: #1a1a1a;
-      --bg-panel-hover: #222222;
-      
-      /* Text Colors - Neon & Bright */
+      --bg-secondary: #050505;
+      --bg-panel: #0a0a0a;
+      --bg-panel-hover: #111111;
       --text-primary: #ffffff;
-      --text-secondary: #e0e0e0;
-      --text-tertiary: #b0b0b0;
-      --text-muted: #808080;
-      --text-neon-green: #00ff88;
-      --text-neon-cyan: #00d9ff;
-      --text-neon-blue: #3b82f6;
-      
-      /* Accent Colors - Clean & Subtle */
-      --accent-blue: #3b82f6;
-      --accent-blue-glow: rgba(59, 130, 246, 0.3);
-      --accent-green: #10b981;
-      --accent-green-glow: rgba(16, 185, 129, 0.3);
-      --accent-orange: #f59e0b;
-      --accent-orange-glow: rgba(245, 158, 11, 0.3);
-      --accent-red: #ef4444;
-      --accent-red-glow: rgba(239, 68, 68, 0.3);
+      --text-secondary: #b0b0b0;
+      --text-muted: #666666;
+      --accent-green: #00ff88;
+      --accent-cyan: #00d9ff;
       --accent-purple: #8b5cf6;
-      --accent-purple-glow: rgba(139, 92, 246, 0.3);
-      
-      /* Borders */
-      --border-color: rgba(255, 255, 255, 0.1);
-      --border-hover: rgba(59, 130, 246, 0.3);
-      --border-active: rgba(59, 130, 246, 0.5);
-      
-      /* Shadows */
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
-      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-      --shadow-glow-cyan: 0 0 20px var(--accent-cyan-glow);
-      --shadow-glow-purple: 0 0 20px var(--accent-purple-glow);
-      --shadow-glow-green: 0 0 20px var(--accent-green-glow);
-      
-      /* Border Radius */
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-xl: 20px;
-      --radius-full: 9999px;
-      
-      /* Transitions */
-      --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      --accent-red: #ef4444;
+      --accent-orange: #f59e0b;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --glow-green: rgba(0, 255, 136, 0.3);
+      --glow-cyan: rgba(0, 217, 255, 0.3);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", 
-        "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      background: #000000;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
-      overflow-x: hidden;
-    }
-    
-    @keyframes particleAnimation {
-      0% { background-position: 0 0, 40px 60px, 130px 270px, 70px 100px; }
-      100% { background-position: 200px 200px, 240px 260px, 330px 470px, 270px 300px; }
     }
 
-    /* Sidebar Toggle Button - Di bawah logo, samping Navigasi */
-    .sidebar-toggle {
-      position: relative;
-      width: 36px;
-      height: 36px;
-      background: rgba(0, 255, 136, 0.1);
-      border: 2px solid rgba(0, 255, 136, 0.4);
-      border-radius: 8px;
-      color: #00ff88;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
-      margin-left: auto;
-      flex-shrink: 0;
-    }
-    
-    .sidebar-toggle:hover {
-      background: rgba(0, 255, 136, 0.2);
-      border-color: #00ff88;
-      box-shadow: 0 0 25px rgba(0, 255, 136, 0.6);
-      transform: scale(1.1) rotate(90deg);
-    }
-    
-    .sidebar.collapsed .sidebar-toggle {
-      width: 32px;
-      height: 32px;
-      font-size: 14px;
-      margin-left: 0;
-      margin-top: 12px;
-      align-self: center;
-    }
-    
-    /* Toggle Button di Konten Area (ketika sidebar collapsed) */
-    .sidebar-toggle-floating {
-      position: fixed;
-      left: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 50;
-      width: 52px;
-      height: 52px;
-      background: rgba(0, 0, 0, 0.95);
-      border: 3px solid rgba(0, 255, 136, 0.8);
-      border-radius: 50%;
-      color: #00ff88;
-      font-size: 22px;
-      font-weight: bold;
-      cursor: pointer;
-      display: none;
-      visibility: hidden;
-      opacity: 0;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      box-shadow: 
-        0 0 30px rgba(0, 255, 136, 0.6), 
-        0 0 0 4px rgba(0, 0, 0, 0.9),
-        inset 0 0 20px rgba(0, 255, 136, 0.2);
-      backdrop-filter: blur(10px);
-      animation: pulseGlow 2s ease-in-out infinite;
-      pointer-events: none;
-    }
-    
-    .sidebar-toggle-floating[style*="display: flex"] {
-      visibility: visible !important;
-      pointer-events: auto !important;
-    }
-    
-    @keyframes pulseGlow {
-      0%, 100% {
-        box-shadow: 
-          0 0 30px rgba(0, 255, 136, 0.6), 
-          0 0 0 4px rgba(0, 0, 0, 0.9),
-          inset 0 0 20px rgba(0, 255, 136, 0.2);
-      }
-      50% {
-        box-shadow: 
-          0 0 50px rgba(0, 255, 136, 1), 
-          0 0 0 4px rgba(0, 0, 0, 0.9),
-          inset 0 0 30px rgba(0, 255, 136, 0.4);
-      }
-    }
-    
-    .sidebar-toggle-floating:hover {
-      background: rgba(0, 255, 136, 0.25);
-      border-color: #00ff88;
-      box-shadow: 
-        0 0 60px rgba(0, 255, 136, 1), 
-        0 0 0 4px rgba(0, 0, 0, 0.9),
-        inset 0 0 40px rgba(0, 255, 136, 0.5);
-      transform: translateY(-50%) scale(1.15);
-      animation: none;
-    }
-    
-    /* Floating toggle visible ketika sidebar collapsed */
-    body:has(.sidebar.collapsed) .sidebar-toggle-floating,
-    body.sidebar-collapsed .sidebar-toggle-floating,
-    .sidebar-toggle-floating.visible {
-      display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
-    
-    /* Hide floating toggle when sidebar is NOT collapsed */
-    body:not(:has(.sidebar.collapsed)) .sidebar-toggle-floating,
-    body:not(.sidebar-collapsed) .sidebar-toggle-floating {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
-    
-    /* Toggle button di sidebar ketika collapsed - posisi di bawah logo */
-    .sidebar.collapsed .sidebar-toggle {
-      position: absolute;
-      top: auto;
-      bottom: -60px;
-      left: 50%;
-      transform: translateX(-50%);
-      margin: 0;
-      width: 40px;
-      height: 40px;
-      font-size: 16px;
-      z-index: 100;
-    }
-    
+    /* ============ SIDEBAR ============ */
     .sidebar {
-      width: 280px;
-      background: rgba(26, 26, 26, 0.5);
-      backdrop-filter: blur(10px);
-      border-right: 2px solid transparent;
-      background-clip: padding-box;
-      padding: 24px 20px;
+      width: 240px;
+      background: var(--bg-primary);
+      border-right: 1px solid var(--border-color);
+      padding: 20px 12px;
       display: flex;
       flex-direction: column;
-      gap: 28px;
-      position: relative;
+      position: fixed;
+      height: 100vh;
       z-index: 100;
-      overflow-y: auto;
-      overflow-x: hidden;
-      transition: all 0.3s ease;
-    }
-    
-    .sidebar::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 0;
-      padding: 2px;
-      background: linear-gradient(180deg, rgba(0, 255, 136, 0.4), rgba(0, 217, 255, 0.4));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0.6;
-      pointer-events: none;
-    }
-    
-    .sidebar.collapsed {
-      width: 80px;
-      padding: 24px 12px;
-    }
-    
-    .sidebar.collapsed .logo-text-judul,
-    .sidebar.collapsed .logo-text-sub,
-    .sidebar.collapsed .btn-nav span:not(:first-child),
-    .sidebar.collapsed .sidebar-footer,
-    .sidebar.collapsed .sidebar-judul {
-      display: none !important;
-    }
-    
-    .sidebar.collapsed .btn-nav {
-      justify-content: center;
-      padding: 12px;
-    }
-    
-    .sidebar.collapsed .btn-nav-ikon {
-      margin: 0 auto;
-    }
-    
-    .sidebar.collapsed .logo {
-      justify-content: center;
-      padding: 12px 8px;
-      position: relative;
-      margin-bottom: 12px;
-    }
-    
-    /* Toggle button di bawah logo ketika collapsed */
-    .sidebar.collapsed .sidebar-section {
-      position: relative;
-    }
-    
-    
-    /* Toggle Button - Di bawah logo */
-    .sidebar-toggle-btn {
-      width: 44px;
-      height: 44px;
-      padding: 0;
-      background: rgba(0, 255, 136, 0.1);
-      border: 2px solid rgba(0, 255, 136, 0.3);
-      border-radius: 12px;
-      color: #00ff88;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      margin: 0 auto 20px;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .sidebar-toggle-btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(0, 255, 136, 0.3);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-    
-    .sidebar-toggle-btn:active::before {
-      width: 100px;
-      height: 100px;
-    }
-    
-    .sidebar-toggle-btn span {
-      position: relative;
-      z-index: 1;
-      transition: all 0.3s ease;
-      display: inline-block;
-    }
-    
-    .sidebar-toggle-btn:hover {
-      background: rgba(0, 255, 136, 0.2);
-      border-color: #00ff88;
-      box-shadow: 0 0 25px rgba(0, 255, 136, 0.5);
-      transform: scale(1.1) rotate(90deg);
-    }
-    
-    .sidebar-toggle-btn:active {
-      transform: scale(0.9) rotate(180deg);
-    }
-    
-    .sidebar.collapsed .sidebar-toggle-btn {
-      width: 40px;
-      height: 40px;
-      font-size: 18px;
-    }
-    
-    .sidebar.collapsed .sidebar-toggle-btn span {
-      transform: rotate(180deg);
-    }
-    
-    @media (max-width: 1024px) {
-      .sidebar {
-        position: fixed;
-        left: -280px;
-        height: 100vh;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-        z-index: 1050;
-      }
-      
-      .sidebar.open {
-        left: 0;
-      }
+      transition: transform 0.3s ease;
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 12px;
-      background: var(--bg-tertiary);
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: var(--transition-base);
-      cursor: pointer;
-    }
-    
-    .logo:hover {
-      background: var(--bg-panel-hover);
-      border-color: rgba(0, 217, 255, 0.3);
-      box-shadow: var(--shadow-glow-cyan);
-      transform: translateY(-2px);
+      gap: 10px;
+      padding: 8px 12px;
+      margin-bottom: 24px;
     }
 
-    .logo-badge {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: transparent;
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-    
-    .logo-badge:hover {
-      transform: scale(1.1) rotate(5deg);
-      filter: drop-shadow(0 0 20px #00ff88);
-    }
-    
-    .logo-badge svg {
-      width: 100%;
-      height: 100%;
-      animation: logoFloat 3s ease-in-out infinite;
-    }
-    
-    @keyframes logoFloat {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
+      font-weight: 800;
+      font-size: 14px;
+      color: #000;
     }
 
-    .logo-text-judul {
-      font-weight: 800;
-      font-size: 18px;
-      background: linear-gradient(135deg, #00ff88, #00d9ff);
+    .logo-text {
+      font-size: 15px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 0.5px;
-      filter: brightness(1.5);
     }
 
-    .logo-text-sub {
-      font-size: 11px;
-      color: #e0e0e0;
-      font-weight: 500;
-      letter-spacing: 0.3px;
+    .nav-section {
+      margin-bottom: 20px;
     }
 
-    .sidebar-section {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      position: relative;
-    }
-
-    .sidebar-judul {
+    .nav-label {
       font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       color: var(--text-muted);
-      font-weight: 700;
       padding: 0 12px;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      position: relative;
-      z-index: 10;
-      pointer-events: auto;
+      margin-bottom: 8px;
     }
 
-    .btn-nav {
+    .nav-btn {
       width: 100%;
-      padding: 12px 16px;
-      border-radius: 12px;
+      padding: 10px 12px;
       background: transparent;
-      border: 1px solid transparent;
+      border: none;
+      border-radius: 8px;
       color: var(--text-secondary);
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 13px;
       text-align: left;
       cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .btn-nav::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 3px;
-      height: 100%;
-      background: linear-gradient(180deg, #00ff88, #00d9ff);
-      opacity: 0;
-      transition: all 0.3s ease;
+      gap: 10px;
+      transition: all 0.2s ease;
+      margin-bottom: 2px;
     }
 
-    .btn-nav span {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .btn-nav span:last-child {
-      font-size: 11px;
-      opacity: 0.5;
-      font-weight: 600;
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
     }
 
-    .btn-nav:hover {
+    .nav-btn.active {
       background: rgba(0, 255, 136, 0.1);
-      border-color: rgba(0, 255, 136, 0.3);
-      color: #00ff88;
-      transform: translateX(6px) scale(1.02);
-      box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
-    }
-    
-    .btn-nav:hover::before {
-      opacity: 1;
-      box-shadow: 0 0 10px #00ff88;
+      color: var(--accent-green);
     }
 
-    .btn-nav.aktif {
-      background: rgba(0, 217, 255, 0.15);
-      border-color: rgba(0, 217, 255, 0.5);
-      color: #00d9ff;
-      box-shadow: 0 4px 16px rgba(0, 217, 255, 0.3);
-    }
-    
-    .btn-nav.aktif::before {
-      opacity: 1;
-      box-shadow: 0 0 15px #00d9ff;
-    }
-    
-    .btn-nav.aktif .btn-nav-ikon {
-      box-shadow: 0 0 12px #00d9ff;
-    }
-
-    .halaman {
-      display: none;
-    }
-
-    .halaman.aktif {
-      display: block;
-    }
-
-    .btn-nav-ikon {
-      width: 8px;
-      height: 8px;
-      border-radius: var(--radius-full);
-      background: var(--gradient-cyan);
-      box-shadow: var(--shadow-glow-cyan);
-    }
-    
-    .btn-nav-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-nav-icon svg {
-      width: 100%;
-      height: 100%;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2.5;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-nav:hover .btn-nav-icon svg {
-      transform: scale(1.15);
-      filter: drop-shadow(0 0 8px currentColor);
-    }
-    
-    .btn-nav.aktif .btn-nav-icon svg {
-      filter: drop-shadow(0 0 12px currentColor);
-      stroke-width: 3;
-    }
-    
-    .sidebar.collapsed .btn-nav-icon {
-      width: 28px;
-      height: 28px;
-    }
+    .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
 
     .sidebar-footer {
       margin-top: auto;
-      padding: 16px;
-      background: var(--bg-tertiary);
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 11px;
-      color: var(--text-tertiary);
-      line-height: 1.6;
+      padding: 12px;
+      font-size: 10px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
     }
 
-    .sidebar-footer strong {
-      color: var(--accent-cyan);
-      font-weight: 700;
-    }
-
-    .konten {
+    /* ============ MAIN CONTENT ============ */
+    .main {
       flex: 1;
-      padding: 32px 40px;
-      position: relative;
-      overflow-y: auto;
-      overflow-x: hidden;
-      z-index: 1;
-      pointer-events: auto;
-      transition: padding-left 0.3s ease;
-    }
-    
-    /* Konten menyesuaikan ketika sidebar collapsed */
-    body:has(.sidebar.collapsed) .konten {
-      padding-left: 100px; /* Space untuk sidebar collapsed (80px) + margin */
-    }
-    
-    /* Custom scrollbar - Dark Theme */
-    ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: #0a0a0a;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #00ff88, #00d9ff);
-      border-radius: 10px;
-      border: 2px solid #0a0a0a;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(180deg, #00d9ff, #3b82f6);
-      box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-    }
-    
-    ::-webkit-scrollbar-corner {
-      background: #0a0a0a;
+      margin-left: 240px;
+      padding: 24px;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease;
     }
 
-    .konten-inner {
-      max-width: 1200px;
-      margin: 0 auto;
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .page-header {
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ============ CARDS & PANELS ============ */
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-header {
       display: flex;
-      flex-direction: column;
-      gap: 28px;
-      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
     }
 
-    .judul-halaman {
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 9px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--accent-green);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge.purple { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+    .badge.cyan { background: rgba(0, 217, 255, 0.15); color: var(--accent-cyan); }
+
+    /* ============ GRID LAYOUTS ============ */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+    /* ============ STAT CARDS ============ */
+    .stat-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ============ BUTTONS ============ */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px var(--glow-green);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn svg { width: 16px; height: 16px; }
+
+    /* ============ FORM ELEMENTS ============ */
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-input:focus, .form-select:focus {
+      border-color: var(--accent-green);
+    }
+
+    .form-select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+
+    /* ============ TABLES ============ */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* ============ PRICE CARDS ============ */
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .price-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 24px;
-      margin-bottom: 8px;
+      align-items: center;
     }
 
-    .judul-teks {
-      font-size: 32px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #00ff88, #00d9ff, #3b82f6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.5px;
-      line-height: 1.2;
-      animation: textShine 3s ease-in-out infinite;
-    }
-    
-    @keyframes textShine {
-      0%, 100% { filter: brightness(1); }
-      50% { filter: brightness(1.3); }
-    }
-
-    .judul-sub {
-      font-size: 14px;
-      color: var(--text-secondary);
-      max-width: 560px;
-      line-height: 1.6;
-      margin-top: 8px;
-    }
-
-    .badge-mode {
-      padding: 10px 16px;
-      border-radius: var(--radius-full);
-      border: 1px solid rgba(0, 217, 255, 0.3);
+    .price-symbol {
       font-size: 12px;
       font-weight: 600;
-      background: var(--bg-panel);
-      backdrop-filter: blur(10px);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: var(--shadow-glow-cyan), var(--shadow-sm);
-      transition: var(--transition-base);
-    }
-    
-    .badge-mode:hover {
-      border-color: rgba(0, 217, 255, 0.5);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-glow-cyan), var(--shadow-md);
+      color: var(--accent-cyan);
     }
 
-    .badge-dot {
+    .price-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    /* ============ PREDICTION CARD ============ */
+    .prediction-box {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 217, 255, 0.1));
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .prediction-direction {
+      font-size: 48px;
+      font-weight: 800;
+      margin: 12px 0;
+    }
+
+    .prediction-direction.up { color: var(--accent-green); }
+    .prediction-direction.down { color: var(--accent-red); }
+
+    /* ============ CHART CONTAINERS ============ */
+    .chart-container {
+      position: relative;
+      height: 200px;
+    }
+
+    /* ============ STATUS INDICATORS ============ */
+    .status-dot {
       width: 8px;
       height: 8px;
-      border-radius: var(--radius-full);
-      background: var(--gradient-green);
-      box-shadow: var(--shadow-glow-green);
-      animation: pulse 2s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    .grid-panel {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      align-items: flex-start;
-    }
-    
-    @media (max-width: 768px) {
-      .grid-panel {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-    }
-    
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .grid-panel {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-      }
-    }
-
-    .panel {
-      background: rgba(26, 26, 26, 0.3);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      border: 2px solid transparent;
-      background-clip: padding-box;
-      padding: 24px;
-      position: relative;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1;
-    }
-    
-    .panel::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 16px;
-      padding: 2px;
-      background: linear-gradient(135deg, rgba(0, 255, 136, 0.4), rgba(0, 217, 255, 0.4));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0.5;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-      z-index: 0;
-    }
-    
-    .panel:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 20px 40px rgba(0, 255, 136, 0.2);
-    }
-    
-    .panel:hover::before {
-      opacity: 1;
-      animation: borderGlow 2s ease-in-out infinite;
-    }
-    
-    @keyframes borderGlow {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    .panel-judul {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--text-primary);
-      position: relative;
-      z-index: 10;
-      pointer-events: auto;
-    }
-
-    .panel-judul span.aksen {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--accent-purple);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      padding: 4px 10px;
-      background: rgba(183, 148, 246, 0.1);
-      border-radius: var(--radius-full);
-      border: 1px solid rgba(183, 148, 246, 0.3);
-    }
-
-    .panel-sub {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 20px;
-      line-height: 1.6;
-      position: relative;
-      z-index: 10;
-      pointer-events: auto;
-    }
-
-    .form-kelompok {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 10px;
-      position: relative;
-      z-index: 10;
-      pointer-events: auto;
-    }
-
-    .label {
-      font-size: 12px;
-      color: var(--warna-teks-secondary);
-      margin-bottom: 2px;
-      position: relative;
-      z-index: 10;
-      pointer-events: auto;
-      cursor: default;
-    }
-
-    input[type="file"],
-    input[type="number"],
-    input[type="text"] {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 12px;
-      border: 2px solid rgba(0, 255, 136, 0.3);
-      background: rgba(26, 26, 26, 0.8);
-      color: #ffffff;
-      font-size: 14px;
-      outline: none;
-      transition: all 0.3s ease;
-      cursor: pointer !important;
-      position: relative;
-      z-index: 10;
-      pointer-events: auto !important;
-    }
-    
-    input[type="file"]:hover,
-    input[type="number"]:hover,
-    input[type="text"]:hover {
-      border-color: rgba(0, 255, 136, 0.6);
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-      background: rgba(26, 26, 26, 0.95);
-    }
-    
-    input[type="file"]:focus,
-    input[type="number"]:focus,
-    input[type="text"]:focus {
-      border-color: #00ff88;
-      box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
-      background: rgba(26, 26, 26, 1);
-    }
-
-    input[type="file"]::file-selector-button {
-      padding: 8px 16px;
-      border-radius: 10px;
-      border: none;
-      margin-right: 12px;
-      background: linear-gradient(135deg, #00ff88, #00d9ff);
-      color: #000000;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
-      transition: all 0.3s ease;
-    }
-
-    input[type="file"]:hover::file-selector-button {
-      transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(0, 255, 136, 0.7);
-      filter: brightness(1.1);
-    }
-    
-    input[type="file"]:active::file-selector-button {
-      transform: translateY(0);
-    }
-    
-    /* Select Dropdown Styling - Modern & Clickable */
-    select {
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%2300ff88' d='M8 11L3 6h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 16px center;
-      background-size: 16px;
-      padding-right: 45px !important;
-      cursor: pointer !important;
-      transition: all 0.3s ease;
-      position: relative;
-      z-index: 10;
-      pointer-events: auto !important;
-    }
-    
-    select:hover {
-      border-color: rgba(0, 255, 136, 0.7) !important;
-      box-shadow: 0 0 25px rgba(0, 255, 136, 0.4), inset 0 0 20px rgba(0, 255, 136, 0.1);
-      transform: translateY(-2px);
-      background-color: rgba(0, 255, 136, 0.05);
-    }
-    
-    select:focus {
-      border-color: #00ff88 !important;
-      box-shadow: 0 0 35px rgba(0, 255, 136, 0.6), inset 0 0 25px rgba(0, 255, 136, 0.15);
-      outline: none;
-      background-color: rgba(0, 255, 136, 0.08);
-    }
-    
-    select:active {
-      transform: translateY(0);
-    }
-    
-    select::after {
-      content: '▼';
-      position: absolute;
-      right: 16px;
-      color: #00ff88;
-    }
-    
-    select option {
-      background: #1a1a1a;
-      color: #ffffff;
-      padding: 12px 16px;
-      cursor: pointer;
-    }
-    
-    select option:hover,
-    select option:checked {
-      background: rgba(0, 255, 136, 0.2);
-      color: #00ff88;
-    }
-
-    input[type="number"]:focus {
-      border-color: rgba(34, 211, 238, 0.85);
-      box-shadow: 0 0 18px rgba(34, 211, 238, 0.8);
-    }
-
-    .btn-utama {
-      padding: 12px 24px;
-      border-radius: 12px;
-      border: 2px solid transparent;
-      background: linear-gradient(135deg, #00ff88, #00d9ff);
-      color: #000000;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer !important;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      z-index: 10;
-      pointer-events: auto !important;
-    }
-    
-    .btn-utama::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.5);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-    
-    .btn-utama:hover::before {
-      width: 300px;
-      height: 300px;
+      display: inline-block;
+      margin-right: 6px;
     }
 
-    .btn-utama:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
-      border-color: #00ff88;
-    }
-    
-    .btn-utama:active {
-      transform: translateY(-1px) scale(1.02);
-    }
+    .status-dot.online { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+    .status-dot.offline { background: var(--accent-red); }
 
-    .btn-utama:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-ghost {
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--warna-teks-secondary);
-      font-size: 12px;
-      cursor: pointer !important;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: var(--transisi);
-      position: relative;
-      z-index: 10;
-      pointer-events: auto !important;
-    }
-
-    .btn-ghost:hover {
-      border-color: rgba(34, 211, 238, 0.7);
-      color: var(--warna-teks);
-      box-shadow: 0 0 18px rgba(34, 211, 238, 0.6);
-    }
-
-    .status-bar {
-      margin-top: 8px;
-      font-size: 12px;
-      min-height: 18px;
-    }
-
-    .status-bar span {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    .status-sukses {
-      color: #22c55e;
-      border-color: rgba(34, 197, 94, 0.6) !important;
-      box-shadow: 0 0 18px rgba(34, 197, 94, 0.7);
-    }
-
-    .status-gagal {
-      color: #f97373;
-      border-color: rgba(248, 113, 113, 0.7) !important;
-      box-shadow: 0 0 18px rgba(248, 113, 113, 0.7);
-    }
-
-    .status-info {
-      color: var(--warna-aksen);
-      border-color: rgba(59, 130, 246, 0.7) !important;
-    }
-
-    .list-berkas {
-      list-style: none;
-      margin-top: 4px;
-      max-height: 120px;
-      overflow: auto;
-      font-size: 12px;
-      padding-right: 4px;
-    }
-
-    .list-berkas li {
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(31, 41, 55, 0.8);
-      color: var(--warna-teks-secondary);
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 12px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
+    /* ============ MOBILE NAV BUTTON ============ */
+    .mobile-nav-btn {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+      border: none;
+      border-radius: 50%;
+      color: #000;
+      font-size: 24px;
       cursor: pointer;
-    }
-    
-    .list-berkas li:hover {
-      background: rgba(0, 255, 136, 0.1);
-      border-color: rgba(0, 255, 136, 0.3);
-      transform: translateX(4px);
-      box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+      z-index: 200;
+      box-shadow: 0 4px 20px var(--glow-green);
+      transition: transform 0.2s ease;
     }
 
-    .list-berkas li span.nama {
-      color: var(--warna-teks);
-      font-weight: 500;
-      transition: all 0.3s ease;
-      flex: 1;
-      text-align: left;
+    .mobile-nav-btn:hover {
+      transform: scale(1.1);
     }
-    
-    .list-berkas li:hover span.nama {
-      color: #00ff88;
-      font-weight: 600;
+
+    /* ============ OVERLAY ============ */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 90;
     }
-    
-    .list-berkas li::before {
-      content: '→';
-      opacity: 0.4;
-      transition: all 0.3s ease;
-      color: #6b7280;
-      font-size: 16px;
-      font-weight: bold;
-      width: 20px;
+
+    .overlay.active { display: block; }
+
+    /* ============ LOADING ============ */
+    .loading {
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    
-    .list-berkas li:hover::before {
-      opacity: 1;
-      color: #00ff88;
-      transform: translateX(2px);
-      text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+      padding: 40px;
+      color: var(--text-muted);
     }
 
-    .hasil-json {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
-        Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 11px;
-      background: radial-gradient(circle at top left, #020617, #020617 60%, #020617);
-      border-radius: 10px;
-      border: 1px solid rgba(30, 64, 175, 0.8);
-      padding: 10px 12px;
-      color: #e5e7eb;
-      max-height: 220px;
-      overflow: auto;
-      box-shadow:
-        0 0 22px rgba(59, 130, 246, 0.85),
-        0 0 60px rgba(30, 64, 175, 0.9);
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--accent-green);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
     }
 
-    .hasil-json strong {
-      color: var(--warna-aksen);
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1024px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
     }
 
-    .halaman {
-      display: none;
-    }
-
-    .halaman.aktif {
-      display: block;
-    }
-
-    @media (max-width: 960px) {
-      .grid-panel {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 768px) {
       .sidebar {
-        display: none;
+        transform: translateX(-100%);
+        width: 260px;
       }
-      body {
-        justify-content: center;
+
+      .sidebar.open { transform: translateX(0); }
+
+      .main {
+        margin-left: 0;
+        padding: 16px;
       }
+
+      .mobile-nav-btn { display: flex; align-items: center; justify-content: center; }
+      
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      
+      .page-title { font-size: 20px; }
+      
+      .price-grid { grid-template-columns: repeat(2, 1fr); }
     }
+
+    @media (max-width: 480px) {
+      .main { padding: 12px; }
+      .card { padding: 16px; }
+      .stat-value { font-size: 24px; }
+    }
+
+    /* ============ SIGNAL COLORS ============ */
+    .signal-buy { color: var(--accent-green); }
+    .signal-sell { color: var(--accent-red); }
+    .signal-hold { color: var(--accent-orange); }
+
+    /* ============ SCROLLBAR ============ */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
   </style>
 </head>
 <body>
+  <!-- Overlay for mobile -->
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="logo">
-      <div class="logo-badge">
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
-              <stop offset="100%" style="stop-color:#00d9ff;stop-opacity:1" />
-            </linearGradient>
-          </defs>
-          <path d="M20 2L36 12V28L20 38L4 28V12L20 2Z" stroke="url(#logoGrad)" stroke-width="2" fill="none"/>
-          <text x="20" y="28" font-family="Arial Black, sans-serif" font-size="20" font-weight="900" fill="url(#logoGrad)" text-anchor="middle">L</text>
-        </svg>
-      </div>
-      <div>
-        <div class="logo-text-judul">Leon Liquidity Engine</div>
-        <div class="logo-text-sub">AI-Powered Trading Signal Generator</div>
-      </div>
+      <div class="logo-icon">LE</div>
+      <span class="logo-text">Leon Engine</span>
     </div>
-    
-    <!-- Toggle Button - Di bawah logo -->
-    <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
-      <span>☰</span>
-    </button>
 
-    <div class="sidebar-section">
-      <div class="sidebar-judul">Navigasi</div>
-      <button class="btn-nav aktif" type="button" onclick="gantiHalaman('dashboard')">
-        <span>
-          <span class="btn-nav-icon" style="color: #00d9ff;">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span>Dashboard</span>
-        </span>
-        <span>⌘D</span>
+    <nav class="nav-section">
+      <div class="nav-label">Live Trading</div>
+      <button class="nav-btn active" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
       </button>
-      <button class="btn-nav" type="button" onclick="gantiHalaman('upload')">
-        <span>
-          <span class="btn-nav-icon" style="color: #22c55e;">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M7 10L12 5L17 10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 5V15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span>Upload Data CSV</span>
-        </span>
-        <span>⌘U</span>
+      <button class="nav-btn" onclick="showPage('live-signals')">
+        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Live Signals
       </button>
-      <button class="btn-nav" type="button" onclick="gantiHalaman('daftar')">
-        <span>
-          <span class="btn-nav-icon" style="color: #a855f7;">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 7V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M17 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M21 17V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M7 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M7 8H17V16H7V8Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span>Daftar Berkas</span>
-        </span>
-        <span>⌘D</span>
+      <button class="nav-btn" onclick="showPage('ai-prediction')">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        AI Prediction
       </button>
-      <button class="btn-nav" type="button" onclick="gantiHalaman('proses')">
-        <span>
-          <span class="btn-nav-icon" style="color: #f59e0b;">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span>Pra Proses Indikator</span>
-        </span>
-        <span>⌘P</span>
+    </nav>
+
+    <nav class="nav-section">
+      <div class="nav-label">Backtest & Research</div>
+      <button class="nav-btn" onclick="showPage('backtest')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Backtest (CSV)
       </button>
-      <button class="btn-nav" type="button" onclick="gantiHalaman('sinyal')">
-        <span>
-          <span class="btn-nav-icon" style="color: #3b82f6;">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 3V21L21 12L3 3Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M21 12L3 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span>Sinyal Trading</span>
-        </span>
-        <span>⌘S</span>
+      <button class="nav-btn" onclick="showPage('data-manager')">
+        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Data Manager
       </button>
-    </div>
+    </nav>
 
     <div class="sidebar-footer">
-      <strong>🔒 Mode: Development</strong><br />
-      Version 2.3 Premium • Offline Analysis<br />
-      <span style="font-size: 10px; opacity: 0.7;">Real-time trading & ML integration coming soon</span>
+      <div style="display: flex; align-items: center; margin-bottom: 8px;">
+        <span class="status-dot online"></span>
+        <span>Server Online</span>
+      </div>
+      <div>Leon Liquidity Engine v2.1</div>
     </div>
   </aside>
 
-  <main class="konten">
-    <!-- Floating Toggle Button (muncul ketika sidebar collapsed) -->
-    <button class="sidebar-toggle-floating" id="sidebarToggleFloating" onclick="toggleSidebar()" title="Tampilkan Sidebar" style="display: none; visibility: hidden;">
-      <span style="font-size: 24px; font-weight: bold;">☰</span>
-    </button>
-    
-    <div class="konten-inner">
-      <header class="judul-halaman">
-        <div>
-          <div class="judul-teks">Trading Signal Dashboard</div>
-          <div class="judul-sub">
-            Sistem analisis trading otomatis dengan teknologi indikator teknikal advanced. 
-            Upload data historis OHLCV dari Binance, proses dengan indikator RSI & EMA multi-periode, 
-            lalu generate sinyal trading berkualitas tinggi untuk 3 mode: Aktif, Santai, dan Pasif Trading.
-          </div>
-        </div>
-        <div class="badge-mode">
-          <span class="badge-dot"></span>
-          <span>System Online • FastAPI Backend • Premium Dark Theme</span>
-        </div>
-      </header>
+  <!-- Main Content -->
+  <main class="main">
 
-      <!-- Halaman Dashboard -->
-      <section class="halaman aktif" id="halaman-dashboard">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch;">
-          <!-- LEFT COLUMN: Statistik Sistem -->
-          <div class="panel">
-            <div class="panel-judul">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px;">
-                <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M21 10V3H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Statistik Sistem
-              <span class="aksen">LIVE OVERVIEW</span>
-            </div>
-            <div class="panel-sub">
-              Ringkasan lengkap performa sistem trading Anda. Monitor total folder coin pairs, 
-              file yang telah diproses, dan jumlah sinyal yang berhasil di-generate secara real-time.
-            </div>
-            <div id="dashboard-stats" style="margin-top: 16px;">
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
-                <div style="padding: 16px; background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(15, 23, 42, 0.6)); border-radius: 10px; border: 1px solid rgba(34, 211, 238, 0.4); box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);">
-                  <div style="font-size: 11px; color: var(--warna-teks-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 6px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 17V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 8H17V16H7V8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Total Folder
-                  </div>
-                  <div style="font-size: 32px; font-weight: 700; color: #22d3ee;" id="stat-total-folder">-</div>
-                  <div style="font-size: 10px; color: var(--warna-teks-secondary); margin-top: 4px;">Coin pairs tersedia</div>
-                </div>
-                <div style="padding: 16px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(15, 23, 42, 0.6)); border-radius: 10px; border: 1px solid rgba(168, 85, 247, 0.4); box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);">
-                  <div style="font-size: 11px; color: var(--warna-teks-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 6px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Total File
-                  </div>
-                  <div style="font-size: 32px; font-weight: 700; color: #a855f7;" id="stat-total-file">-</div>
-                  <div style="font-size: 10px; color: var(--warna-teks-secondary); margin-top: 4px;">File CSV uploaded</div>
-                </div>
-                <div style="padding: 16px; background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(15, 23, 42, 0.6)); border-radius: 10px; border: 1px solid rgba(34, 197, 94, 0.4); box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);">
-                  <div style="font-size: 11px; color: var(--warna-teks-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 6px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    File Processed
-                  </div>
-                  <div style="font-size: 32px; font-weight: 700; color: #22c55e;" id="stat-total-processed">-</div>
-                  <div style="font-size: 10px; color: var(--warna-teks-secondary); margin-top: 4px;">Siap untuk analisis</div>
-                </div>
-                <div style="padding: 16px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(15, 23, 42, 0.6)); border-radius: 10px; border: 1px solid rgba(251, 191, 36, 0.4); box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);">
-                  <div style="font-size: 11px; color: var(--warna-teks-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 6px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    Total Sinyal
-                  </div>
-                  <div style="font-size: 32px; font-weight: 700; color: #fbbf24;" id="stat-total-signals">-</div>
-                  <div style="font-size: 10px; color: var(--warna-teks-secondary); margin-top: 4px;">Sinyal tergenerate</div>
-                </div>
-              </div>
-            </div>
-            
+    <!-- ============ DASHBOARD PAGE ============ -->
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Real-time market overview dan trading signals</p>
+      </div>
 
-            
-            <!-- Quick Actions -->
-            <div style="margin-top: 24px;">
-              <div style="font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--warna-teks); display: flex; align-items: center; gap: 8px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="currentColor"/></svg>
-                Quick Actions
-              </div>
-              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn-utama" type="button" onclick="gantiHalaman('upload')" style="flex: 1; min-width: 150px;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 10L12 5L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 5V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  <span>Upload Data</span>
-                </button>
-                <button class="btn-utama" type="button" onclick="gantiHalaman('proses')" style="flex: 1; min-width: 150px;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  <span>Pra-Proses</span>
-                </button>
-                <button class="btn-utama" type="button" onclick="gantiHalaman('sinyal')" style="flex: 1; min-width: 150px;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  <span>Generate Sinyal</span>
-                </button>
-                <button class="btn-ghost" type="button" onclick="muatDashboardStats()" style="flex: 0; min-width: 100px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 4V10H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  <span>Refresh</span>
-                </button>
-                <button class="btn-ghost" type="button" onclick="debugBacktestData()" style="flex: 0; min-width: 80px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                  <span>Debug</span>
-                </button>
-              </div>
-            </div>
-            
-            <!-- System Info -->
-            <div style="margin-top: 24px; padding: 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 4px;">
-              <div style="font-size: 12px; color: #93c5fd; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;"><strong>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                Info Sistem</strong></div>
-              <div style="font-size: 11px; color: var(--warna-teks-secondary);">
-                <strong>Version:</strong> V2.1 (Modern System) | 
-                <strong>Mode:</strong> Offline | 
-                <strong>Backend:</strong> FastAPI + Python | 
-                <strong>Status:</strong> <span style="color: #22c55e;">● Online</span>
-              </div>
-            </div>
+      <!-- Stats Row -->
+      <div class="grid-4" style="margin-bottom: 20px;">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total-signals">0</div>
+          <div class="stat-label">Total Signals</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color: var(--accent-green);" id="stat-win-rate">0%</div>
+          <div class="stat-label">Win Rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color: var(--accent-cyan);" id="stat-avg-pnl">0%</div>
+          <div class="stat-label">Avg P&L</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color: var(--accent-purple);" id="stat-active-pairs">10</div>
+          <div class="stat-label">Active Pairs</div>
+        </div>
+      </div>
+
+      <!-- Real-time Prices -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Real-Time Prices
+            <span class="badge">LIVE</span>
           </div>
-          
-          <!-- RIGHT COLUMN: Real Backtest Performance -->
-          <div class="panel" style="display: flex; flex-direction: column;">
-            <div class="panel-judul">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px;">
-                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
-              </svg>
-              Real Backtest Performance
-              <span class="aksen">EXPERT RESULTS</span>
-            </div>
-            <div class="panel-sub">
-              Hasil backtest real menggunakan data historis H1. Win rate dan P&L adalah hasil aktual dari simulasi trading dengan expert mode confluence 5/6.
-            </div>
-            
-            <!-- Win Rate & P&L -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 16px 0;">
-              <div style="text-align: center; padding: 12px; background: rgba(34, 197, 94, 0.1); border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3);">
-                <div style="font-size: 10px; color: var(--warna-teks-secondary); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  Win Rate
-                </div>
-                <div style="font-size: 24px; font-weight: 700; color: #22c55e;" id="backtest-winrate">-</div>
-              </div>
-              <div style="text-align: center; padding: 12px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.3);">
-                <div style="font-size: 10px; color: var(--warna-teks-secondary); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2V22M17 5H9.5C8.11929 5 7 6.11929 7 7.5C7 8.88071 8.11929 10 9.5 10H14.5C15.8807 10 17 11.1193 17 12.5C17 13.8807 15.8807 15 14.5 15H7M21 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  Avg P&L
-                </div>
-                <div style="font-size: 24px; font-weight: 700; color: #3b82f6;" id="backtest-avgpnl">-</div>
-              </div>
-              <div style="text-align: center; padding: 12px; background: rgba(168, 85, 247, 0.1); border-radius: 8px; border: 1px solid rgba(168, 85, 247, 0.3);">
-                <div style="font-size: 10px; color: var(--warna-teks-secondary); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                  Duration
-                </div>
-                <div style="font-size: 24px; font-weight: 700; color: #a855f7;" id="backtest-duration">-</div>
-              </div>
-            </div>
-            
-            <!-- Hit TP/SL Breakdown -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
-              <div style="text-align: center; padding: 10px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; border: 1px solid rgba(34, 197, 94, 0.3);">
-                <div style="font-size: 9px; color: var(--warna-teks-secondary); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  HIT TP
-                </div>
-                <div style="font-size: 18px; font-weight: 700; color: #22c55e;" id="backtest-hittp">-</div>
-              </div>
-              <div style="text-align: center; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.3);">
-                <div style="font-size: 9px; color: var(--warna-teks-secondary); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  HIT SL
-                </div>
-                <div style="font-size: 18px; font-weight: 700; color: #ef4444;" id="backtest-hitsl">-</div>
-              </div>
-              <div style="text-align: center; padding: 10px; background: rgba(156, 163, 175, 0.1); border-radius: 6px; border: 1px solid rgba(156, 163, 175, 0.3);">
-                <div style="font-size: 9px; color: var(--warna-teks-secondary); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                  TIMEOUT
-                </div>
-                <div style="font-size: 18px; font-weight: 700; color: #9ca3af;" id="backtest-timeout">-</div>
-              </div>
-            </div>
-            
-            <div style="font-size: 10px; color: var(--warna-teks-secondary); text-align: center; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 4px; border-left: 3px solid #3b82f6;">
-              <strong>Real Performance:</strong> Backtested dengan data historis H1. Win rate dan P&L adalah hasil aktual dari simulasi trading.
-            </div>
-            
-            <!-- BREAKDOWN SECTION: Inside right column, below backtest -->
-            <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1);">
-              <div style="font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--warna-teks); display: flex; align-items: center; gap: 8px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                Breakdown per Mode
-              </div>
-              
-              <!-- Signal Breakdown by Mode - Compact Version -->
-              <div id="signal-breakdown" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                <!-- Aktif -->
-                <div style="padding: 10px; background: linear-gradient(135deg, rgba(34, 211, 238, 0.15), rgba(15, 23, 42, 0.7)); border-radius: 6px; border: 1px solid rgba(34, 211, 238, 0.4); text-align: center;">
-                  <div style="font-size: 9px; color: var(--warna-teks-secondary); text-transform: uppercase; margin-bottom: 4px;">Aktif</div>
-                  <div style="font-size: 18px; font-weight: 700; color: #22d3ee;" id="aktif-count">-</div>
-                  <div style="font-size: 9px; color: var(--warna-teks-secondary);"><span id="aktif-percentage">-</span>%</div>
-                  <div style="font-size: 9px; color: #22d3ee; margin-top: 4px;"><span id="aktif-accuracy">-</span>% conf</div>
-                </div>
-                
-                <!-- Santai -->
-                <div style="padding: 10px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(15, 23, 42, 0.7)); border-radius: 6px; border: 1px solid rgba(168, 85, 247, 0.4); text-align: center;">
-                  <div style="font-size: 9px; color: var(--warna-teks-secondary); text-transform: uppercase; margin-bottom: 4px;">Santai</div>
-                  <div style="font-size: 18px; font-weight: 700; color: #a855f7;" id="santai-count">-</div>
-                  <div style="font-size: 9px; color: var(--warna-teks-secondary);"><span id="santai-percentage">-</span>%</div>
-                  <div style="font-size: 9px; color: #a855f7; margin-top: 4px;"><span id="santai-accuracy">-</span>% conf</div>
-                </div>
-                
-                <!-- Pasif -->
-                <div style="padding: 10px; background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(15, 23, 42, 0.7)); border-radius: 6px; border: 1px solid rgba(34, 197, 94, 0.4); text-align: center;">
-                  <div style="font-size: 9px; color: var(--warna-teks-secondary); text-transform: uppercase; margin-bottom: 4px;">Pasif</div>
-                  <div style="font-size: 18px; font-weight: 700; color: #22c55e;" id="pasif-count">-</div>
-                  <div style="font-size: 9px; color: var(--warna-teks-secondary);"><span id="pasif-percentage">-</span>%</div>
-                  <div style="font-size: 9px; color: #22c55e; margin-top: 4px;"><span id="pasif-accuracy">-</span>% conf</div>
-                </div>
-              </div>
-            </div>
+          <button class="btn btn-secondary" onclick="loadRealtimePrices()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div class="price-grid" id="realtime-prices">
+          <div class="loading"><div class="spinner"></div>Memuat harga...</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Distribusi Hasil <span class="badge">PIE CHART</span></div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartPie"></canvas>
           </div>
         </div>
-        
-        <!-- BOTTOM SECTION: Coin Pairs & Activity -->
-        <div class="panel" style="margin-top: 24px;">
-            <div class="panel-judul">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px;">
-                <path d="M3 7V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M17 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M21 17V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M7 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M7 8H17V16H7V8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Coin Pairs & Activity
-              <span class="aksen">ASSET MANAGEMENT</span>
-            </div>
-            <div class="panel-sub">
-              Daftar lengkap folder coin pairs yang tersedia untuk analisis. 
-              Klik folder untuk melihat detail file dan riwayat trading signals.
-            </div>
-            <ul class="list-berkas" id="dashboard-list-folder" style="max-height: 300px;"></ul>
-            
-            <!-- Recent Activity -->
-            <div style="margin-top: 20px;">
-              <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--warna-teks);">📋 Fitur Tersedia</div>
-              <div style="font-size: 11px; color: var(--warna-teks-secondary); line-height: 1.6;">
-                <div style="padding: 8px; background: rgba(15, 23, 42, 0.6); border-radius: 6px; margin-bottom: 8px;">
-                  <strong style="color: #22d3ee;">✓ Mode Aktif:</strong> RSI 6, EMA 9/20/50, monitoring aktif 1-4H
-                </div>
-                <div style="padding: 8px; background: rgba(15, 23, 42, 0.6); border-radius: 6px; margin-bottom: 8px;">
-                  <strong style="color: #a855f7;">✓ Mode Santai:</strong> RSI 8, EMA 20/50/200, check 2-3x sehari
-                </div>
-                <div style="padding: 8px; background: rgba(15, 23, 42, 0.6); border-radius: 6px; margin-bottom: 8px;">
-                  <strong style="color: #22c55e;">✓ Mode Pasif:</strong> RSI 14, EMA 50/100/200, check sekali sehari
-                </div>
-                <div style="padding: 8px; background: rgba(15, 23, 42, 0.6); border-radius: 6px;">
-                  <strong style="color: #fbbf24;">✓ Market Regime:</strong> Trending, Sideways, Volatile detection
-                </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Equity Curve <span class="badge cyan">GROWTH</span></div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartEquity"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LIVE SIGNALS PAGE ============ -->
+    <section class="page" id="page-live-signals">
+      <div class="page-header">
+        <h1 class="page-title">Live Signals</h1>
+        <p class="page-subtitle">Trading signals real-time dari analisis AI</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Generate Signal</div>
+        </div>
+        <div class="grid-3" style="margin-bottom: 16px;">
+          <div class="form-group">
+            <label class="form-label">Symbol</label>
+            <select class="form-select" id="live-symbol">
+              <option value="BTCUSDT">BTC/USDT</option>
+              <option value="ETHUSDT">ETH/USDT</option>
+              <option value="BNBUSDT">BNB/USDT</option>
+              <option value="SOLUSDT">SOL/USDT</option>
+              <option value="XRPUSDT">XRP/USDT</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mode Trading</label>
+            <select class="form-select" id="live-mode">
+              <option value="aktif">Aktif (1-4H)</option>
+              <option value="santai" selected>Santai (4-12H)</option>
+              <option value="pasif">Pasif (12-24H)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">&nbsp;</label>
+            <button class="btn btn-primary" style="width: 100%;" onclick="generateLiveSignal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Generate Signal
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Latest Signals</div>
+        </div>
+        <div class="table-container" id="live-signals-table">
+          <div class="loading"><div class="spinner"></div>Belum ada signal. Klik Generate untuk memulai.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ AI PREDICTION PAGE ============ -->
+    <section class="page" id="page-ai-prediction">
+      <div class="page-header">
+        <h1 class="page-title">AI Prediction</h1>
+        <p class="page-subtitle">Prediksi arah harga menggunakan LSTM Deep Learning</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Select Symbol</div>
+          </div>
+          <div class="form-group">
+            <select class="form-select" id="ai-symbol" style="font-size: 16px; padding: 14px;">
+              <option value="BTCUSDT">BTC/USDT - Bitcoin</option>
+              <option value="ETHUSDT">ETH/USDT - Ethereum</option>
+              <option value="BNBUSDT">BNB/USDT - Binance Coin</option>
+              <option value="SOLUSDT">SOL/USDT - Solana</option>
+              <option value="XRPUSDT">XRP/USDT - Ripple</option>
+              <option value="DOGEUSDT">DOGE/USDT - Dogecoin</option>
+              <option value="ADAUSDT">ADA/USDT - Cardano</option>
+              <option value="AVAXUSDT">AVAX/USDT - Avalanche</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="getAIPrediction()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
+            Get AI Prediction
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Prediction Result <span class="badge purple">LSTM</span></div>
+          </div>
+          <div id="ai-prediction-result">
+            <div class="loading">Pilih symbol dan klik "Get AI Prediction"</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Tentang AI Prediction</div>
+        </div>
+        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.7;">
+          <p><strong>LSTM (Long Short-Term Memory)</strong> adalah jenis neural network yang sangat baik untuk menganalisis data time-series seperti harga cryptocurrency.</p>
+          <br>
+          <p>Model ini menganalisis:</p>
+          <ul style="margin-left: 20px; margin-top: 8px;">
+            <li>Pola harga historis (OHLCV)</li>
+            <li>Indikator teknikal (RSI, EMA, ATR)</li>
+            <li>Volume dan momentum</li>
+          </ul>
+          <br>
+          <p style="color: var(--accent-orange);">⚠️ Disclaimer: Prediksi AI bukan jaminan profit. Selalu gunakan risk management yang baik.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BACKTEST PAGE ============ -->
+    <section class="page" id="page-backtest">
+      <div class="page-header">
+        <h1 class="page-title">Backtest (CSV)</h1>
+        <p class="page-subtitle">Test strategi trading dengan data historis</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Generate Backtest Signal</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pilih Folder Data</label>
+            <select class="form-select" id="backtest-folder">
+              <option value="">-- Pilih Folder --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mode Trading</label>
+            <select class="form-select" id="backtest-mode">
+              <option value="aktif">Aktif - RSI 6, EMA 9/20/50</option>
+              <option value="santai" selected>Santai - RSI 8, EMA 20/50/200</option>
+              <option value="pasif">Pasif - RSI 14, EMA 50/100/200</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="width: 100%;" onclick="runBacktest()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Run Backtest
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Backtest Statistics</div>
+          </div>
+          <div id="backtest-stats">
+            <div class="grid-2" style="gap: 12px;">
+              <div class="stat-card">
+                <div class="stat-value" id="bt-total">0</div>
+                <div class="stat-label">Total Signals</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" style="color: var(--accent-green);" id="bt-winrate">0%</div>
+                <div class="stat-label">Win Rate</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" style="color: var(--accent-green);" id="bt-tp">0</div>
+                <div class="stat-label">HIT TP</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" style="color: var(--accent-red);" id="bt-sl">0</div>
+                <div class="stat-label">HIT SL</div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <!-- Halaman Upload -->
-      <section class="grid-panel halaman" id="halaman-upload">
-        <!-- Panel kiri: Upload + Proses -->
-        <div class="panel" id="panel-upload">
-          <div class="panel-judul">
-            Upload Data CSV
-            <span class="aksen">DATA HISTORIS</span>
-          </div>
-          <div class="panel-sub">
-            Pilih file OHLCV 1m Binance (<code>open_time, open, high, low, close, volume</code>)
-            lalu unggah ke server. File akan disimpan di folder yang dipilih.
-          </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Backtest Results</div>
+        </div>
+        <div class="table-container" id="backtest-results">
+          <div class="loading">Pilih folder dan klik "Run Backtest" untuk memulai</div>
+        </div>
+      </div>
+    </section>
 
-          <div class="form-kelompok">
-            <label class="label" for="select-folder-upload">Pilih Folder Tujuan</label>
+    <!-- ============ DATA MANAGER PAGE ============ -->
+    <section class="page" id="page-data-manager">
+      <div class="page-header">
+        <h1 class="page-title">Data Manager</h1>
+        <p class="page-subtitle">Upload dan kelola data CSV untuk backtest</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Upload CSV</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pilih Folder Tujuan</label>
             <div style="display: flex; gap: 8px;">
-              <select id="select-folder-upload" style="flex: 1; padding: 12px 16px; border-radius: 12px; border: 2px solid rgba(0, 255, 136, 0.3); background: rgba(26, 26, 26, 0.8); color: #ffffff; font-size: 14px; outline: none; cursor: pointer; transition: all 0.3s ease;">
+              <select class="form-select" id="upload-folder" style="flex: 1;">
                 <option value="">-- Pilih Folder --</option>
               </select>
-              <button id="btn-buat-folder" class="btn-ghost" type="button" style="white-space: nowrap;">
-                <span>+</span>
-                <span>Buat Folder</span>
-              </button>
+              <button class="btn btn-secondary" onclick="createFolder()">+ Folder</button>
             </div>
           </div>
-
-          <div class="form-kelompok">
-            <label class="label" for="input-csv">Pilih berkas CSV (bisa pilih beberapa file sekaligus)</label>
-            <input id="input-csv" type="file" accept=".csv" multiple />
+          <div class="form-group">
+            <label class="form-label">File CSV</label>
+            <input type="file" class="form-input" id="upload-file" accept=".csv" />
           </div>
-
-          <button id="btn-upload" class="btn-utama" type="button">
-            <span>⭱</span>
-            <span>Unggah CSV ke Backend</span>
+          <button class="btn btn-primary" style="width: 100%;" onclick="uploadCSV()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload
           </button>
-
-          <div class="status-bar" id="status-upload"></div>
+          <div id="upload-status" style="margin-top: 12px; font-size: 12px;"></div>
         </div>
-      </section>
 
-      <!-- Halaman Pra Proses Indikator -->
-      <section class="grid-panel halaman" id="halaman-proses">
-        <div class="panel">
-          <div class="panel-judul">
-            Pra Proses Indikator
-            <span class="aksen">RSI · EMA</span>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Pra-Proses Data</div>
           </div>
-          <div class="panel-sub">
-            Tambahkan kolom <strong>RSI</strong> dan <strong>EMA</strong> ke
-            seluruh berkas di folder yang dipilih. Hasilnya akan disimpan sebagai
-            <code>.processed.csv</code> di folder processed yang sesuai.
-          </div>
-
-          <div class="form-kelompok">
-            <label class="label" for="select-folder-proses">Pilih Folder yang Akan Diproses</label>
-            <select id="select-folder-proses" style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 2px solid rgba(0, 255, 136, 0.3); background: rgba(26, 26, 26, 0.8); color: #ffffff; font-size: 14px; outline: none; cursor: pointer; transition: all 0.3s ease;">
+          <div class="form-group">
+            <label class="form-label">Pilih Folder untuk Diproses</label>
+            <select class="form-select" id="process-folder">
               <option value="">-- Pilih Folder --</option>
             </select>
           </div>
-
-          <div style="margin-bottom:16px; padding:12px; background:rgba(255,255,255,0.03); border-radius:6px; border-left:3px solid #4CAF50;">
-            <div style="font-size:13px; color:#aaa; margin-bottom:4px; display: flex; align-items: center; gap: 8px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Periode Indikator (FIXED)
-            </div>
-            <div style="font-size:14px; color:#fff;">
-              <strong>RSI:</strong> 14 | <strong>EMA 50:</strong> Trend Jangka Menengah | <strong>EMA 200:</strong> Trend Jangka Panjang
-            </div>
-            <div style="font-size:12px; color:#888; margin-top:4px;">
-              Periode ini sudah ditetapkan dan tidak bisa diubah untuk konsistensi analisis.
-            </div>
-          </div>
-
-          <div style="display:flex; gap:10px; align-items:center; margin-bottom:4px;">
-            <button id="btn-proses" class="btn-utama" type="button">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="currentColor"/></svg>
-              <span>Proses Semua Berkas</span>
-            </button>
-          </div>
-
-          <div class="status-bar" id="status-proses"></div>
-
-          <div style="margin-top:20px;">
-            <div class="panel-judul" style="font-size: 14px; margin-bottom: 8px;">
-              Hasil Pra-Proses
-              <span class="aksen">RESULT</span>
-            </div>
-            <pre class="hasil-json" id="hasil-json">(belum ada hasil)</pre>
-          </div>
+          <button class="btn btn-primary" style="width: 100%;" onclick="processData()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Proses Indikator
+          </button>
+          <div id="process-status" style="margin-top: 12px; font-size: 12px;"></div>
         </div>
-      </section>
+      </div>
 
-      <!-- Halaman Sinyal Trading -->
-      <section class="grid-panel halaman" id="halaman-sinyal">
-        <div class="panel">
-          <div class="panel-judul">
-            Generate Sinyal Trading
-            <span class="aksen">RULE-BASED</span>
-          </div>
-          <div class="panel-sub">
-            Generate sinyal trading berdasarkan indikator RSI dan EMA yang sudah diproses.
-            Sinyal akan menampilkan Entry, Stop Loss, Take Profit, dan confidence score.
-          </div>
-
-          <div class="form-kelompok">
-            <label class="label" for="select-folder-sinyal">Pilih Folder yang Akan Dianalisis</label>
-            <select id="select-folder-sinyal" style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 2px solid rgba(0, 255, 136, 0.3); background: rgba(26, 26, 26, 0.8); color: #ffffff; font-size: 14px; outline: none; cursor: pointer; transition: all 0.3s ease;">
-              <option value="">-- Pilih Folder --</option>
-            </select>
-          </div>
-
-          <div class="panel-judul" style="font-size: 13px; margin-top: 16px; margin-bottom: 8px;">
-            Trading Style
-            <span class="aksen">STRATEGY</span>
-          </div>
-
-          <div class="form-kelompok">
-            <label class="label" for="select-trading-style">Pilih Strategi Trading</label>
-            <select id="select-trading-style" style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 2px solid rgba(0, 217, 255, 0.3); background: rgba(26, 26, 26, 0.8); color: #ffffff; font-size: 14px; outline: none; cursor: pointer; transition: all 0.3s ease;">
-              <option value="aktif">Mode Aktif - Monitoring Aktif 1-4H (RSI 6, EMA 9/20/50)</option>
-              <option value="santai" selected>Mode Santai - Check 2-3x Sehari (RSI 8, EMA 20/50/200)</option>
-              <option value="pasif">Mode Pasif - Check Sekali Sehari (RSI 14, EMA 50/100/200)</option>
-            </select>
-            <div id="info-trading-style" style="margin-top: 8px; padding: 10px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 4px; font-size: 12px; color: #93c5fd;">
-              <strong>Mode Santai:</strong> Trading dengan check 2-3x sehari. Entry berdasarkan momentum dengan konfirmasi trend.
-            </div>
-          </div>
-
-          <div style="display:flex; gap:10px; align-items:center; margin-bottom:4px; margin-top: 12px;">
-            <button id="btn-generate-sinyal" class="btn-utama" type="button">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span>Generate Sinyal</span>
-            </button>
-          </div>
-
-          <div class="status-bar" id="status-sinyal"></div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Daftar Folder</div>
+          <button class="btn btn-secondary" onclick="loadFolders()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/></svg>
+            Refresh
+          </button>
         </div>
-
-        <div class="panel">
-          <div class="panel-judul">
-            Hasil Sinyal
-            <span class="aksen">TRADING SIGNALS</span>
-          </div>
-          <div class="panel-sub">
-            Daftar sinyal yang berhasil di-generate dari data processed.
-          </div>
-          <div id="tabel-sinyal" style="margin-top: 12px; max-height: 600px; overflow: auto;">
-            <div style="text-align: center; padding: 40px; color: var(--warna-teks-secondary);">
-              Belum ada sinyal. Pilih folder dan klik "Generate Sinyal".
-            </div>
-          </div>
+        <div id="folder-list">
+          <div class="loading"><div class="spinner"></div>Memuat folder...</div>
         </div>
-      </section>
-
-      <section class="halaman" id="halaman-daftar">
-        <div class="grid-panel" style="grid-template-columns: 1fr 1fr; gap: 24px;">
-          <div class="panel">
-            <div class="panel-judul">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px;">
-                <path d="M3 7V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M17 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M21 17V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M7 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M7 8H17V16H7V8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Daftar Folder
-              <span class="aksen">FOLDER MANAGEMENT</span>
-            </div>
-            <div class="panel-sub">
-              Klik folder untuk melihat file di dalamnya. Gunakan tombol untuk mengelola folder.
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <button id="btn-refresh-folder" class="btn-ghost" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 4V10H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span>Refresh Folder</span>
-              </button>
-              <button id="btn-buat-folder-daftar" class="btn-ghost" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span>Buat Folder</span>
-              </button>
-            </div>
-            <ul class="list-berkas" id="list-folder" style="max-height: 500px;"></ul>
-          </div>
-
-          <div class="panel">
-            <div class="panel-judul">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px;">
-                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              File di Folder: <span id="nama-folder-aktif" style="color: var(--warna-aksen);">-</span>
-              <span class="aksen">FILE LIST</span>
-            </div>
-            <div class="panel-sub">
-              Daftar file di folder yang dipilih. Klik file untuk melihat isinya, atau hapus file yang tidak diperlukan.
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <button id="btn-refresh-file" class="btn-ghost" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 4V10H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14L18.36 18.36A9 9 0 0 1 3.51 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span>Refresh File</span>
-              </button>
-            </div>
-            <ul class="list-berkas" id="list-file-folder" style="max-height: 400px;"></ul>
-          </div>
-        </div>
-        
-        <!-- Preview Panel Terpisah - Full Width -->
-        <div class="panel" style="margin-top: 24px;">
-          <div class="panel-judul">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px;">
-              <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Preview Berkas
-            <span class="aksen">SAMPLE DATA</span>
-          </div>
-          <div class="panel-sub">
-            Klik file di atas untuk melihat preview data. Preview akan menampilkan 10 baris pertama dari file yang dipilih.
-          </div>
-          <div class="status-bar" id="status-preview"></div>
-          <div id="preview-tabel" style="margin-top:16px; max-height:500px; overflow:auto; background: rgba(0, 0, 0, 0.3); border-radius: 8px; padding: 12px;"></div>
-        </div>
-      </section>
-    </div>
+      </div>
+    </section>
   </main>
 
+  <!-- Mobile Nav Button -->
+  <button class="mobile-nav-btn" onclick="toggleSidebar()">☰</button>
+select>label></div>div>div></div>div>div></div>""
+
+
   <script>
-    let halamanAktif = "dashboard";
-    let folderAktif = "";
+    // ============ NAVIGATION ============
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      
+      const page = document.getElementById('page-' + pageId);
+      if (page) page.classList.add('active');
+      
+      event.target.closest('.nav-btn')?.classList.add('active');
+      
+      // Close sidebar on mobile
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('overlay').classList.remove('active');
+      }
+    }
 
-    // Toggle Sidebar Function
     function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const toggleBtn = document.querySelector('.sidebar-toggle-btn');
-      const toggleFloating = document.getElementById('sidebarToggleFloating');
-      const isDesktop = window.innerWidth > 1024;
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('overlay').classList.toggle('active');
+    }
+
+    // ============ REAL-TIME PRICES ============
+    async function loadRealtimePrices() {
+      const container = document.getElementById('realtime-prices');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div>Memuat harga...</div>';
       
-      if (isDesktop) {
-        sidebar.classList.toggle('collapsed');
+      try {
+        const res = await fetch('/binance/prices');
+        const data = await res.json();
         
-        // Update floating toggle visibility
-        if (sidebar.classList.contains('collapsed')) {
-          if (toggleFloating) {
-            toggleFloating.style.display = 'flex';
-            toggleFloating.style.visibility = 'visible';
-            toggleFloating.style.opacity = '1';
-            toggleFloating.classList.add('visible');
+        if (data.status === 'sukses' && data.data) {
+          let html = '';
+          data.data.forEach(item => {
+            const symbol = item.symbol.replace('USDT', '');
+            const price = parseFloat(item.price);
+            const formatted = price >= 1 ? price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : price.toFixed(6);
+            html += `<div class="price-card"><span class="price-symbol">${symbol}</span><span class="price-value">$${formatted}</span></div>`;
+          });
+          container.innerHTML = html;
+        }
+      } catch (err) {
+        container.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Error: ${err.message}</div>`;
+      }
+    }
+
+    // ============ AI PREDICTION ============
+    async function getAIPrediction() {
+      const symbol = document.getElementById('ai-symbol').value;
+      const container = document.getElementById('ai-prediction-result');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div>Menganalisis...</div>';
+      
+      try {
+        const res = await fetch(`/lstm/predict/${symbol}`);
+        const data = await res.json();
+        
+        if (data.status === 'sukses' && data.prediksi) {
+          const pred = data.prediksi;
+          const dir = pred.direction;
+          const conf = (pred.confidence * 100).toFixed(0);
+          const price = data.harga_terkini ? parseFloat(data.harga_terkini).toLocaleString('en-US', {minimumFractionDigits: 2}) : '-';
+          
+          const dirClass = dir === 'UP' ? 'up' : 'down';
+          const dirIcon = dir === 'UP' ? '↑' : dir === 'DOWN' ? '↓' : '→';
+          const dirText = dir === 'UP' ? 'NAIK' : dir === 'DOWN' ? 'TURUN' : 'NETRAL';
+          const rekom = data.rekomendasi?.aksi || (dir === 'UP' ? 'BELI' : dir === 'DOWN' ? 'JUAL' : 'TUNGGU');
+          
+          container.innerHTML = `
+            <div class="prediction-box">
+              <div style="font-size: 12px; color: var(--text-muted);">${symbol.replace('USDT', '/USDT')}</div>
+              <div class="prediction-direction ${dirClass}">${dirIcon}</div>
+              <div style="font-size: 18px; font-weight: 700; color: ${dir === 'UP' ? 'var(--accent-green)' : 'var(--accent-red)'};">${dirText}</div>
+              <div style="margin-top: 12px; font-size: 13px;">Confidence: <strong>${conf}%</strong></div>
+              <div style="margin-top: 8px; font-size: 13px;">Harga: <strong>$${price}</strong></div>
+              ${pred.rsi ? `<div style="margin-top: 8px; font-size: 11px; color: var(--text-secondary);">RSI: ${pred.rsi} | EMA20: ${pred.ema_20} | EMA50: ${pred.ema_50}</div>` : ''}
+              <div style="margin-top: 16px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                <div style="font-size: 11px; color: var(--text-muted);">Rekomendasi</div>
+                <div style="font-size: 18px; font-weight: 700; color: ${rekom === 'BELI' ? 'var(--accent-green)' : rekom === 'JUAL' ? 'var(--accent-red)' : 'var(--accent-orange)'};">${rekom}</div>
+                ${data.rekomendasi?.alasan ? `<div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${data.rekomendasi.alasan}</div>` : ''}
+              </div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        container.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Error: ${err.message}</div>`;
+      }
+    }
+
+    // ============ LIVE SIGNALS ============
+    async function generateLiveSignal() {
+      const symbol = document.getElementById('live-symbol').value;
+      const mode = document.getElementById('live-mode').value;
+      const container = document.getElementById('live-signals-table');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div>Generating signal...</div>';
+      
+      try {
+        // Get real-time data and analyze
+        const res = await fetch(`/binance/analyze/${symbol}?mode_trading=${mode}`, { method: 'POST' });
+        const data = await res.json();
+        
+        if (data.status === 'sukses') {
+          // Show current indicators
+          let html = `
+            <div style="margin-bottom: 16px; padding: 12px; background: var(--bg-secondary); border-radius: 8px;">
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Indikator Terkini - ${symbol}</div>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px;">
+                <span>RSI: <strong style="color: var(--accent-cyan);">${data.indikator_terkini?.rsi_14 || '-'}</strong></span>
+                <span>EMA20: <strong>${data.indikator_terkini?.ema_20 || '-'}</strong></span>
+                <span>EMA50: <strong>${data.indikator_terkini?.ema_50 || '-'}</strong></span>
+                <span>Harga: <strong style="color: var(--accent-green);">$${data.harga_terkini?.toLocaleString() || '-'}</strong></span>
+              </div>
+            </div>
+          `;
+          
+          if (data.sinyal && data.sinyal.length > 0) {
+            html += '<table><thead><tr><th>Pair</th><th>Signal</th><th>Entry</th><th>SL</th><th>TP</th><th>Confidence</th><th>Alasan</th></tr></thead><tbody>';
+            data.sinyal.forEach(s => {
+              html += `<tr>
+                <td><strong>${s.pair || symbol}</strong></td>
+                <td class="${s.tipe === 'BELI' ? 'signal-buy' : 'signal-sell'}"><strong>${s.tipe}</strong></td>
+                <td>$${s.entry?.toFixed(2) || '-'}</td>
+                <td>$${s.stop_loss?.toFixed(2) || '-'}</td>
+                <td>$${s.take_profit?.toFixed(2) || '-'}</td>
+                <td>${s.confidence ? (s.confidence * 100).toFixed(0) + '%' : '-'}</td>
+                <td style="font-size: 11px;">${s.alasan || '-'}</td>
+              </tr>`;
+            });
+            html += '</tbody></table>';
+          } else {
+            html += '<div style="padding: 20px; color: var(--text-muted); text-align: center;">Tidak ada signal yang memenuhi kriteria saat ini. Coba mode trading lain atau tunggu kondisi market yang lebih baik.</div>';
           }
-          document.body.classList.add('sidebar-collapsed');
+          container.innerHTML = html;
         } else {
-          if (toggleFloating) {
-            toggleFloating.style.display = 'none';
-            toggleFloating.style.visibility = 'hidden';
-            toggleFloating.style.opacity = '0';
-            toggleFloating.classList.remove('visible');
-          }
-          document.body.classList.remove('sidebar-collapsed');
+          container.innerHTML = '<div style="padding: 20px; color: var(--text-muted);">Tidak ada signal yang memenuhi kriteria saat ini.</div>';
+        }
+      } catch (err) {
+        container.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Error: ${err.message}</div>`;
+      }
+    }
+
+    // ============ BACKTEST ============
+    async function runBacktest() {
+      const folder = document.getElementById('backtest-folder').value;
+      const mode = document.getElementById('backtest-mode').value;
+      
+      if (!folder) {
+        alert('Pilih folder terlebih dahulu!');
+        return;
+      }
+      
+      const container = document.getElementById('backtest-results');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div>Running backtest...</div>';
+      
+      try {
+        const res = await fetch('/sinyal/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ folder, mode_trading: mode, confidence_minimum: 0.60 })
+        });
+        
+        const data = await res.json();
+        
+        // Update stats
+        if (data.backtest_statistics) {
+          const stats = data.backtest_statistics;
+          document.getElementById('bt-total').textContent = stats.total_signals || 0;
+          document.getElementById('bt-winrate').textContent = (stats.win_rate || 0) + '%';
+          document.getElementById('bt-tp').textContent = stats.hit_tp || 0;
+          document.getElementById('bt-sl').textContent = stats.hit_sl || 0;
         }
         
-        // Update icon dengan animasi
-        if (toggleBtn) {
-          const icon = toggleBtn.querySelector('span');
-          if (sidebar.classList.contains('collapsed')) {
-            icon.style.transform = 'rotate(180deg)';
-            setTimeout(() => {
-              icon.textContent = '→';
-            }, 150);
-          } else {
-            icon.style.transform = 'rotate(0deg)';
-            setTimeout(() => {
-              icon.textContent = '☰';
-            }, 150);
-          }
-        }
-      } else {
-        sidebar.classList.toggle('open');
-      }
-    }
-    
-    // Check sidebar state on load and update floating toggle
-    document.addEventListener('DOMContentLoaded', function() {
-      const sidebar = document.getElementById('sidebar');
-      const toggleFloating = document.getElementById('sidebarToggleFloating');
-      if (sidebar && sidebar.classList.contains('collapsed')) {
-        if (toggleFloating) {
-          toggleFloating.style.display = 'flex';
-          toggleFloating.style.visibility = 'visible';
-          toggleFloating.style.opacity = '1';
-          toggleFloating.classList.add('visible');
-        }
-        document.body.classList.add('sidebar-collapsed');
-      } else {
-        if (toggleFloating) {
-          toggleFloating.style.display = 'none';
-          toggleFloating.style.visibility = 'hidden';
-          toggleFloating.style.opacity = '0';
-          toggleFloating.classList.remove('visible');
-        }
-        document.body.classList.remove('sidebar-collapsed');
-      }
-    });
-    
-    // Update floating toggle visibility on window resize
-    window.addEventListener('resize', function() {
-      const sidebar = document.getElementById('sidebar');
-      const toggleFloating = document.getElementById('sidebarToggleFloating');
-      if (window.innerWidth > 1024) {
-        if (sidebar && sidebar.classList.contains('collapsed')) {
-          if (toggleFloating) {
-            toggleFloating.style.display = 'flex';
-            toggleFloating.style.visibility = 'visible';
-            toggleFloating.style.opacity = '1';
-            toggleFloating.classList.add('visible');
-          }
-          document.body.classList.add('sidebar-collapsed');
+        // Show signals
+        if (data.sinyal && data.sinyal.length > 0) {
+          let html = '<table><thead><tr><th>Pair</th><th>Tipe</th><th>Entry</th><th>SL</th><th>TP</th><th>Conf</th><th>Result</th><th>P&L</th></tr></thead><tbody>';
+          data.sinyal.forEach(s => {
+            const resultColor = s.backtest_result === 'HIT_TP' ? 'var(--accent-green)' : s.backtest_result === 'HIT_SL' ? 'var(--accent-red)' : 'var(--text-muted)';
+            const pnl = s.pnl_percent || 0;
+            const pnlColor = pnl > 0 ? 'var(--accent-green)' : pnl < 0 ? 'var(--accent-red)' : 'var(--text-muted)';
+            html += `<tr>
+              <td>${s.pair || '-'}</td>
+              <td class="${s.tipe === 'BELI' ? 'signal-buy' : 'signal-sell'}"><strong>${s.tipe}</strong></td>
+              <td>${s.entry?.toFixed(4) || '-'}</td>
+              <td>${s.stop_loss?.toFixed(4) || '-'}</td>
+              <td>${s.take_profit?.toFixed(4) || '-'}</td>
+              <td>${(s.confidence * 100).toFixed(0)}%</td>
+              <td style="color: ${resultColor};"><strong>${s.backtest_result || '-'}</strong></td>
+              <td style="color: ${pnlColor};">${pnl > 0 ? '+' : ''}${pnl.toFixed(2)}%</td>
+            </tr>`;
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
         } else {
-          if (toggleFloating) {
-            toggleFloating.style.display = 'none';
-            toggleFloating.style.visibility = 'hidden';
-            toggleFloating.style.opacity = '0';
-            toggleFloating.classList.remove('visible');
-          }
-          document.body.classList.remove('sidebar-collapsed');
+          container.innerHTML = '<div style="padding: 20px; color: var(--text-muted);">Tidak ada signal yang ditemukan.</div>';
         }
-      } else {
-        if (toggleFloating) {
-          toggleFloating.style.display = 'none';
-          toggleFloating.style.visibility = 'hidden';
-        }
-        document.body.classList.remove('sidebar-collapsed');
-      }
-    });
-    
-    // Observer untuk memastikan toggle button selalu visible ketika sidebar collapsed
-    let sidebarObserver = null;
-    
-    function initSidebarObserver() {
-      const sidebar = document.getElementById('sidebar');
-      const toggleFloating = document.getElementById('sidebarToggleFloating');
-      
-      if (!sidebar || !toggleFloating) return;
-      
-      // Hapus observer lama jika ada
-      if (sidebarObserver) {
-        sidebarObserver.disconnect();
-      }
-      
-      // Buat observer baru
-      sidebarObserver = new MutationObserver(function() {
-        if (window.innerWidth > 1024) {
-          if (sidebar.classList.contains('collapsed')) {
-            toggleFloating.style.display = 'flex';
-            toggleFloating.style.visibility = 'visible';
-            toggleFloating.style.opacity = '1';
-            document.body.classList.add('sidebar-collapsed');
-          } else {
-            toggleFloating.style.display = 'none';
-            toggleFloating.style.visibility = 'hidden';
-            toggleFloating.style.opacity = '0';
-            document.body.classList.remove('sidebar-collapsed');
-          }
-        }
-      });
-      
-      // Start observing sidebar for class changes
-      sidebarObserver.observe(sidebar, {
-        attributes: true,
-        attributeFilter: ['class']
-      });
-    }
-    
-    // Initialize observer setelah DOM loaded
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initSidebarObserver);
-    } else {
-      initSidebarObserver();
-    }
-    
-    // Close sidebar on mobile when clicking outside
-    document.addEventListener('click', function(e) {
-      const sidebar = document.getElementById('sidebar');
-      const toggle = document.getElementById('sidebarToggle');
-      
-      if (window.innerWidth <= 1024 && 
-          sidebar && sidebar.classList.contains('open') &&
-          !sidebar.contains(e.target) && 
-          !toggle.contains(e.target)) {
-        sidebar.classList.remove('open');
-      }
-    });
-    
-    function setStatus(elemenId, teks, tipe) {
-      const el = document.getElementById(elemenId);
-      if (!el) return;
-      if (!teks) {
-        el.innerHTML = "";
-        return;
-      }
-      const kelas =
-        tipe === "sukses"
-          ? "status-sukses"
-          : tipe === "gagal"
-          ? "status-gagal"
-          : "status-info";
-      el.innerHTML = '<span class="' + kelas + '">' + teks + "</span>";
-    }
-
-    function gantiHalaman(nama) {
-      halamanAktif = nama;
-      
-      // Hide semua halaman
-      const semua = document.querySelectorAll(".halaman");
-      semua.forEach((el) => {
-        el.classList.remove("aktif");
-      });
-      
-      // Show halaman yang dipilih
-      const halamanTarget = document.getElementById("halaman-" + nama);
-      if (halamanTarget) {
-        halamanTarget.classList.add("aktif");
-      }
-      
-      // Update tombol aktif di sidebar
-      const semuaBtn = document.querySelectorAll(".btn-nav");
-      semuaBtn.forEach((btn) => {
-        btn.classList.remove("aktif");
-        const onclickAttr = btn.getAttribute("onclick");
-        if (onclickAttr) {
-          // Cek apakah onclick mengandung nama halaman yang dipilih
-          if (onclickAttr.includes("'" + nama + "'") || onclickAttr.includes('"' + nama + '"')) {
-            btn.classList.add("aktif");
-          }
-        }
-      });
-      
-      // Load data sesuai halaman
-      if (nama === "dashboard") {
-        muatDashboardStats();
-        muatDaftarFolder();
-      } else if (nama === "daftar") {
-        muatDaftarFolder();
-      } else if (nama === "upload" || nama === "proses" || nama === "sinyal") {
-        muatDaftarFolderKeSelect();
-      }
-    }
-
-    async function unggahCSV() {
-      const input = document.getElementById("input-csv");
-      const tombol = document.getElementById("btn-upload");
-      const selectFolder = document.getElementById("select-folder-upload");
-      if (!input.files || input.files.length === 0) {
-        setStatus("status-upload", "Silakan pilih berkas CSV terlebih dahulu.", "gagal");
-        return;
-      }
-      if (!selectFolder || !selectFolder.value) {
-        setStatus("status-upload", "Silakan pilih folder tujuan terlebih dahulu.", "gagal");
-        return;
-      }
-
-      const semuaBerkas = Array.from(input.files);
-      const totalBerkas = semuaBerkas.length;
-      let berhasil = 0;
-      let gagal = 0;
-      const daftarError = [];
-
-      try {
-        tombol.disabled = true;
-        setStatus(
-          "status-upload",
-          `Mengunggah ${totalBerkas} file ke folder '${selectFolder.value}'... (0/${totalBerkas})`,
-          "info"
-        );
-
-        // Upload setiap file satu per satu
-        for (let i = 0; i < semuaBerkas.length; i++) {
-          const berkas = semuaBerkas[i];
-          const formData = new FormData();
-          formData.append("berkas", berkas);
-
-          try {
-            setStatus(
-              "status-upload",
-              `Mengunggah ${berkas.name}... (${i + 1}/${totalBerkas})`,
-              "info"
-            );
-
-            const respons = await fetch("/unggah-csv/?folder=" + encodeURIComponent(selectFolder.value), {
-              method: "POST",
-              body: formData,
-            });
-
-            if (!respons.ok) {
-              const teks = await respons.text();
-              throw new Error(teks || "Gagal mengunggah " + berkas.name);
-            }
-
-            const data = await respons.json();
-            berhasil++;
-          } catch (err) {
-            gagal++;
-            daftarError.push(berkas.name + ": " + err.message);
-            console.error("Error upload " + berkas.name + ":", err);
-          }
-        }
-
-        // Tampilkan hasil akhir
-        if (gagal === 0) {
-          setStatus(
-            "status-upload",
-            `Semua ${berhasil} file berhasil diunggah ke folder '${selectFolder.value}'.`,
-            "sukses"
-          );
-        } else if (berhasil > 0) {
-          setStatus(
-            "status-upload",
-            `⚠️ ${berhasil} file berhasil, ${gagal} file gagal. Error: ${daftarError.join("; ")}`,
-            "gagal"
-          );
-        } else {
-          setStatus(
-            "status-upload",
-            `Semua file gagal diunggah. Error: ${daftarError.join("; ")}`,
-            "gagal"
-          );
-        }
-
-        // Reset input file
-        input.value = "";
-        // Refresh dashboard jika di halaman dashboard
-        if (halamanAktif === "dashboard") muatDashboardStats();
       } catch (err) {
-        console.error(err);
-        setStatus("status-upload", "Error: " + String(err), "gagal");
-      } finally {
-        tombol.disabled = false;
+        container.innerHTML = `<div style="color: var(--accent-red); padding: 20px;">Error: ${err.message}</div>`;
       }
     }
 
-    async function muatDaftarBerkas() {
-      const ul = document.getElementById("list-berkas");
-      if (!ul) return;
-      ul.innerHTML = "<li><span>Memuat daftar berkas...</span></li>";
-
+    // ============ DATA MANAGER ============
+    async function loadFolders() {
       try {
-        const respons = await fetch("/unggah-csv/daftar");
-        if (!respons.ok) {
-          const teks = await respons.text();
-          throw new Error(teks || "Gagal memuat daftar berkas.");
-        }
-        const data = await respons.json();
-
-        const ul2 = document.getElementById("list-berkas-2");
-        if (ul2) {
-          ul2.innerHTML = "";
-        }
-
-        if (!data.berkas || data.berkas.length === 0) {
-          const kosongHtml =
-            '<li><span class="nama">Belum ada berkas</span><span>-</span></li>';
-          ul.innerHTML = kosongHtml;
-          if (ul2) ul2.innerHTML = kosongHtml;
-          return;
-        }
-
-        ul.innerHTML = "";
-        data.berkas.forEach((nama) => {
-          const li = document.createElement("li");
-          li.innerHTML =
-            '<span class="nama">' + nama + '</span>' +
-            '<span>upload</span>';
-          li.addEventListener("click", () => muatPreviewBerkas(nama));
-          ul.appendChild(li);
-
-          if (ul2) {
-            const li2 = document.createElement("li");
-            li2.innerHTML =
-              '<span class="nama">' + nama + '</span>' +
-              '<span>upload</span>';
-            li2.addEventListener("click", () => muatPreviewBerkas(nama));
-            ul2.appendChild(li2);
-          }
-        });
-      } catch (err) {
-        console.error(err);
-        ul.innerHTML =
-          '<li><span class="nama">Error</span><span>' +
-          String(err) +
-          "</span></li>";
-      }
-    }
-
-    async function muatPreviewBerkas(nama) {
-      const kontainer = document.getElementById("preview-tabel");
-      if (!kontainer) return;
-
-      setStatus("status-preview", "Memuat preview untuk " + nama + " ...", "info");
-      kontainer.innerHTML = "";
-
-      try {
-        const respons = await fetch(
-          "/unggah-csv/preview?nama_berkas=" +
-            encodeURIComponent(nama) +
-            "&jenis=processed&limit=20"
-        );
-        if (!respons.ok) {
-          const teks = await respons.text();
-          throw new Error(teks || "Gagal mengambil preview.");
-        }
-        const data = await respons.json();
-
-        setStatus(
-          "status-preview",
-          "Menampilkan " +
-            data.contoh.length +
-            " baris dari " +
-            data.jumlah_baris +
-            " (sumber: " +
-            data.sumber +
-            ")",
-          "sukses"
-        );
-
-        if (!data.contoh || data.contoh.length === 0) {
-          kontainer.innerHTML = "<div style='font-size:12px;'>Berkas kosong.</div>";
-          return;
-        }
-
-        const kolom = data.kolom || Object.keys(data.contoh[0]);
-        let html =
-          "<table style='width:100%; border-collapse:collapse; font-size:11px;'><thead><tr>";
-        kolom.forEach((k) => {
-          html +=
-            "<th style='position:sticky; top:0; background:#020617; border-bottom:1px solid rgba(55,65,81,0.9); padding:4px 6px; text-align:left;'>" +
-            k +
-            "</th>";
-        });
-        html += "</tr></thead><tbody>";
-
-        data.contoh.forEach((baris) => {
-          html += "<tr>";
-          kolom.forEach((k) => {
-            html +=
-              "<td style='border-bottom:1px solid rgba(31,41,55,0.7); padding:3px 6px; color:#e5e7eb;'>" +
-              (baris[k] ?? "") +
-              "</td>";
-          });
-          html += "</tr>";
-        });
-        html += "</tbody></table>";
-
-        if (data.ringkasan) {
-          html +=
-            "<div style='margin-top:8px; font-size:11px; color:#9ca3af;'>" +
-            "Rentang waktu: <strong>" +
-            (data.ringkasan.waktu_mulai || "-") +
-            "</strong> s/d <strong>" +
-            (data.ringkasan.waktu_selesai || "-") +
-            "</strong> · Close: <strong>" +
-            (data.ringkasan.close_min ?? "-") +
-            "</strong> → <strong>" +
-            (data.ringkasan.close_max ?? "-") +
-            "</strong> · Volume Total: <strong>" +
-            (data.ringkasan.volume_total ?? "-") +
-            "</strong></div>";
-        }
-
-        kontainer.innerHTML = html;
-      } catch (err) {
-        console.error(err);
-        setStatus("status-preview", String(err), "gagal");
-        kontainer.innerHTML =
-          "<div style='font-size:12px; color:#fca5a5;'>Error: " +
-          String(err) +
-          "</div>";
-      }
-    }
-
-    async function jalankanPraProses() {
-      const tombol = document.getElementById("btn-proses");
-      const selectFolder = document.getElementById("select-folder-proses");
-      const kotakHasil = document.getElementById("hasil-json");
-
-      if (!selectFolder || !selectFolder.value) {
-        setStatus("status-proses", "Silakan pilih folder yang akan diproses.", "gagal");
-        return;
-      }
-
-      // Periode sudah FIXED: RSI 14, EMA 50, EMA 200
-
-      try {
-        tombol.disabled = true;
-        setStatus(
-          "status-proses",
-          "Menjalankan pra-proses indikator untuk folder '" + selectFolder.value + "'...",
-          "info"
-        );
-        kotakHasil.textContent = "(memproses ...)";
-
-        const respons = await fetch("/pra-proses/indikator/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            folder: selectFolder.value,
-            // Periode sudah FIXED di backend: RSI 14, EMA 50, EMA 200
-          }),
-        });
-
-        if (!respons.ok) {
-          const teks = await respons.text();
-          throw new Error(teks || "Gagal pra-proses indikator.");
-        }
-
-        const data = await respons.json();
-        setStatus(
-          "status-proses",
-          "Berhasil memproses " + data.jumlah_berkas + " berkas di folder '" + data.folder + "'.",
-          "sukses"
-        );
-        kotakHasil.textContent = JSON.stringify(data, null, 2);
-        if (halamanAktif === "dashboard") muatDashboardStats();
-        if (halamanAktif === "daftar" && folderAktif === selectFolder.value) muatFileDiFolder();
-      } catch (err) {
-        console.error(err);
-        setStatus("status-proses", String(err), "gagal");
-        kotakHasil.textContent = "Error: " + String(err);
-      } finally {
-        tombol.disabled = false;
-      }
-    }
-
-    // Fungsi manajemen folder
-    async function muatDaftarFolder() {
-      try {
-        const respons = await fetch("/folder/daftar");
-        if (!respons.ok) throw new Error("Gagal memuat daftar folder.");
-        const data = await respons.json();
-        const ul = document.getElementById("list-folder");
-        if (!ul) return;
-        ul.innerHTML = "";
-        if (!data.folder || data.folder.length === 0) {
-          ul.innerHTML = '<li><span class="nama">Belum ada folder</span></li>';
-          return;
-        }
-        data.folder.forEach((nama) => {
-          const li = document.createElement("li");
-          li.style.cursor = "pointer";
-          li.title = "Klik untuk melihat file di folder " + nama;
-          
-          const spanNama = document.createElement("span");
-          spanNama.className = "nama";
-          spanNama.textContent = nama;
-          spanNama.style.cursor = "pointer";
-          spanNama.addEventListener("click", () => pilihFolder(nama));
-          
-          const spanAksi = document.createElement("span");
-          spanAksi.style.display = "flex";
-          spanAksi.style.gap = "4px";
-          
-          const btnRename = document.createElement("button");
-          btnRename.className = "btn-ghost";
-          btnRename.style.padding = "4px 8px";
-          btnRename.style.fontSize = "12px";
-          btnRename.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 2.5C18.8978 2.10218 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10218 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10218 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-          btnRename.addEventListener("click", (e) => {
-            e.stopPropagation();
-            renameFolderPrompt(nama);
-          });
-          
-          const btnHapus = document.createElement("button");
-          btnHapus.className = "btn-ghost";
-          btnHapus.style.padding = "4px 8px";
-          btnHapus.style.fontSize = "12px";
-          btnHapus.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-          btnHapus.addEventListener("click", (e) => {
-            e.stopPropagation();
-            hapusFolderPrompt(nama);
-          });
-          
-          spanAksi.appendChild(btnRename);
-          spanAksi.appendChild(btnHapus);
-          li.appendChild(spanNama);
-          li.appendChild(spanAksi);
-          ul.appendChild(li);
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function muatDaftarFolderKeSelect() {
-      try {
-        const respons = await fetch("/folder/daftar");
-        if (!respons.ok) return;
-        const data = await respons.json();
-        const selectUpload = document.getElementById("select-folder-upload");
-        const selectProses = document.getElementById("select-folder-proses");
-        const selectSinyal = document.getElementById("select-folder-sinyal");
-        [selectUpload, selectProses, selectSinyal].forEach((select) => {
-          if (!select) return;
-          select.innerHTML = '<option value="">-- Pilih Folder --</option>';
-          if (data.folder && data.folder.length > 0) {
-            data.folder.forEach((nama) => {
-              const opt = document.createElement("option");
-              opt.value = nama;
-              opt.textContent = nama;
-              select.appendChild(opt);
-            });
-          }
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function buatFolderBaru() {
-      openCustomModal("Buat Folder Baru", async (nama) => {
-        if (!nama || !nama.trim()) return;
-        try {
-          showLoading();
-          const respons = await fetch("/folder/buat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nama_folder: nama.trim() }),
-          });
-          if (!respons.ok) {
-            const teks = await respons.text();
-            throw new Error(teks);
-          }
-          showNotification("Folder berhasil dibuat!", "success");
-          muatDaftarFolder();
-          muatDaftarFolderKeSelect();
-          if (halamanAktif === "dashboard") muatDashboardStats();
-        } catch (err) {
-          showNotification("Error: " + err.message, "error");
-        } finally {
-          hideLoading();
-        }
-      });
-    }
-
-    async function renameFolderPrompt(namaLama) {
-      openCustomModal("Rename Folder", async (namaBaru) => {
-        if (!namaBaru || !namaBaru.trim() || namaBaru.trim() === namaLama) return;
-        try {
-          showLoading();
-          const respons = await fetch("/folder/rename", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nama_lama: namaLama, nama_baru: namaBaru.trim() }),
-          });
-          if (!respons.ok) {
-            const teks = await respons.text();
-            throw new Error(teks);
-          }
-          showNotification("Folder berhasil diubah!", "success");
-          muatDaftarFolder();
-          muatDaftarFolderKeSelect();
-          if (folderAktif === namaLama) folderAktif = namaBaru.trim();
-          if (halamanAktif === "dashboard") muatDashboardStats();
-          if (halamanAktif === "daftar") muatFileDiFolder();
-        } catch (err) {
-          showNotification("Error: " + err.message, "error");
-        } finally {
-          hideLoading();
-        }
-      }, namaLama);
-    }
-
-    async function hapusFolderPrompt(nama) {
-      openConfirmModal("Hapus Folder", "Hapus folder '" + nama + "' beserta semua isinya? Tindakan ini tidak dapat dibatalkan!", async () => {
-        try {
-          showLoading();
-          const respons = await fetch("/folder/hapus?nama_folder=" + encodeURIComponent(nama), {
-            method: "DELETE",
-          });
-          if (!respons.ok) {
-            const teks = await respons.text();
-            throw new Error(teks);
-          }
-          showNotification("Folder berhasil dihapus!", "success");
-          if (folderAktif === nama) folderAktif = "";
-          muatDaftarFolder();
-          muatDaftarFolderKeSelect();
-          if (halamanAktif === "dashboard") muatDashboardStats();
-          if (halamanAktif === "daftar") {
-            document.getElementById("nama-folder-aktif").textContent = "-";
-            document.getElementById("list-file-folder").innerHTML = "";
-          }
-        } catch (err) {
-          showNotification("Error: " + err.message, "error");
-        } finally {
-          hideLoading();
-        }
-      });
-    }
-
-    function pilihFolder(nama) {
-      folderAktif = nama;
-      document.getElementById("nama-folder-aktif").textContent = nama;
-      muatFileDiFolder();
-    }
-
-    async function muatFileDiFolder() {
-      if (!folderAktif) {
-        document.getElementById("list-file-folder").innerHTML = '<li><span>Pilih folder terlebih dahulu</span></li>';
-        return;
-      }
-      try {
-        const respons = await fetch("/unggah-csv/daftar?folder=" + encodeURIComponent(folderAktif));
-        if (!respons.ok) throw new Error("Gagal memuat daftar file.");
-        const data = await respons.json();
-        const ul = document.getElementById("list-file-folder");
-        if (!ul) return;
-        ul.innerHTML = "";
-        if (!data.berkas || data.berkas.length === 0) {
-          ul.innerHTML = '<li><span>Folder kosong</span></li>';
-          return;
-        }
-        data.berkas.forEach((nama) => {
-          const li = document.createElement("li");
-          const spanNama = document.createElement("span");
-          spanNama.className = "nama";
-          spanNama.style.cursor = "pointer";
-          spanNama.textContent = nama;
-          spanNama.addEventListener("click", () => lihatFile(folderAktif, nama));
-          
-          const spanAksi = document.createElement("span");
-          spanAksi.style.display = "flex";
-          spanAksi.style.gap = "4px";
-          
-          const btnHapus = document.createElement("button");
-          btnHapus.className = "btn-ghost";
-          btnHapus.style.padding = "4px 8px";
-          btnHapus.style.fontSize = "12px";
-          btnHapus.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-          btnHapus.addEventListener("click", () => hapusFilePrompt(folderAktif, nama));
-          
-          spanAksi.appendChild(btnHapus);
-          li.appendChild(spanNama);
-          li.appendChild(spanAksi);
-          ul.appendChild(li);
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function hapusFilePrompt(folder, nama) {
-      openConfirmModal("Hapus File", "Hapus file '" + nama + "'?", async () => {
-        try {
-          showLoading();
-          const respons = await fetch("/unggah-csv/hapus?folder=" + encodeURIComponent(folder) + "&nama_berkas=" + encodeURIComponent(nama), {
-            method: "DELETE",
-          });
-          if (!respons.ok) {
-            const teks = await respons.text();
-            throw new Error(teks);
-          }
-          showNotification("File berhasil dihapus!", "success");
-          muatFileDiFolder();
-        } catch (err) {
-          showNotification("Error: " + err.message, "error");
-        } finally {
-          hideLoading();
-        }
-      });
-    }
-
-    function debugBacktestData() {
-      console.log("=== DEBUG BACKTEST DATA ===");
-      const backtestStats = localStorage.getItem("backtestStatistics");
-      const signalBreakdowns = localStorage.getItem("signalBreakdowns");
-      const lastSignalCount = localStorage.getItem("lastSignalCount");
-      const lastTradingStyle = localStorage.getItem("lastTradingStyle");
-      
-      console.log("Raw backtestStatistics:", backtestStats);
-      console.log("Parsed backtestStatistics:", JSON.parse(backtestStats || "{}"));
-      console.log("Raw signalBreakdowns:", signalBreakdowns);
-      console.log("Parsed signalBreakdowns:", JSON.parse(signalBreakdowns || "{}"));
-      console.log("lastSignalCount:", lastSignalCount);
-      console.log("lastTradingStyle:", lastTradingStyle);
-      
-      alert("Debug data logged to console. Check browser console (F12).");
-    }
-
-    async function muatDashboardStats() {
-      try {
-        const respons = await fetch("/folder/daftar");
-        if (!respons.ok) return;
-        const data = await respons.json();
+        const res = await fetch('/folder/daftar');
+        const data = await res.json();
+        
         const folders = data.folder || [];
-        let totalFile = 0;
-        let totalProcessed = 0;
         
-        // Count files and processed files for each folder
-        for (const folder of folders) {
-          try {
-            // Count uploaded files
-            const respFile = await fetch("/unggah-csv/daftar?folder=" + encodeURIComponent(folder));
-            if (respFile.ok) {
-              const dataFile = await respFile.json();
-              const jumlahFile = dataFile.berkas ? dataFile.berkas.length : 0;
-              totalFile += jumlahFile;
-            }
-            
-            // Count processed files (check processed folder)
-            const respProcessed = await fetch("/processed-csv/daftar?folder=" + encodeURIComponent(folder));
-            if (respProcessed.ok) {
-              const dataProcessed = await respProcessed.json();
-              const jumlahProcessed = dataProcessed.berkas ? dataProcessed.berkas.length : 0;
-              totalProcessed += jumlahProcessed;
-            }
-          } catch (e) {
-            console.error("Error counting files for folder " + folder + ":", e);
+        // Update all folder selects
+        const selects = ['upload-folder', 'process-folder', 'backtest-folder'];
+        selects.forEach(id => {
+          const select = document.getElementById(id);
+          if (select) {
+            select.innerHTML = '<option value="">-- Pilih Folder --</option>';
+            folders.forEach(f => {
+              select.innerHTML += `<option value="${f}">${f}</option>`;
+            });
           }
-        }
-        
-        // Get signal breakdown from localStorage
-        const breakdowns = JSON.parse(localStorage.getItem("signalBreakdowns") || "{}");
-        const aktifData = breakdowns.aktif || { count: 0, avgConfidence: 0 };
-        const santaiData = breakdowns.santai || { count: 0, avgConfidence: 0 };
-        const pasifData = breakdowns.pasif || { count: 0, avgConfidence: 0 };
-        
-        const totalSignals = aktifData.count + santaiData.count + pasifData.count;
-        
-        // Get backtest statistics from localStorage
-        const backtestStatsRaw = localStorage.getItem("backtestStatistics");
-        console.log("Raw backtestStatistics from localStorage:", backtestStatsRaw);
-        const backtestStats = JSON.parse(backtestStatsRaw || "{}");
-        console.log("Parsed backtest statistics:", backtestStats);
-        const {
-          win_rate = 0,
-          avg_pnl = 0,
-          avg_duration_hours = 0,
-          hit_tp = 0,
-          hit_sl = 0,
-          timeout = 0,
-          total_signals = 0,
-          total_closed = 0
-        } = backtestStats;
-        
-        // Update stats with null checks
-        const statFolderEl = document.getElementById("stat-total-folder");
-        const statFileEl = document.getElementById("stat-total-file");
-        const statProcessedEl = document.getElementById("stat-total-processed");
-        const statSignalsEl = document.getElementById("stat-total-signals");
-        if (statFolderEl) statFolderEl.textContent = folders.length;
-        if (statFileEl) statFileEl.textContent = totalFile;
-        if (statProcessedEl) statProcessedEl.textContent = totalProcessed;
-        if (statSignalsEl) statSignalsEl.textContent = totalSignals > 0 ? totalSignals.toLocaleString() : "0";
-        
-        // Update breakdown section (always visible now)
-        if (totalSignals > 0) {
-          // Breakdown section is always visible
-          
-          // Aktif
-          const aktifPct = totalSignals > 0 ? ((aktifData.count / totalSignals) * 100).toFixed(1) : 0;
-          const aktifAccuracy = aktifData.avgConfidence ? (aktifData.avgConfidence * 100).toFixed(1) : 0;
-          const aktifCountEl = document.getElementById("aktif-count");
-          const aktifPercentageEl = document.getElementById("aktif-percentage");
-          const aktifBarEl = document.getElementById("aktif-bar");
-          const aktifAccuracyEl = document.getElementById("aktif-accuracy");
-          if (aktifCountEl) aktifCountEl.textContent = aktifData.count.toLocaleString();
-          if (aktifPercentageEl) aktifPercentageEl.textContent = aktifPct;
-          if (aktifBarEl) aktifBarEl.style.width = aktifPct + "%";
-          if (aktifAccuracyEl) aktifAccuracyEl.textContent = aktifAccuracy;
-          
-          // Santai
-          const santaiPct = totalSignals > 0 ? ((santaiData.count / totalSignals) * 100).toFixed(1) : 0;
-          const santaiAccuracy = santaiData.avgConfidence ? (santaiData.avgConfidence * 100).toFixed(1) : 0;
-          const santaiCountEl = document.getElementById("santai-count");
-          const santaiPercentageEl = document.getElementById("santai-percentage");
-          const santaiBarEl = document.getElementById("santai-bar");
-          const santaiAccuracyEl = document.getElementById("santai-accuracy");
-          if (santaiCountEl) santaiCountEl.textContent = santaiData.count.toLocaleString();
-          if (santaiPercentageEl) santaiPercentageEl.textContent = santaiPct;
-          if (santaiBarEl) santaiBarEl.style.width = santaiPct + "%";
-          if (santaiAccuracyEl) santaiAccuracyEl.textContent = santaiAccuracy;
-          
-          // Pasif
-          const pasifPct = totalSignals > 0 ? ((pasifData.count / totalSignals) * 100).toFixed(1) : 0;
-          const pasifAccuracy = pasifData.avgConfidence ? (pasifData.avgConfidence * 100).toFixed(1) : 0;
-          const pasifCountEl = document.getElementById("pasif-count");
-          const pasifPercentageEl = document.getElementById("pasif-percentage");
-          const pasifBarEl = document.getElementById("pasif-bar");
-          const pasifAccuracyEl = document.getElementById("pasif-accuracy");
-          if (pasifCountEl) pasifCountEl.textContent = pasifData.count.toLocaleString();
-          if (pasifPercentageEl) pasifPercentageEl.textContent = pasifPct;
-          if (pasifBarEl) pasifBarEl.style.width = pasifPct + "%";
-          if (pasifAccuracyEl) pasifAccuracyEl.textContent = pasifAccuracy;
-          
-          // Overall
-          const totalConfidence = (aktifData.avgConfidence * aktifData.count + 
-                                   santaiData.avgConfidence * santaiData.count + 
-                                   pasifData.avgConfidence * pasifData.count) / totalSignals;
-          const overallAccuracy = totalSignals > 0 ? (totalConfidence * 100).toFixed(1) : 0;
-          const avgConfidence = totalSignals > 0 ? (totalConfidence * 100).toFixed(1) : 0;
-          
-          // These elements may not exist, so check first
-          const overallAccuracyEl = document.getElementById("overall-accuracy");
-          const avgConfidenceEl = document.getElementById("avg-confidence");
-          if (overallAccuracyEl) overallAccuracyEl.textContent = overallAccuracy + "%";
-          if (avgConfidenceEl) avgConfidenceEl.textContent = avgConfidence + "%";
-        } else {
-          // Breakdown section stays visible with default values
-        }
-        
-        // Update backtest statistics with better formatting
-        const winRateEl = document.getElementById("backtest-winrate");
-        const avgPnlEl = document.getElementById("backtest-avgpnl");
-        const durationEl = document.getElementById("backtest-duration");
-        const hitTpEl = document.getElementById("backtest-hittp");
-        const hitSlEl = document.getElementById("backtest-hitsl");
-        const timeoutEl = document.getElementById("backtest-timeout");
-        
-        // Ensure numbers are properly converted
-        const winRateNum = Number(win_rate) || 0;
-        const avgPnlNum = Number(avg_pnl) || 0;
-        const avgDurationNum = Number(avg_duration_hours) || 0;
-        const hitTpNum = Number(hit_tp) || 0;
-        const hitSlNum = Number(hit_sl) || 0;
-        const timeoutNum = Number(timeout) || 0;
-        const totalClosedNum = Number(total_closed) || 0;
-        
-        if (winRateEl) winRateEl.textContent = totalClosedNum > 0 ? winRateNum.toFixed(1) + "%" : "-";
-        if (avgPnlEl) avgPnlEl.textContent = totalClosedNum > 0 ? (avgPnlNum >= 0 ? "+" : "") + avgPnlNum.toFixed(2) + "%" : "-";
-        if (durationEl) durationEl.textContent = totalClosedNum > 0 ? avgDurationNum.toFixed(1) + "h" : "-";
-        if (hitTpEl) hitTpEl.textContent = hitTpNum > 0 ? hitTpNum.toLocaleString() : "0";
-        if (hitSlEl) hitSlEl.textContent = hitSlNum > 0 ? hitSlNum.toLocaleString() : "0";
-        if (timeoutEl) timeoutEl.textContent = timeoutNum > 0 ? timeoutNum.toLocaleString() : "0";
-        
-        console.log("Updated backtest display:", {
-          win_rate, avg_pnl, avg_duration_hours, hit_tp, hit_sl, timeout, total_closed
         });
         
         // Update folder list
-        const ul = document.getElementById("dashboard-list-folder");
-        if (ul) {
-          ul.innerHTML = "";
-          if (folders.length === 0) {
-            ul.innerHTML = '<li><span style="color: var(--warna-teks-secondary);">Belum ada folder. Buat folder baru untuk mulai.</span></li>';
-          } else {
-            folders.forEach((folder) => {
-              const li = document.createElement("li");
-              li.innerHTML = '<span class="nama" style="color: #22d3ee; font-weight: 600;">' + folder + '</span><span style="font-size: 10px; color: var(--warna-teks-secondary);">Coin pair</span>';
-              li.style.cursor = "pointer";
-              li.onclick = () => {
-                gantiHalaman("daftar");
-                pilihFolder(folder);
-              };
-              ul.appendChild(li);
-            });
-          }
+        const listContainer = document.getElementById('folder-list');
+        if (folders.length > 0) {
+          let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">';
+          folders.forEach(f => {
+            html += `<div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
+              <div style="font-size: 24px; margin-bottom: 4px;">📁</div>
+              <div style="font-size: 13px; font-weight: 600;">${f}</div>
+            </div>`;
+          });
+          html += '</div>';
+          listContainer.innerHTML = html;
+        } else {
+          listContainer.innerHTML = '<div style="padding: 20px; color: var(--text-muted); text-align: center;">Belum ada folder. Buat folder baru untuk memulai.</div>';
         }
       } catch (err) {
-        console.error(err);
+        console.error('Error loading folders:', err);
       }
     }
 
-    async function lihatFile(folder, nama) {
+    async function createFolder() {
+      const name = prompt('Nama folder baru (contoh: BTC, ETH):');
+      if (!name) return;
+      
       try {
-        setStatus("status-preview", "Memuat preview file...", "info");
-        const respons = await fetch("/unggah-csv/preview?folder=" + encodeURIComponent(folder) + "&nama_berkas=" + encodeURIComponent(nama) + "&jenis=processed&limit=10");
-        if (!respons.ok) {
-          const teks = await respons.text();
-          throw new Error(teks);
-        }
-        const data = await respons.json();
-        const tabelDiv = document.getElementById("preview-tabel");
-        if (!tabelDiv) return;
+        const res = await fetch('/folder/buat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nama_folder: name })
+        });
         
-        let html = "<table style='width:100%; border-collapse:collapse; font-size:11px;'>";
-        if (data.contoh && data.contoh.length > 0) {
-          const kolom = Object.keys(data.contoh[0]);
-          html += "<tr style='background:rgba(34,211,238,0.1);'>";
-          kolom.forEach((k) => {
-            html += "<th style='padding:6px; text-align:left; border:1px solid rgba(148,163,184,0.3);'>" + k + "</th>";
-          });
-          html += "</tr>";
-          data.contoh.forEach((row) => {
-            html += "<tr>";
-            kolom.forEach((k) => {
-              const nilai = row[k] != null ? String(row[k]).replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;") : "-";
-              html += "<td style='padding:4px; border:1px solid rgba(148,163,184,0.2);'>" + nilai + "</td>";
-            });
-            html += "</tr>";
-          });
+        if (res.ok) {
+          loadFolders();
+          alert('Folder berhasil dibuat!');
+        } else {
+          const err = await res.text();
+          alert('Error: ' + err);
         }
-        html += "</table>";
-        if (data.ringkasan) {
-          html += "<div style='margin-top:12px; font-size:11px; color:var(--warna-teks-secondary);'>";
-          html += "<strong>Ringkasan:</strong> ";
-          if (data.ringkasan.waktu_mulai) html += "Mulai: " + data.ringkasan.waktu_mulai + " | ";
-          if (data.ringkasan.waktu_selesai) html += "Selesai: " + data.ringkasan.waktu_selesai + " | ";
-          if (data.ringkasan.close_min) html += "Min: " + data.ringkasan.close_min + " | ";
-          if (data.ringkasan.close_max) html += "Max: " + data.ringkasan.close_max;
-          html += "</div>";
-        }
-        tabelDiv.innerHTML = html;
-        setStatus("status-preview", "Preview berhasil dimuat (" + data.jumlah_baris + " baris total).", "sukses");
       } catch (err) {
-        console.error(err);
-        setStatus("status-preview", "Error: " + err.message, "gagal");
-        document.getElementById("preview-tabel").innerHTML = "";
+        alert('Error: ' + err.message);
       }
     }
 
-    async function generateSinyal() {
-      const tombol = document.getElementById("btn-generate-sinyal");
-      const selectFolder = document.getElementById("select-folder-sinyal");
-      const selectTradingStyle = document.getElementById("select-trading-style");
-      const kontainerSinyal = document.getElementById("tabel-sinyal");
-
-      if (!selectFolder || !selectFolder.value) {
-        setStatus("status-sinyal", "Silakan pilih folder yang akan dianalisis.", "gagal");
+    async function uploadCSV() {
+      const folder = document.getElementById('upload-folder').value;
+      const fileInput = document.getElementById('upload-file');
+      const status = document.getElementById('upload-status');
+      
+      if (!folder) {
+        status.innerHTML = '<span style="color: var(--accent-red);">Pilih folder terlebih dahulu!</span>';
         return;
       }
-
-      const tradingStyle = selectTradingStyle?.value || "santai";
+      
+      if (!fileInput.files[0]) {
+        status.innerHTML = '<span style="color: var(--accent-red);">Pilih file CSV!</span>';
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('berkas', fileInput.files[0]);
+      
+      status.innerHTML = '<span style="color: var(--accent-cyan);">Uploading...</span>';
+      
       try {
-        showLoading();
-        tombol.disabled = true;
-        setStatus("status-sinyal", "Mengenerate sinyal untuk folder '" + selectFolder.value + "' dengan style '" + tradingStyle + "'...", "info");
-        if (kontainerSinyal) kontainerSinyal.innerHTML = "<div style='text-align:center; padding:20px; color:var(--warna-teks-secondary);'>Memproses...</div>";
-
-        // Confidence minimum EXPERT LEVEL untuk kejujuran semua mode
-        let confidenceMin = 0.60;  // Minimum 60% untuk expert mode - ULTRA SELECTIVE!
-        
-        const bodyRequest = {
-          folder: selectFolder.value,
-          mode_trading: tradingStyle,  // FIXED: Pakai "mode_trading" sesuai API
-          confidence_minimum: confidenceMin,     // HONEST: Balanced confidence threshold
-        };
-
-        const respons = await fetch("/sinyal/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(bodyRequest),
+        const res = await fetch(`/unggah-csv/?folder=${encodeURIComponent(folder)}`, {
+          method: 'POST',
+          body: formData
         });
-
-        if (!respons.ok) {
-          const teks = await respons.text();
-          throw new Error(teks || "Gagal generate sinyal.");
-        }
-
-        const data = await respons.json();
-        console.log("Generate sinyal response:", data);
         
-        // Store signal count and breakdown in localStorage for dashboard
-        if (data.jumlah_sinyal >= 0) {  // Allow 0 signals too
-          localStorage.setItem("lastSignalCount", data.jumlah_sinyal.toString());
-          localStorage.setItem("lastTradingStyle", tradingStyle);
-          
-          // Calculate and store breakdown
-          const breakdown = {
-            mode: tradingStyle,
-            count: data.jumlah_sinyal,
-            timestamp: new Date().toISOString()
-          };
-          
-          // Calculate and store accuracy per signal
-          if (data.sinyal && data.sinyal.length > 0) {
-            const avgConfidence = data.sinyal.reduce((sum, s) => sum + (s.confidence || 0), 0) / data.sinyal.length;
-            breakdown.avgConfidence = avgConfidence;
-          } else {
-            breakdown.avgConfidence = 0;
-          }
-          
-          // Get existing breakdown and update
-          let allBreakdowns = JSON.parse(localStorage.getItem("signalBreakdowns") || "{}");
-          allBreakdowns[tradingStyle] = breakdown;
-          localStorage.setItem("signalBreakdowns", JSON.stringify(allBreakdowns));
-          
-          // Store backtest statistics - CRITICAL FIX
-          if (data.backtest_statistics) {
-            console.log("Storing backtest statistics:", data.backtest_statistics);
-            localStorage.setItem("backtestStatistics", JSON.stringify(data.backtest_statistics));
-          } else {
-            console.log("No backtest statistics in response:", data);
-            // Store empty stats if none provided
-            const emptyStats = {
-              total_signals: 0,
-              hit_tp: 0,
-              hit_sl: 0,
-              timeout: 0,
-              win_rate: 0,
-              avg_pnl: 0,
-              avg_duration_hours: 0,
-              avg_profit: 0,
-              avg_loss: 0,
-              total_closed: 0
-            };
-            localStorage.setItem("backtestStatistics", JSON.stringify(emptyStats));
-          }
-          
-          // Always refresh dashboard stats after storing data
-          console.log("Refreshing dashboard stats after signal generation...");
-          setTimeout(() => muatDashboardStats(), 500);
-        }
-        
-        setStatus(
-          "status-sinyal",
-          "Berhasil generate " + data.jumlah_sinyal + " sinyal dari folder '" + data.folder + "'.",
-          data.jumlah_sinyal > 0 ? "sukses" : "info"
-        );
-
-        // Tampilkan sinyal dalam tabel
-        if (kontainerSinyal) {
-          if (!data.sinyal || data.sinyal.length === 0) {
-            kontainerSinyal.innerHTML = "<div style='text-align:center; padding:40px; color:var(--warna-teks-secondary);'>Tidak ada sinyal yang ditemukan. Coba ubah parameter atau pastikan data sudah diproses dengan indikator.</div>";
-            return;
-          }
-
-          let html = "<table style='width:100%; border-collapse:collapse; font-size:12px;'>";
-          html += "<thead><tr style='background:rgba(34,211,238,0.15); position:sticky; top:0;'>";
-          html += "<th style='padding:8px; text-align:left; border:1px solid rgba(148,163,184,0.3);'>Pair</th>";
-          html += "<th style='padding:8px; text-align:left; border:1px solid rgba(148,163,184,0.3);'>Tipe</th>";
-          html += "<th style='padding:8px; text-align:right; border:1px solid rgba(148,163,184,0.3);'>Entry</th>";
-          html += "<th style='padding:8px; text-align:right; border:1px solid rgba(148,163,184,0.3);'>SL</th>";
-          html += "<th style='padding:8px; text-align:right; border:1px solid rgba(148,163,184,0.3);'>TP</th>";
-          html += "<th style='padding:8px; text-align:center; border:1px solid rgba(148,163,184,0.3);'>Confidence</th>";
-          html += "<th style='padding:8px; text-align:center; border:1px solid rgba(148,163,184,0.3);'>🎯 Result</th>";
-          html += "<th style='padding:8px; text-align:center; border:1px solid rgba(148,163,184,0.3);'>P&L</th>";
-          html += "<th style='padding:8px; text-align:left; border:1px solid rgba(148,163,184,0.3);'>Alasan</th>";
-          html += "<th style='padding:8px; text-align:left; border:1px solid rgba(148,163,184,0.3);'>Waktu</th>";
-          html += "</tr></thead><tbody>";
-
-          data.sinyal.forEach((s) => {
-            // NEON COLORS: BELI = neon green, JUAL = neon red
-            const warnaTipe = (s.tipe === "BELI") ? "#00ff41" : (s.tipe === "JUAL") ? "#ff0055" : "#9ca3af";
-            const warnaConf = s.confidence > 0.7 ? "#22c55e" : s.confidence > 0.5 ? "#eab308" : "#f97316";
-            
-            // Backtest result colors and modern icons
-            const backtestResult = s.backtest_result || "UNKNOWN";
-            const warnaResult = backtestResult === "HIT_TP" ? "#22c55e" : 
-                               backtestResult === "HIT_SL" ? "#ef4444" : "#9ca3af";
-            const iconResult = backtestResult === "HIT_TP" ? 
-              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="' + warnaResult + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : 
-              backtestResult === "HIT_SL" ? 
-              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 6L6 18M6 6L18 18" stroke="' + warnaResult + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : 
-              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="' + warnaResult + '" stroke-width="2"/><path d="M12 6V12L16 14" stroke="' + warnaResult + '" stroke-width="2" stroke-linecap="round"/></svg>';
-            
-            // P&L colors
-            const pnl = s.pnl_percent || 0;
-            const warnaPnl = pnl > 0 ? "#22c55e" : pnl < 0 ? "#ef4444" : "#9ca3af";
-            const pnlText = pnl !== 0 ? (pnl > 0 ? "+" : "") + pnl.toFixed(2) + "%" : "-";
-            
-            html += "<tr style='border-bottom:1px solid rgba(148,163,184,0.2);'>";
-            html += "<td style='padding:6px; border:1px solid rgba(148,163,184,0.2);'>" + (s.pair || "-") + "</td>";
-            html += "<td style='padding:6px; border:1px solid rgba(148,163,184,0.2);'><strong style='color:" + warnaTipe + "; text-shadow: 0 0 10px " + warnaTipe + ";'>" + s.tipe + "</strong></td>";
-            html += "<td style='padding:6px; text-align:right; border:1px solid rgba(148,163,184,0.2);'>" + s.entry.toFixed(4) + "</td>";
-            html += "<td style='padding:6px; text-align:right; border:1px solid rgba(148,163,184,0.2);'>" + s.stop_loss.toFixed(4) + "</td>";
-            html += "<td style='padding:6px; text-align:right; border:1px solid rgba(148,163,184,0.2);'>" + s.take_profit.toFixed(4) + "</td>";
-            html += "<td style='padding:6px; text-align:center; border:1px solid rgba(148,163,184,0.2);'><strong style='color:" + warnaConf + "'>" + (s.confidence * 100).toFixed(0) + "%</strong></td>";
-            html += "<td style='padding:6px; text-align:center; border:1px solid rgba(148,163,184,0.2);'><div style='display:flex; align-items:center; justify-content:center; gap:4px; color:" + warnaResult + "; font-weight:bold;'>" + iconResult + "<span>" + backtestResult + "</span></div></td>";
-            html += "<td style='padding:6px; text-align:center; border:1px solid rgba(148,163,184,0.2);'><strong style='color:" + warnaPnl + "'>" + pnlText + "</strong></td>";
-            html += "<td style='padding:6px; border:1px solid rgba(148,163,184,0.2); font-size:11px;'>" + s.alasan + "</td>";
-            html += "<td style='padding:6px; border:1px solid rgba(148,163,184,0.2); font-size:11px;'>" + (s.timestamp ? new Date(s.timestamp).toLocaleString("id-ID") : "-") + "</td>";
-            html += "</tr>";
-          });
-
-          html += "</tbody></table>";
-          kontainerSinyal.innerHTML = html;
+        if (res.ok) {
+          const data = await res.json();
+          status.innerHTML = `<span style="color: var(--accent-green);">✓ Upload berhasil! ${data.jumlah_baris} baris data.</span>`;
+          fileInput.value = '';
+        } else {
+          const err = await res.text();
+          status.innerHTML = `<span style="color: var(--accent-red);">Error: ${err}</span>`;
         }
       } catch (err) {
-        console.error(err);
-        setStatus("status-sinyal", "Error: " + err.message, "gagal");
-        if (kontainerSinyal) kontainerSinyal.innerHTML = "<div style='text-align:center; padding:20px; color:#f97316;'>Error: " + err.message + "</div>";
-      } finally {
-        hideLoading();
-        tombol.disabled = false;
+        status.innerHTML = `<span style="color: var(--accent-red);">Error: ${err.message}</span>`;
       }
     }
 
-    function sambungkanEvent() {
-      const btnUpload = document.getElementById("btn-upload");
-      const btnProses = document.getElementById("btn-proses");
-      const btnRefreshDaftar = document.getElementById("btn-refresh-daftar");
-      const btnRefreshDaftar2 = document.getElementById("btn-refresh-daftar-2");
-      const btnQuickList = document.getElementById("btn-lihat-daftar-quick");
-      const btnBuatFolder = document.getElementById("btn-buat-folder");
-      const btnBuatFolderDaftar = document.getElementById("btn-buat-folder-daftar");
-      const btnRefreshFolder = document.getElementById("btn-refresh-folder");
-      const btnRefreshFile = document.getElementById("btn-refresh-file");
-      const btnGenerateSinyal = document.getElementById("btn-generate-sinyal");
-      const selectTradingStyle = document.getElementById("select-trading-style");
-      const infoTradingStyle = document.getElementById("info-trading-style");
-
-      // Update info box ketika trading style berubah
-      if (selectTradingStyle && infoTradingStyle) {
-        const styleInfo = {
-          aktif: "<strong>Mode Aktif:</strong> Monitoring aktif 1-4H. RSI 6, EMA 9/20/50. Butuh check sering.",
-          santai: "<strong>Mode Santai:</strong> Check 2-3x sehari. RSI 8, EMA 20/50/200. Balance antara profit dan waktu.",
-          pasif: "<strong>Mode Pasif:</strong> Check sekali sehari. RSI 14, EMA 50/100/200. Fokus trend besar dengan RR tinggi."
-        };
+    async function processData() {
+      const folder = document.getElementById('process-folder').value;
+      const status = document.getElementById('process-status');
+      
+      if (!folder) {
+        status.innerHTML = '<span style="color: var(--accent-red);">Pilih folder terlebih dahulu!</span>';
+        return;
+      }
+      
+      status.innerHTML = '<span style="color: var(--accent-cyan);">Processing...</span>';
+      
+      try {
+        const res = await fetch('/pra-proses/indikator/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ folder })
+        });
         
-        selectTradingStyle.addEventListener("change", function() {
-          const style = this.value;
-          infoTradingStyle.innerHTML = styleInfo[style] || styleInfo.santai;
+        if (res.ok) {
+          const data = await res.json();
+          status.innerHTML = `<span style="color: var(--accent-green);">✓ Berhasil memproses ${data.jumlah_berkas} file!</span>`;
+        } else {
+          const err = await res.text();
+          status.innerHTML = `<span style="color: var(--accent-red);">Error: ${err}</span>`;
+        }
+      } catch (err) {
+        status.innerHTML = `<span style="color: var(--accent-red);">Error: ${err.message}</span>`;
+      }
+    }
+
+    // ============ CHARTS ============
+    let chartPie = null;
+    let chartEquity = null;
+
+    function initCharts() {
+      // Pie Chart
+      const ctxPie = document.getElementById('chartPie');
+      if (ctxPie) {
+        chartPie = new Chart(ctxPie, {
+          type: 'doughnut',
+          data: {
+            labels: ['HIT TP', 'HIT SL', 'TIMEOUT'],
+            datasets: [{
+              data: [65, 25, 10],
+              backgroundColor: ['rgba(0, 255, 136, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(102, 102, 102, 0.8)'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { color: '#b0b0b0', font: { size: 11 } } } }
+          }
         });
       }
 
-      // Sambungkan event listener untuk tombol sidebar (backup jika onclick tidak bekerja)
-      const semuaBtnNav = document.querySelectorAll(".btn-nav");
-      semuaBtnNav.forEach((btn) => {
-        btn.addEventListener("click", function(e) {
-          const onclickAttr = this.getAttribute("onclick");
-          if (onclickAttr) {
-            // Ekstrak nama halaman dari onclick
-            const match = onclickAttr.match(/gantiHalaman\(['"]([^'"]+)['"]\)/);
-            if (match) {
-              e.preventDefault();
-              gantiHalaman(match[1]);
+      // Equity Chart
+      const ctxEquity = document.getElementById('chartEquity');
+      if (ctxEquity) {
+        const labels = ['Start', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10'];
+        const data = [10000, 10250, 10100, 10400, 10350, 10600, 10550, 10800, 11000, 10900, 11200];
+        
+        chartEquity = new Chart(ctxEquity, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Equity',
+              data: data,
+              borderColor: 'rgba(0, 255, 136, 1)',
+              backgroundColor: 'rgba(0, 255, 136, 0.1)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666', font: { size: 10 } } },
+              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666', font: { size: 10 } } }
             }
           }
         });
-      });
-
-      if (btnUpload) btnUpload.addEventListener("click", unggahCSV);
-      if (btnProses) btnProses.addEventListener("click", jalankanPraProses);
-      if (btnRefreshDaftar) btnRefreshDaftar.addEventListener("click", muatDaftarBerkas);
-      if (btnRefreshDaftar2)
-        btnRefreshDaftar2.addEventListener("click", muatDaftarBerkas);
-      if (btnQuickList)
-        btnQuickList.addEventListener("click", () => gantiHalaman("daftar"));
-      if (btnBuatFolder) btnBuatFolder.addEventListener("click", buatFolderBaru);
-      if (btnBuatFolderDaftar) btnBuatFolderDaftar.addEventListener("click", buatFolderBaru);
-      if (btnRefreshFolder) btnRefreshFolder.addEventListener("click", muatDaftarFolder);
-      if (btnRefreshFile) btnRefreshFile.addEventListener("click", muatFileDiFolder);
-      if (btnGenerateSinyal) btnGenerateSinyal.addEventListener("click", generateSinyal);
-
-      // Set halaman default ke dashboard
-      gantiHalaman("dashboard");
-      
-      // Load initial data
-      muatDaftarFolderKeSelect();
+      }
     }
 
-    document.addEventListener("DOMContentLoaded", sambungkanEvent);
-  </script>
-  
-  <!-- Loading Overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner">
-      <div class="spinner-ring"></div>
-      <div class="spinner-ring"></div>
-      <div class="spinner-ring"></div>
-      <div class="loading-text">Generating Signals...</div>
-    </div>
-  </div>
-  
-  <!-- Custom Modal -->
-  <div class="modal-overlay" id="modalOverlay" onclick="closeCustomModal()">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <h3 id="modalTitle">Modal Title</h3>
-        <button class="modal-close" onclick="closeCustomModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <label class="modal-label">Nama Folder (Coin Pair)</label>
-        <input type="text" id="modalInput" class="modal-input" placeholder="Contoh: BTC, ETH, SOL">
-        <p class="modal-hint">Gunakan nama coin pair untuk organisasi yang lebih baik</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeCustomModal()">Batal</button>
-        <button class="btn-primary" id="modalConfirm">Konfirmasi</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Confirm Modal -->
-  <div class="modal-overlay" id="confirmOverlay" onclick="closeConfirmModal()">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <h3 id="confirmTitle">Konfirmasi</h3>
-        <button class="modal-close" onclick="closeConfirmModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <p id="confirmMessage" style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;"></p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeConfirmModal()">Batal</button>
-        <button class="btn-primary" id="confirmYes" style="background: linear-gradient(135deg, #ef4444, #dc2626);">Ya, Hapus</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Notification Container -->
-  <div id="notificationContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 12px; max-width: 400px;"></div>
-  
-  <style>
-    /* Loading Overlay */
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.95);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      backdrop-filter: blur(10px);
-    }
-    
-    .loading-overlay.active {
-      display: flex;
-    }
-    
-    .loading-spinner {
-      position: relative;
-      width: 200px;
-      height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .spinner-ring {
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      border: 4px solid transparent;
-      border-top-color: #00ff88;
-      border-radius: 50%;
-      animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-    }
-    
-    .spinner-ring:nth-child(2) {
-      width: 120px;
-      height: 120px;
-      border-top-color: #00d9ff;
-      animation-delay: -0.5s;
-    }
-    
-    .spinner-ring:nth-child(3) {
-      width: 90px;
-      height: 90px;
-      border-top-color: #3b82f6;
-      animation-delay: -1s;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .loading-text {
-      position: absolute;
-      bottom: -40px;
-      font-size: 18px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #00ff88, #00d9ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    
-    /* Custom Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      backdrop-filter: blur(10px);
-    }
-    
-    .modal-overlay.active {
-      display: flex;
-    }
-    
-    .modal-box {
-      background: rgba(26, 26, 26, 0.95);
-      border: 2px solid #00ff88;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 20px 60px rgba(0, 255, 136, 0.3);
-      animation: modalSlideIn 0.3s ease-out;
-    }
-    
-    @keyframes modalSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-50px) scale(0.9);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-    
-    .modal-header {
-      padding: 24px;
-      border-bottom: 1px solid rgba(0, 255, 136, 0.2);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .modal-header h3 {
-      font-size: 20px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #00ff88, #00d9ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    .modal-close {
-      width: 36px;
-      height: 36px;
-      border: none;
-      background: transparent;
-      color: #fff;
-      font-size: 32px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      line-height: 1;
-    }
-    
-    .modal-close:hover {
-      background: rgba(255, 0, 0, 0.2);
-      color: #ff0055;
-      transform: rotate(90deg);
-    }
-    
-    .modal-body {
-      padding: 24px;
-    }
-    
-    .modal-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #00ff88;
-    }
-    
-    .modal-input {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(0, 0, 0, 0.5);
-      border: 2px solid rgba(0, 255, 136, 0.3);
-      border-radius: 12px;
-      color: #fff;
-      font-size: 14px;
-      transition: all 0.3s ease;
-    }
-    
-    .modal-input:focus {
-      outline: none;
-      border-color: #00ff88;
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-    }
-    
-    .modal-hint {
-      font-size: 12px;
-      color: #808080;
-      margin-top: 8px;
-    }
-    
-    .modal-footer {
-      padding: 24px;
-      border-top: 1px solid rgba(0, 255, 136, 0.2);
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-    }
-    
-    .btn-secondary {
-      padding: 10px 20px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      background: transparent;
-      color: #fff;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-secondary:hover {
-      border-color: #fff;
-      background: rgba(255, 255, 255, 0.1);
-    }
-    
-    .btn-primary {
-      padding: 10px 20px;
-      border: none;
-      background: linear-gradient(135deg, #00ff88, #00d9ff);
-      color: #000;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
-    }
-    
-    /* Notification Styles */
-    .notification {
-      background: rgba(26, 26, 26, 0.95);
-      border: 2px solid rgba(0, 255, 136, 0.4);
-      border-radius: 12px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
-      animation: slideIn 0.3s ease-out;
-      min-width: 300px;
-    }
-    
-    @keyframes slideIn {
-      from {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-    
-    @keyframes slideOut {
-      from {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      to {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-    }
-    
-    .notification-success {
-      border-color: rgba(34, 197, 94, 0.6);
-      box-shadow: 0 10px 40px rgba(34, 197, 94, 0.3);
-    }
-    
-    .notification-error {
-      border-color: rgba(239, 68, 68, 0.6);
-      box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3);
-    }
-    
-    .notification-info {
-      border-color: rgba(59, 130, 246, 0.6);
-      box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
-    }
-    
-    .notification-content {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex: 1;
-    }
-    
-    .notification-icon {
-      font-size: 20px;
-    }
-    
-    .notification-message {
-      font-size: 14px;
-      color: #ffffff;
-      font-weight: 500;
-    }
-    
-    .notification-close {
-      background: transparent;
-      border: none;
-      color: #ffffff;
-      font-size: 24px;
-      cursor: pointer;
-      padding: 0;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-      opacity: 0.6;
-    }
-    
-    .notification-close:hover {
-      opacity: 1;
-      background: rgba(255, 255, 255, 0.1);
-      transform: rotate(90deg);
-    }
-  </style>
-  
-  <script>
-    // Loading functions
-    function showLoading() {
-      document.getElementById('loadingOverlay').classList.add('active');
-    }
-    
-    function hideLoading() {
-      document.getElementById('loadingOverlay').classList.remove('active');
-    }
-    
-    // Modal functions
-    function openCustomModal(title, callback, defaultValue = '') {
-      document.getElementById('modalTitle').textContent = title;
-      document.getElementById('modalInput').value = defaultValue;
-      document.getElementById('modalOverlay').classList.add('active');
+    // ============ INIT ============
+    document.addEventListener('DOMContentLoaded', () => {
+      loadRealtimePrices();
+      loadFolders();
+      initCharts();
       
-      // Focus input
-      setTimeout(() => {
-        document.getElementById('modalInput').focus();
-        document.getElementById('modalInput').select();
-      }, 100);
-      
-      document.getElementById('modalConfirm').onclick = function() {
-        const value = document.getElementById('modalInput').value.trim();
-        if (value) {
-          callback(value);
-          closeCustomModal();
-        }
-      };
-      
-      // Enter key support
-      document.getElementById('modalInput').onkeypress = function(e) {
-        if (e.key === 'Enter') {
-          document.getElementById('modalConfirm').click();
-        }
-      };
-    }
-    
-    function openConfirmModal(title, message, callback) {
-      const confirmOverlay = document.getElementById('confirmOverlay');
-      document.getElementById('confirmTitle').textContent = title;
-      document.getElementById('confirmMessage').textContent = message;
-      confirmOverlay.classList.add('active');
-      
-      document.getElementById('confirmYes').onclick = function() {
-        callback();
-        closeConfirmModal();
-      };
-    }
-    
-    function closeConfirmModal() {
-      document.getElementById('confirmOverlay').classList.remove('active');
-    }
-    
-    function closeCustomModal() {
-      document.getElementById('modalOverlay').classList.remove('active');
-    }
-    
-    // Notification System
-    function showNotification(message, type = 'info') {
-      const notification = document.createElement('div');
-      notification.className = `notification notification-${type}`;
-      notification.innerHTML = `
-        <div class="notification-content">
-          <span class="notification-icon">
-            ${type === 'success' ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : 
-            type === 'error' ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M15 9L9 15M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' : 
-            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'}
-          </span>
-          <span class="notification-message">${message}</span>
-        </div>
-        <button class="notification-close" onclick="this.parentElement.remove()">×</button>
-      `;
-      
-      document.getElementById('notificationContainer').appendChild(notification);
-      
-      // Auto remove after 5 seconds
-      setTimeout(() => {
-        if (notification.parentElement) {
-          notification.style.animation = 'slideOut 0.3s ease-out';
-          setTimeout(() => notification.remove(), 300);
-        }
-      }, 5000);
-    }
+      // Update stats from localStorage if available
+      const stats = JSON.parse(localStorage.getItem('backtestStatistics') || '{}');
+      if (stats.total_signals) {
+        document.getElementById('stat-total-signals').textContent = stats.total_signals;
+        document.getElementById('stat-win-rate').textContent = stats.win_rate + '%';
+        document.getElementById('stat-avg-pnl').textContent = (stats.avg_pnl > 0 ? '+' : '') + stats.avg_pnl + '%';
+      }
+    });
   </script>
 </body>
 </html>
-    
