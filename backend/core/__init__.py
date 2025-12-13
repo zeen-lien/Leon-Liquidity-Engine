@@ -1,1 +1,41 @@
-# Core module untuk konfigurasi dan utilitas dasar
+"""
+Core module - Konfigurasi dan utilities dasar.
+"""
+
+from .config import (
+    BASE_DIR,
+    DATA_DIR,
+    UPLOADS_DIR,
+    PROCESSED_DIR,
+    MODELS_DIR,
+    DATABASE_DIR,
+    DATABASE_URL,
+    BINANCE_SPOT_BASE_URL,
+    BINANCE_FUTURES_BASE_URL,
+    BINANCE_SPOT_WS_URL,
+    BINANCE_FUTURES_WS_URL,
+    DEFAULT_SPOT_SYMBOLS,
+    DEFAULT_FUTURES_SYMBOLS,
+    TRADING_MODES,
+    MIN_CONFIDENCE,
+    AUTO_SIGNAL_INTERVAL,
+)
+
+__all__ = [
+    "BASE_DIR",
+    "DATA_DIR", 
+    "UPLOADS_DIR",
+    "PROCESSED_DIR",
+    "MODELS_DIR",
+    "DATABASE_DIR",
+    "DATABASE_URL",
+    "BINANCE_SPOT_BASE_URL",
+    "BINANCE_FUTURES_BASE_URL",
+    "BINANCE_SPOT_WS_URL",
+    "BINANCE_FUTURES_WS_URL",
+    "DEFAULT_SPOT_SYMBOLS",
+    "DEFAULT_FUTURES_SYMBOLS",
+    "TRADING_MODES",
+    "MIN_CONFIDENCE",
+    "AUTO_SIGNAL_INTERVAL",
+]

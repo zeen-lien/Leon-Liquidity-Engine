@@ -30,3 +30,14 @@ Thumbs.db
 # Data files (optional - uncomment if you don't want to upload data)
 # data/uploads/
 # data/processed/
+
+# Database
+data/database/*.db
+
+# Model files
+data/models/*.h5
+data/models/*.keras
+
+# Temporary files
+*.tmp
+*.temp

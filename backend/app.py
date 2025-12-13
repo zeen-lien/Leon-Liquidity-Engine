@@ -1,17 +1,24 @@
 """
-Backend sederhana untuk Leon Liquidity Engine.
-Semua variabel dan komentar menggunakan bahasa Indonesia agar mudah dipahami.
+Backend Leon Liquidity Engine v3.0
+Support untuk Spot & Futures trading dengan AI prediction.
 """
 
 from io import BytesIO
 from pathlib import Path
 from typing import List, Optional
+from datetime import datetime
 import shutil
 
 import pandas as pd
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query
 from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
+
+# Import dari modules yang sudah di-refactor
+from .core.config import UPLOADS_DIR, PROCESSED_DIR, TRADING_MODES
+from .models import init_db
+from .api import signals_router, binance_router
 
 from .services.praproses_data import (
     simpan_hasil_preprocess,
@@ -33,11 +40,9 @@ from .services.binance_realtime import (
 )
 from .services.lstm_predictor import lstm_predictor, get_prediction_for_symbol
 
-# Folder tujuan penyimpanan berkas historis (struktur: data/uploads/<folder>/...)
-FOLDER_DATA_BASE = Path("data") / "uploads"
-FOLDER_DATA_BASE.mkdir(parents=True, exist_ok=True)
-FOLDER_HASIL_BASE = Path("data") / "processed"
-FOLDER_HASIL_BASE.mkdir(parents=True, exist_ok=True)
+# Folder paths (menggunakan config)
+FOLDER_DATA_BASE = UPLOADS_DIR
+FOLDER_HASIL_BASE = PROCESSED_DIR
 
 # Daftar kolom minimal agar data bisa dipakai untuk analisis OHLCV.
 KOLOM_WAJIB: List[str] = ["open_time", "open", "high", "low", "close", "volume"]
@@ -54,10 +59,22 @@ HEADER_BINANCE_VISION: List[str] = [
 ]
 
 aplikasi = FastAPI(
-    title="Backend Leon Liquidity Engine",
-    description="API untuk mengelola data historis sebelum dianalisis model DL.",
-    version="0.1.0",
+    title="Leon Liquidity Engine API",
+    description="Trading Signal Generator dengan AI Prediction untuk Spot & Futures",
+    version="3.0.0",
 )
+
+# Include routers dari api module
+aplikasi.include_router(signals_router)
+aplikasi.include_router(binance_router)
+
+
+@aplikasi.on_event("startup")
+async def startup_event():
+    """Initialize database saat startup"""
+    init_db()
+    print("Leon Liquidity Engine v3.0 started!")
+    print("Database initialized.")
 
 
 @aplikasi.get("/cek-kesehatan")
@@ -66,7 +83,12 @@ async def cek_kesehatan():
     Endpoint untuk memastikan server hidup.
     Mengembalikan status sederhana.
     """
-    return {"status": "sehat"}
+    return {
+        "status": "sehat",
+        "version": "3.0.0",
+        "features": ["spot", "futures", "signals", "ai_prediction"],
+        "timestamp": datetime.now().isoformat()
+    }
 
 
 # ============================================================================

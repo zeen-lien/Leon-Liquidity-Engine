@@ -516,21 +516,56 @@
       <div class="card cyber-card">
         <div class="card-header">
           <div class="card-title">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
             <span>SIGNAL GENERATOR</span>
+            <span class="badge" id="market-badge">FUTURES</span>
           </div>
         </div>
-        <div class="form-grid-3">
-          <div class="form-group">
-            <label class="form-label">SYMBOL</label>
-            <select class="form-select cyber-select" id="live-symbol">
-              <option value="BTCUSDT">BTC/USDT</option>
-              <option value="ETHUSDT">ETH/USDT</option>
-              <option value="BNBUSDT">BNB/USDT</option>
-              <option value="SOLUSDT">SOL/USDT</option>
-              <option value="XRPUSDT">XRP/USDT</option>
-            </select>
+        
+        <!-- Market Type Selector -->
+        <div class="market-selector" style="display:flex;gap:8px;margin-bottom:16px;">
+          <button class="btn-cyber" id="btn-spot" onclick="setMarket('SPOT')" style="flex:1;">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/></svg>
+            <span>SPOT</span>
+          </button>
+          <button class="btn-cyber primary" id="btn-futures" onclick="setMarket('FUTURES')" style="flex:1;">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span>FUTURES</span>
+          </button>
+        </div>
+        
+        <!-- Symbol Search -->
+        <div class="form-group">
+          <label class="form-label">CARI SYMBOL</label>
+          <div class="input-group">
+            <input type="text" class="cyber-input" id="symbol-search" placeholder="Ketik nama coin (BTC, ETH, PEPE...)" oninput="searchSymbol(this.value)">
+            <button class="btn-cyber" onclick="addToFavorites()">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </button>
           </div>
+          <div id="search-results" style="margin-top:8px;"></div>
+        </div>
+        
+        <!-- Favorites -->
+        <div class="form-group">
+          <label class="form-label">FAVORITES</label>
+          <div id="favorites-list" style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="fav-tag" onclick="selectSymbol('BTCUSDT')">BTC</span>
+            <span class="fav-tag" onclick="selectSymbol('ETHUSDT')">ETH</span>
+            <span class="fav-tag" onclick="selectSymbol('SOLUSDT')">SOL</span>
+          </div>
+        </div>
+        
+        <!-- Selected Symbol -->
+        <div class="form-group">
+          <label class="form-label">SYMBOL TERPILIH</label>
+          <div class="selected-symbol" id="selected-symbol-display">
+            <span class="symbol-name" style="font-family:'Orbitron';font-size:18px;color:var(--neon-cyan);">BTCUSDT</span>
+            <input type="hidden" id="live-symbol" value="BTCUSDT">
+          </div>
+        </div>
+        
+        <div class="form-grid-3" style="margin-top:12px;">
           <div class="form-group">
             <label class="form-label">MODE TRADING</label>
             <select class="form-select cyber-select" id="live-mode">
@@ -542,8 +577,16 @@
           <div class="form-group">
             <label class="form-label">SIGNAL TYPE</label>
             <select class="form-select cyber-select" id="live-signal-type">
-              <option value="hybrid" selected>HYBRID (Technical + AI)</option>
+              <option value="hybrid" selected>HYBRID (Tech + AI)</option>
               <option value="technical">TECHNICAL ONLY</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">INTERVAL</label>
+            <select class="form-select cyber-select" id="live-interval">
+              <option value="15m">15 Menit</option>
+              <option value="1h" selected>1 Jam</option>
+              <option value="4h">4 Jam</option>
             </select>
           </div>
         </div>
@@ -556,7 +599,7 @@
         <div class="info-box" style="margin-top: 16px;">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
           <div>
-            <strong>HYBRID Signal</strong> menggabungkan analisis Technical (RSI, EMA, ATR) + AI Prediction (LSTM) untuk sinyal yang lebih akurat. Jika keduanya sejalan, confidence meningkat!
+            <strong>HYBRID Signal</strong> menggabungkan Technical (RSI, EMA, ATR) + AI (LSTM). Support <strong>SPOT</strong> dan <strong>FUTURES</strong> market. Cari coin apapun yang ada di Binance!
           </div>
         </div>
       </div>
@@ -1278,6 +1321,70 @@
     }
 
     .info-box strong { color: var(--neon-cyan); }
+
+    /* ============ FAVORITES & SYMBOL SELECTOR ============ */
+    .fav-tag {
+      display: inline-block;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid var(--neon-cyan);
+      border-radius: 6px;
+      color: var(--neon-cyan);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .fav-tag:hover {
+      background: rgba(0, 255, 247, 0.2);
+      box-shadow: 0 0 15px rgba(0, 255, 247, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .fav-tag.active {
+      background: var(--neon-cyan);
+      color: #000;
+    }
+    
+    .selected-symbol {
+      padding: 12px 16px;
+      background: rgba(0, 255, 247, 0.1);
+      border: 2px solid var(--neon-cyan);
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0, 255, 247, 0.2);
+    }
+    
+    .search-result-item {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    
+    .search-result-item:hover {
+      background: rgba(0, 255, 247, 0.1);
+      border-color: var(--neon-cyan);
+    }
+    
+    .search-result-item .symbol {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      color: var(--neon-yellow);
+    }
+    
+    .search-result-item .base {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
 
     /* ============ COMPARISON GRID ============ */
     .comparison-grid {
@@ -2035,14 +2142,16 @@
 
     // ============ LIVE SIGNALS (HYBRID) ============
     async function generateLiveSignal() {
-      const symbol = document.getElementById('live-symbol').value;
+      const symbol = document.getElementById('live-symbol').value || selectedSymbol;
       const mode = document.getElementById('live-mode').value;
       const signalType = document.getElementById('live-signal-type')?.value || 'technical';
+      const interval = document.getElementById('live-interval')?.value || '1h';
       const container = document.getElementById('live-signals-table');
-      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>ANALYZING...</span></div>';
+      container.innerHTML = `<div class="loading-cyber"><div class="cyber-spinner"></div><span>ANALYZING ${symbol} (${currentMarket})...</span></div>`;
       
       try {
-        const endpoint = signalType === 'hybrid' ? `/hybrid/analyze/${symbol}?mode_trading=${mode}` : `/binance/analyze/${symbol}?mode_trading=${mode}`;
+        // Use hybrid endpoint with market type
+        const endpoint = `/hybrid/analyze/${symbol}?mode_trading=${mode}&interval=${interval}`;
         const res = await fetch(endpoint, { method: 'POST' });
         const data = await res.json();
         
@@ -2403,18 +2512,151 @@
       }
     }
 
+    // ============ MARKET & SYMBOL SELECTOR ============
+    let currentMarket = 'FUTURES';
+    let selectedSymbol = 'BTCUSDT';
+    let searchTimeout = null;
+    
+    function setMarket(market) {
+      currentMarket = market;
+      document.getElementById('market-badge').textContent = market;
+      document.getElementById('btn-spot').classList.toggle('primary', market === 'SPOT');
+      document.getElementById('btn-futures').classList.toggle('primary', market === 'FUTURES');
+      document.getElementById('btn-spot').style.borderColor = market === 'SPOT' ? 'var(--neon-orange)' : 'var(--neon-red)';
+      document.getElementById('btn-futures').style.borderColor = market === 'FUTURES' ? 'var(--neon-orange)' : 'var(--neon-red)';
+      loadFavorites();
+      showInfo(`Market diubah ke ${market}`);
+    }
+    
+    function selectSymbol(symbol) {
+      selectedSymbol = symbol.toUpperCase();
+      document.getElementById('live-symbol').value = selectedSymbol;
+      document.getElementById('selected-symbol-display').innerHTML = `<span class="symbol-name" style="font-family:'Orbitron';font-size:18px;color:var(--neon-cyan);">${selectedSymbol}</span>`;
+      document.getElementById('symbol-search').value = '';
+      document.getElementById('search-results').innerHTML = '';
+      
+      // Update active state on favorites
+      document.querySelectorAll('.fav-tag').forEach(tag => {
+        tag.classList.toggle('active', tag.textContent === selectedSymbol.replace('USDT', ''));
+      });
+      
+      showSuccess(`Symbol: ${selectedSymbol}`);
+    }
+    
+    async function searchSymbol(query) {
+      if (query.length < 2) {
+        document.getElementById('search-results').innerHTML = '';
+        return;
+      }
+      
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(async () => {
+        try {
+          const res = await fetch(`/binance/search?query=${encodeURIComponent(query)}&market=${currentMarket}`);
+          const data = await res.json();
+          
+          if (data.results && data.results.length > 0) {
+            let html = '';
+            data.results.slice(0, 8).forEach(r => {
+              html += `<div class="search-result-item" onclick="selectSymbol('${r.symbol}')">
+                <span class="symbol">${r.symbol}</span>
+                <span class="base">${r.base}</span>
+              </div>`;
+            });
+            document.getElementById('search-results').innerHTML = html;
+          } else {
+            document.getElementById('search-results').innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:8px;">Tidak ditemukan</div>';
+          }
+        } catch (err) {
+          console.error('Search error:', err);
+        }
+      }, 300);
+    }
+    
+    async function addToFavorites() {
+      if (!selectedSymbol) return;
+      
+      try {
+        const res = await fetch('/signals/favorites/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ symbol: selectedSymbol, market_type: currentMarket })
+        });
+        const data = await res.json();
+        
+        if (data.status === 'sukses') {
+          showSuccess(data.message);
+          loadFavorites();
+        } else {
+          showError(data.detail || 'Gagal menambahkan');
+        }
+      } catch (err) {
+        showError('Gagal menambahkan ke favorit');
+      }
+    }
+    
+    async function loadFavorites() {
+      try {
+        const res = await fetch('/signals/favorites');
+        const data = await res.json();
+        
+        const container = document.getElementById('favorites-list');
+        if (data.favorites && data.favorites.length > 0) {
+          let html = '';
+          data.favorites.forEach(f => {
+            const base = f.symbol.replace('USDT', '');
+            const isActive = f.symbol === selectedSymbol ? 'active' : '';
+            html += `<span class="fav-tag ${isActive}" onclick="selectSymbol('${f.symbol}')">${base}</span>`;
+          });
+          container.innerHTML = html;
+        } else {
+          container.innerHTML = '<span style="color:var(--text-muted);font-size:11px;">Belum ada favorit. Cari dan tambahkan coin!</span>';
+        }
+      } catch (err) {
+        console.error('Load favorites error:', err);
+      }
+    }
+
+    // ============ LOAD STATISTICS ============
+    async function loadStatistics() {
+      try {
+        const res = await fetch('/signals/statistics?days=30');
+        const data = await res.json();
+        
+        document.getElementById('stat-total-signals').textContent = data.total_signals || 0;
+        document.getElementById('stat-win-rate').textContent = (data.win_rate || 0) + '%';
+        document.getElementById('stat-avg-pnl').textContent = (data.avg_pnl > 0 ? '+' : '') + (data.avg_pnl || 0).toFixed(1) + '%';
+        
+        // Update chart if available
+        if (chartPie && data.hit_tp !== undefined) {
+          chartPie.data.datasets[0].data = [data.hit_tp, data.hit_sl, data.expired || 0];
+          chartPie.update();
+        }
+      } catch (err) {
+        console.error('Load statistics error:', err);
+      }
+    }
+    
+    async function loadActiveSignals() {
+      try {
+        const res = await fetch('/signals/active');
+        const data = await res.json();
+        
+        // Update active pairs count
+        document.getElementById('stat-active-pairs').textContent = data.length || 0;
+      } catch (err) {
+        console.error('Load active signals error:', err);
+      }
+    }
+
     // ============ INIT ============
     document.addEventListener('DOMContentLoaded', () => {
       loadRealtimePrices();
       loadFolders();
       initCharts();
-      
-      const stats = JSON.parse(localStorage.getItem('backtestStatistics') || '{}');
-      if (stats.total_signals) {
-        document.getElementById('stat-total-signals').textContent = stats.total_signals;
-        document.getElementById('stat-win-rate').textContent = stats.win_rate + '%';
-        document.getElementById('stat-avg-pnl').textContent = (stats.avg_pnl > 0 ? '+' : '') + stats.avg_pnl + '%';
-      }
+      loadFavorites();
+      loadStatistics();
+      loadActiveSignals();
     });
   </script>
 </body>
