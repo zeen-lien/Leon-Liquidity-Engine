@@ -80,6 +80,11 @@ class Signal(Base):
     # Trading Mode
     mode_trading = Column(String(20), default="santai")
     
+    # Entry Size (untuk tracking profit/loss dalam dollar)
+    modal_total = Column(Float, nullable=True)      # Total modal user
+    entry_pct = Column(Float, nullable=True)        # Persentase entry dari modal
+    entry_amount = Column(Float, nullable=True)     # Jumlah dollar yang dientry
+    
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     closed_at = Column(DateTime, nullable=True)

@@ -58,7 +58,7 @@ def hitung_ema(kolom_tutup: pd.Series, periode: int = 50) -> pd.Series:
     # Handle NaN values
     ema = kolom_tutup.ewm(span=periode, adjust=False).mean()
     # Fill NaN dengan forward fill, lalu backward fill
-    ema = ema.fillna(method='ffill').fillna(method='bfill')
+    ema = ema.ffill().bfill()
     return ema
 
 

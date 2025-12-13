@@ -4,14 +4,25 @@ Trading Signal Generator dengan AI Prediction untuk **Spot & Futures** market.
 
 ## Fitur Utama
 
+### Live Trading
+- **Dashboard** - Command center dengan watchlist, quick signal, active signals
+- **Live Signals** - Generate sinyal BELI/JUAL dengan Entry, SL, TP
+- **Market Chart** - TradingView candlestick chart real-time
+- **Signal Tracking** - Track otomatis SL/TP dengan auto-update status
+
+### Research Lab
+- **Backtest Engine** - Test strategi dengan data historis CSV
+- **Data Manager** - Upload, kelola, dan proses data CSV
+- **ML Training** - Train LSTM model untuk prediksi lebih akurat
+
 ### Multi-Market Support
 - **Binance Spot** - Trading spot dengan harga real-time
 - **Binance Futures** - Trading futures dengan leverage, funding rate, open interest
 
 ### Dynamic Symbol Selection
 - Cari coin apapun yang ada di Binance
-- Tambahkan ke favorites untuk akses cepat
-- Support semua pair USDT
+- Tambahkan ke favorites dengan label SPOT/FUTURES
+- Watchlist dengan harga real-time
 
 ### Hybrid Signal Generator
 - **Technical Analysis**: RSI, EMA, ATR, Support/Resistance, Divergence
@@ -22,6 +33,7 @@ Trading Signal Generator dengan AI Prediction untuk **Spot & Futures** market.
 - Catat semua sinyal yang di-generate
 - Track otomatis SL/TP
 - Statistik win rate dan PnL
+- Auto-tracking service
 
 ### Real-time Data
 - WebSocket connection ke Binance

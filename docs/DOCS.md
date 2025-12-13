@@ -1,5 +1,5 @@
 # DOKUMENTASI LENGKAP
-## Leon Liquidity Engine - Sistem Cerdas Analisis Trading Cryptocurrency
+## Leon Liquidity Engine v3.0 - Sistem Trading Cryptocurrency Cyberpunk
 
 ---
 
@@ -10,40 +10,47 @@
 3. [Instalasi & Setup](#3-instalasi--setup)
 4. [Struktur Project](#4-struktur-project)
 5. [Fitur Utama](#5-fitur-utama)
-6. [Mode Trading](#6-mode-trading)
-7. [Algoritma Sistem Cerdas](#7-algoritma-sistem-cerdas)
-8. [Panduan Penggunaan](#8-panduan-penggunaan)
-9. [API Reference](#9-api-reference)
-10. [Interpretasi Hasil](#10-interpretasi-hasil)
-11. [Troubleshooting & FAQ](#11-troubleshooting--faq)
+6. [Mode Trading & Market Types](#6-mode-trading--market-types)
+7. [Signal Tracking System](#7-signal-tracking-system)
+8. [Entry Size Management](#8-entry-size-management)
+9. [Algoritma Sistem Cerdas](#9-algoritma-sistem-cerdas)
+10. [Panduan Penggunaan](#10-panduan-penggunaan)
+11. [API Reference](#11-api-reference)
+12. [Interpretasi Hasil](#12-interpretasi-hasil)
+13. [Troubleshooting & FAQ](#13-troubleshooting--faq)
 
 ---
 
 ## 1. PENDAHULUAN
 
-### 1.1 Tentang Leon Liquidity Engine
+### 1.1 Tentang Leon Liquidity Engine v3.0
 
-Leon Liquidity Engine adalah **Sistem Cerdas** berbasis web yang dirancang untuk menganalisis data cryptocurrency dan menghasilkan sinyal trading (BELI/JUAL) berdasarkan indikator teknikal dan machine learning.
+Leon Liquidity Engine v3.0 adalah **Sistem Trading Cryptocurrency** berbasis web dengan tema cyberpunk yang dirancang untuk menganalisis data real-time dan menghasilkan sinyal trading (BELI/JUAL) dengan sistem tracking otomatis dan manajemen entry size yang canggih.
 
-### 1.2 Latar Belakang
+### 1.2 Fitur Revolusioner v3.0
 
-Trading cryptocurrency memerlukan analisis teknikal yang kompleks dan pengambilan keputusan yang cepat. Trader pemula sering kesulitan mengidentifikasi waktu yang tepat untuk membeli atau menjual aset. Sistem ini dirancang untuk membantu trader dengan:
-- Menganalisis data historis dan real-time cryptocurrency
-- Mengidentifikasi peluang trading berdasarkan indikator teknikal
-- Memberikan rekomendasi sinyal BELI/JUAL dengan tingkat kepercayaan (confidence)
-- Melakukan backtesting untuk validasi performa sistem
-- Prediksi arah harga menggunakan LSTM Deep Learning
+**🚀 NEW FEATURES:**
+- **Multi-Signal Support**: Satu symbol bisa punya 3 signals berbeda (AKTIF, SANTAI, PASIF) secara bersamaan
+- **SPOT vs FUTURES**: Diferensiasi market dengan strategi khusus untuk investor jangka panjang (SPOT) dan trader aktif (FUTURES)
+- **Entry Size Management**: Sistem manajemen modal dengan persentase entry dan tracking P&L dalam dollar
+- **Active Signal Tracking**: Real-time monitoring signals dengan auto-refresh dan filter canggih
+- **Signal History**: Riwayat lengkap semua signals dengan statistik performa
+- **Smart Price Formatting**: Format harga dinamis untuk small cap coins (PEPE, SHIB, dll)
+- **Auto Signal Service**: Background service untuk monitoring SL/TP secara otomatis
 
-### 1.3 Fitur Utama
+### 1.3 Fitur Utama v3.0
 
-| Fitur | Deskripsi |
-|-------|-----------|
-| Live Trading | Analisis real-time dari Binance API |
-| AI Prediction | Prediksi arah harga dengan LSTM Neural Network |
-| Backtest Engine | Simulasi trading dengan data historis CSV |
-| Data Manager | Upload dan kelola data CSV |
-| Dashboard | Monitoring statistik dan performa |
-| Cyberpunk UI | Interface futuristik dengan tema neon |
+| Fitur | Deskripsi | Status |
+|-------|-----------|--------|
+| **Dashboard Command Center** | Real-time stats, watchlist, quick signal generator | ✅ ACTIVE |
+| **Live Signals (Hybrid)** | Analisis real-time dengan Technical + LSTM AI | ✅ ACTIVE |
+| **Active Tracking** | Monitor signals aktif dengan filter dan real-time updates | ✅ ACTIVE |
+| **Signal History** | Riwayat lengkap dengan statistik dan filter | ✅ ACTIVE |
+| **Market Chart** | Live candlestick chart dari Binance WebSocket | ✅ ACTIVE |
+| **Backtest Engine** | Simulasi trading dengan data historis | ✅ ACTIVE |
+| **Data Manager** | Upload dan kelola data CSV | ✅ ACTIVE |
+| **ML Training** | AI prediction dengan LSTM Neural Network | ✅ ACTIVE |
+| **Cyberpunk UI** | Interface futuristik dengan neon theme | ✅ ACTIVE |
 
 ### 1.4 Komponen Sistem Cerdas
 
@@ -253,55 +260,291 @@ Kelola data CSV:
 
 ---
 
-## 6. MODE TRADING
+## 6. MODE TRADING & MARKET TYPES
 
-Sistem menggunakan data H1 (1 jam) dan menyediakan 3 mode trading:
+### 6.1 Market Types
 
-### 6.1 Mode AKTIF (1-4 Jam)
+**FUTURES Market:**
+- Support BELI dan JUAL signals (long & short)
+- Take Profit: 3x ATR
+- Interval berdasarkan mode trading
+- Cocok untuk: Active trading, scalping, swing trading
 
-| Parameter | Nilai |
-|-----------|-------|
-| RSI Period | 6 |
-| RSI Oversold | 15 |
-| RSI Overbought | 85 |
-| EMA | 9, 20, 50 |
-| ATR Period | 6 |
-| Risk-Reward | 2.0 |
-| Target Durasi | 1-4 jam |
+**SPOT Market:**
+- Hanya BELI signals (no shorting)
+- Take Profit: 5x ATR (lebih lebar untuk long-term)
+- Interval: 1D (daily) untuk semua mode
+- Mode khusus: "INVESTOR" untuk buy & hold strategy
+- Cocok untuk: Long-term investment, DCA strategy
 
-**Cocok untuk:** Trading aktif, quick trend catching
+### 6.2 Mode Trading dengan Interval Mapping
 
-### 6.2 Mode SANTAI (4-12 Jam)
+| Mode | Interval (FUTURES) | Interval (SPOT) | Target Durasi | Risk-Reward |
+|------|-------------------|-----------------|---------------|-------------|
+| **AKTIF** | 15m | 1D | 1-4 jam | 2.0x |
+| **SANTAI** | 1h | 1D | 4-12 jam | 2.5x |
+| **PASIF** | 4h | 1D | 12-24 jam | 3.0x |
+| **INVESTOR** | - | 1D | 1-30 hari | 5.0x |
 
-| Parameter | Nilai |
-|-----------|-------|
-| RSI Period | 8 |
-| RSI Oversold | 18 |
-| RSI Overbought | 82 |
-| EMA | 20, 50, 200 |
-| ATR Period | 10 |
-| Risk-Reward | 2.5 |
-| Target Durasi | 4-12 jam |
+### 6.3 Multi-Signal Support
 
-**Cocok untuk:** Day trading, work-life balance
+**REVOLUTIONARY FEATURE**: Satu symbol bisa memiliki multiple signals dengan mode berbeda secara bersamaan!
 
-### 6.3 Mode PASIF (12-24 Jam)
+**Contoh:**
+```
+BTCUSDT:
+├── Signal AKTIF (15m) - Entry: $97,500 - Status: OPEN
+├── Signal SANTAI (1h) - Entry: $97,200 - Status: OPEN  
+└── Signal PASIF (4h) - Entry: $96,800 - Status: OPEN
+```
 
-| Parameter | Nilai |
-|-----------|-------|
-| RSI Period | 14 |
-| RSI Oversold | 15 |
-| RSI Overbought | 85 |
-| EMA | 50, 100, 200 |
-| ATR Period | 14 |
-| Risk-Reward | 3.0 |
-| Target Durasi | 12-24 jam |
+**Rules:**
+- Maksimal 1 signal per mode per symbol
+- Jika ada signal OPEN untuk mode yang sama, harus tunggu close dulu
+- Bisa generate signal mode lain tanpa menunggu
 
-**Cocok untuk:** Swing trading, conservative approach
+### 6.4 Parameter Detail per Mode
+
+**Mode AKTIF (Quick Scalping):**
+| Parameter | FUTURES | SPOT |
+|-----------|---------|------|
+| Interval | 15m | 1D |
+| RSI Period | 6 | 14 |
+| RSI Oversold | 15 | 30 |
+| RSI Overbought | 85 | 70 |
+| EMA | 9, 20, 50 | 20, 50, 200 |
+| ATR Multiplier | 2.0x | 5.0x |
+| Target | 1-4 jam | 1-7 hari |
+
+**Mode SANTAI (Balanced Trading):**
+| Parameter | FUTURES | SPOT |
+|-----------|---------|------|
+| Interval | 1h | 1D |
+| RSI Period | 8 | 14 |
+| RSI Oversold | 18 | 30 |
+| RSI Overbought | 82 | 70 |
+| EMA | 20, 50, 200 | 50, 100, 200 |
+| ATR Multiplier | 2.5x | 5.0x |
+| Target | 4-12 jam | 3-14 hari |
+
+**Mode PASIF (Swing Trading):**
+| Parameter | FUTURES | SPOT |
+|-----------|---------|------|
+| Interval | 4h | 1D |
+| RSI Period | 14 | 21 |
+| RSI Oversold | 15 | 25 |
+| RSI Overbought | 85 | 75 |
+| EMA | 50, 100, 200 | 100, 200, 300 |
+| ATR Multiplier | 3.0x | 5.0x |
+| Target | 12-24 jam | 7-30 hari |
 
 ---
 
-## 7. ALGORITMA SISTEM CERDAS
+## 7. SIGNAL TRACKING SYSTEM
+
+### 7.1 Auto Signal Service
+
+**Background Service** yang berjalan otomatis untuk monitoring semua signals aktif:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    AUTO SIGNAL SERVICE                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────────┐  │
+│  │   BINANCE   │    │  DATABASE   │    │   WEBSOCKET     │  │
+│  │  WEBSOCKET  │◄──►│   SIGNALS   │◄──►│   FRONTEND      │  │
+│  │ (Real-time) │    │   (SQLite)  │    │ (Live Updates)  │  │
+│  └─────────────┘    └─────────────┘    └─────────────────┘  │
+│         │                   │                     │         │
+│         ▼                   ▼                     ▼         │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │              MONITORING ENGINE                          │ │
+│  │                                                         │ │
+│  │  • Check SL/TP setiap detik                            │ │
+│  │  • Update highest/lowest price                         │ │
+│  │  • Calculate real-time P&L                             │ │
+│  │  • Auto close signals (HIT_TP/HIT_SL)                  │ │
+│  │  • Expire old signals (>168 hours)                     │ │
+│  │  • Send notifications                                   │ │
+│  │                                                         │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 7.2 Signal Status Lifecycle
+
+```
+OPEN ──────┐
+           │
+           ├─► HIT_TP (Take Profit reached) ✅
+           │
+           ├─► HIT_SL (Stop Loss reached) ❌
+           │
+           ├─► EXPIRED (>168 hours timeout) ⏰
+           │
+           └─► CANCELLED (Manual close) 🚫
+```
+
+### 7.3 Real-time Features
+
+**Live Price Updates:**
+- WebSocket connection ke Binance
+- Update harga setiap detik
+- Automatic reconnection jika disconnect
+
+**Active Tracking Page:**
+- Real-time P&L calculation
+- Progress bar ke TP/SL
+- Duration counter
+- Filter by Market/Mode/Type
+- Auto-refresh setiap 5 detik
+
+**Dashboard Integration:**
+- Live active signals count
+- Real-time statistics
+- Performance metrics
+- Equity simulation
+
+### 7.4 Database Schema
+
+**Signals Table:**
+```sql
+CREATE TABLE signals (
+    id INTEGER PRIMARY KEY,
+    symbol VARCHAR(20) NOT NULL,
+    market_type VARCHAR(7) DEFAULT 'FUTURES',
+    signal_type VARCHAR(4) NOT NULL,
+    entry_price FLOAT NOT NULL,
+    stop_loss FLOAT NOT NULL,
+    take_profit FLOAT NOT NULL,
+    confidence FLOAT NOT NULL,
+    mode_trading VARCHAR(20) DEFAULT 'santai',
+    
+    -- Entry Size Management
+    modal_total FLOAT,      -- Total modal user
+    entry_pct FLOAT,        -- Persentase entry dari modal  
+    entry_amount FLOAT,     -- Jumlah dollar yang dientry
+    
+    -- Timestamps
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    closed_at DATETIME,
+    
+    -- Status & Results
+    status VARCHAR(9) DEFAULT 'OPEN',
+    exit_price FLOAT,
+    pnl_percent FLOAT,
+    pnl_usdt FLOAT,
+    duration_minutes INTEGER,
+    
+    -- Price Tracking
+    highest_price FLOAT,    -- Highest since entry
+    lowest_price FLOAT,     -- Lowest since entry
+    
+    -- Analysis Data
+    confluence_status VARCHAR(20),
+    technical_confidence FLOAT,
+    lstm_confidence FLOAT,
+    lstm_direction VARCHAR(10),
+    alasan TEXT
+);
+```
+
+---
+
+## 8. ENTRY SIZE MANAGEMENT
+
+### 8.1 Konsep Entry Size
+
+**Entry Size** adalah sistem manajemen modal yang memungkinkan user menentukan berapa persen dari total modal yang akan digunakan untuk setiap signal.
+
+**Formula:**
+```
+Entry Amount ($) = Modal Total ($) × Entry Percentage (%) ÷ 100
+
+Contoh:
+Modal Total: $1,000
+Entry Percentage: 10%
+Entry Amount: $1,000 × 10% = $100
+```
+
+### 8.2 P&L Calculation
+
+**Profit/Loss dalam Dollar:**
+```
+P&L ($) = Entry Amount ($) × P&L Percentage (%) ÷ 100
+
+Contoh Signal BELI:
+Entry: $97,000
+Current: $98,940
+P&L%: +2.0%
+Entry Amount: $100
+P&L ($): $100 × 2.0% = +$2.00
+```
+
+### 8.3 Implementation
+
+**Dashboard Quick Signal:**
+```html
+<div class="form-group">
+    <label>ENTRY SIZE</label>
+    <div style="display:flex;gap:6px;">
+        <input id="quick-modal" value="1000" placeholder="Modal ($)">
+        <input id="quick-entry-pct" value="10" placeholder="Pct (%)">
+        <span id="quick-entry-amount">$100</span>
+    </div>
+</div>
+```
+
+**Live Signals Page:**
+```html
+<div class="form-group">
+    <label>ENTRY SIZE (% dari Modal)</label>
+    <div class="input-group">
+        <input id="signal-modal" placeholder="Modal ($)" value="1000">
+        <input id="signal-entry-pct" placeholder="%" value="10">
+        <span id="signal-entry-amount">$100</span>
+    </div>
+</div>
+```
+
+**Active Tracking Display:**
+```html
+<div class="active-signal-card">
+    <div class="entry-info">
+        <span>ENTRY SIZE</span>
+        <span>${entryAmount.toFixed(0)}</span>
+    </div>
+    <div class="pnl-info">
+        <span>P&L ($)</span>
+        <span style="color:${pnlColor}">${pnlSign}$${Math.abs(pnlDollar).toFixed(2)}</span>
+    </div>
+</div>
+```
+
+### 8.4 Fallback System
+
+**Old Signals (NULL entry_amount):**
+- Menggunakan nilai dari `tracking-modal` input di Active Tracking page
+- Semua old signals akan menampilkan entry size yang sama
+- Ini adalah expected behavior
+
+**New Signals:**
+- Menyimpan `modal_total`, `entry_pct`, dan `entry_amount` ke database
+- Menampilkan entry size sesuai yang disimpan
+- P&L calculation menggunakan entry_amount yang tersimpan
+
+### 8.5 Benefits
+
+1. **Risk Management**: User bisa kontrol exposure per signal
+2. **Portfolio Tracking**: Total P&L dalam dollar, bukan hanya percentage
+3. **Realistic Simulation**: Equity curve berdasarkan actual dollar amounts
+4. **Flexible Sizing**: Bisa adjust entry size per signal sesuai confidence level
+
+---
+
+## 9. ALGORITMA SISTEM CERDAS
 
 ### 7.1 Knowledge Base (Basis Pengetahuan)
 
@@ -406,53 +649,121 @@ PROSES:
 
 ---
 
-## 8. PANDUAN PENGGUNAAN
+## 10. PANDUAN PENGGUNAAN
 
+### 10.1 Dashboard Command Center
 
-### 8.1 Dashboard
+**Fitur Utama:**
+- **Stats Grid**: Total signals, win rate, avg P&L, active signals
+- **Performance Summary**: Real-time statistics dengan refresh button
+- **Watchlist**: Favorite pairs dengan live prices dari Binance
+- **Quick Signal**: Generate signal langsung dari dashboard
+- **Active Signals**: Preview signals yang sedang berjalan
+- **Charts**: Pie chart distribusi hasil & equity simulation
 
-Dashboard adalah halaman utama yang menampilkan ringkasan statistik sistem.
+**Quick Signal Generator:**
+1. Pilih Symbol (BTC, ETH, BNB, SOL, XRP)
+2. Pilih Market Type (FUTURES/SPOT)
+3. Pilih Mode Trading (AKTIF/SANTAI/PASIF atau INVESTOR untuk SPOT)
+4. Set Entry Size (Modal + Percentage)
+5. Klik "GENERATE NOW"
+6. Konfirmasi untuk "SAVE & TRACK"
 
-**Informasi yang Ditampilkan:**
-- Total Signals: Jumlah sinyal yang dihasilkan
-- Win Rate: Persentase sinyal yang profit
-- Avg P&L: Rata-rata profit/loss
-- Active Pairs: Jumlah cryptocurrency aktif
-- Real-time Prices: Harga terkini dari Binance
-- Charts: Distribusi hasil dan equity curve
+### 10.2 Live Signals (Hybrid Analysis)
 
-### 8.2 Live Signals
-
-**Langkah-langkah:**
-1. Klik menu "Live Signals" di sidebar
-2. Pilih cryptocurrency dari dropdown (BTC, ETH, BNB, SOL, XRP)
-3. Pilih mode trading (Aktif, Santai, Pasif)
-4. Klik "GENERATE SIGNAL"
-5. Lihat hasil sinyal dengan Entry, SL, TP, dan Confidence
-
-**Output:**
-- Pair: Pasangan mata uang
-- Signal: BELI atau JUAL
-- Entry: Harga masuk posisi
-- Stop Loss: Batas kerugian
-- Take Profit: Target keuntungan
-- Confidence: Tingkat kepercayaan (35-80%)
-- Reason: Alasan sinyal dihasilkan
-
-### 8.3 AI Prediction
+**Revolutionary Hybrid System**: Kombinasi Technical Analysis + LSTM AI
 
 **Langkah-langkah:**
-1. Klik menu "AI Prediction" di sidebar
-2. Pilih cryptocurrency dari dropdown
-3. Klik "ANALYZE WITH AI"
-4. Lihat hasil prediksi arah harga
+1. Klik menu "Live Signals"
+2. **Pilih Market Type**: FUTURES atau SPOT
+3. **Cari Symbol**: Ketik nama coin (BTC, ETH, PEPE, dll)
+4. **Set Entry Size**: Modal total dan persentase entry
+5. **Pilih Mode Trading**: 
+   - FUTURES: AKTIF (15m), SANTAI (1h), PASIF (4h)
+   - SPOT: Semua mode menggunakan interval 1D (INVESTOR)
+6. Klik "GENERATE HYBRID SIGNAL"
 
-**Output:**
-- Direction: NAIK (Bullish) atau TURUN (Bearish)
-- Confidence: Tingkat kepercayaan prediksi
-- Current Price: Harga terkini
-- Recommendation: BELI, JUAL, atau TUNGGU
-- Indicators: RSI, EMA20, EMA50
+**Output Hybrid:**
+- **Technical Confluence**: Berapa indikator yang align (X/6)
+- **LSTM AI Prediction**: Direction + Confidence dari Neural Network
+- **Combined Signal**: BELI/JUAL dengan Entry/SL/TP
+- **Confidence Score**: Gabungan technical + AI (35-80%)
+- **Detailed Reason**: Penjelasan lengkap kenapa signal dihasilkan
+
+**Multi-Signal Support:**
+- Bisa generate signal berbeda untuk mode berbeda
+- Contoh: BTCUSDT AKTIF + BTCUSDT SANTAI + BTCUSDT PASIF bersamaan
+- Sistem akan reject jika sudah ada signal OPEN untuk mode yang sama
+
+### 10.3 Active Tracking (Real-time Monitoring)
+
+**Fitur Canggih:**
+- **Real-time Updates**: Auto-refresh setiap 5 detik
+- **Live P&L**: Profit/Loss dalam percentage dan dollar
+- **Progress Bars**: Visual progress menuju TP atau SL
+- **Duration Counter**: Berapa lama signal sudah berjalan
+- **Advanced Filters**: Filter by Market, Mode, Type
+- **Modal Input**: Fallback entry size untuk old signals
+
+**Filter System:**
+```
+Market Filter: All | FUTURES | SPOT
+Mode Filter: All | AKTIF | SANTAI | PASIF  
+Type Filter: All | BELI | JUAL
+```
+
+**Signal Card Information:**
+- Symbol + Market Type + Mode badge
+- Entry Time (Jakarta timezone)
+- Entry Size dalam dollar
+- Current Price vs Entry Price
+- Real-time P&L (% dan $)
+- Progress to TP/SL dengan visual bar
+- Duration counter
+- Action buttons (Close manual jika perlu)
+
+### 10.4 Signal History (Complete Records)
+
+**Comprehensive History System:**
+
+**Stats Summary:**
+- Total Closed Signals
+- HIT TP vs HIT SL count
+- Overall Win Rate
+- Total Profit vs Total Loss dalam dollar
+
+**Advanced Filters:**
+```
+Status: All | HIT_TP | HIT_SL | EXPIRED | CANCELLED
+Market: All | FUTURES | SPOT
+Type: All | BELI | JUAL
+```
+
+**History Table Columns:**
+- Symbol (dengan market type dan mode)
+- Signal Type (BELI/JUAL dengan color coding)
+- Status (HIT_TP=green, HIT_SL=red, etc)
+- Entry Price vs Exit Price
+- P&L Percentage dan P&L Dollar
+- Entry Size yang digunakan
+- Duration (berapa lama signal berjalan)
+- Closed Date (kapan signal selesai)
+
+### 10.5 Market Chart (Live Binance Data)
+
+**Real-time Candlestick Chart:**
+- **Live WebSocket**: Data langsung dari Binance
+- **Multiple Symbols**: BTC, ETH, BNB, SOL, XRP, DOGE, ADA, AVAX, PEPE
+- **Multiple Timeframes**: 1m, 5m, 15m, 1h, 4h, 1d
+- **Real-time Ticker**: Price, 24h change, high/low
+- **Auto Reconnection**: Jika WebSocket disconnect
+
+**Chart Features:**
+- Candlestick visualization dengan Chart.js
+- Real-time price updates
+- Volume data
+- Responsive design
+- Status indicator (CONNECTING/LIVE/DISCONNECTED)
 
 ### 8.4 Backtest Engine
 
@@ -496,43 +807,173 @@ open_time,open,high,low,close,volume
 
 ---
 
-## 9. API REFERENCE
+## 11. API REFERENCE
 
-### 9.1 Health Check
+### 11.1 Health Check
 ```http
 GET /cek-kesehatan
 ```
-Response: `{"status": "sehat", "versi": "2.1"}`
+Response: `{"status": "sehat", "versi": "3.0"}`
 
-### 9.2 Folder Management
+### 11.2 Signal Management
 
-**Daftar Folder:**
+**Create Signal:**
 ```http
-GET /folder/daftar
-```
-
-**Buat Folder:**
-```http
-POST /folder/buat
+POST /signals/create
 Content-Type: application/json
 
-{"nama_folder": "BTC"}
+{
+  "symbol": "BTCUSDT",
+  "market_type": "FUTURES",
+  "signal_type": "BELI", 
+  "entry_price": 97500.0,
+  "stop_loss": 95000.0,
+  "take_profit": 102500.0,
+  "confidence": 0.75,
+  "mode_trading": "santai",
+  "modal_total": 1000.0,
+  "entry_pct": 10.0,
+  "entry_amount": 100.0,
+  "alasan": "RSI oversold + EMA alignment"
+}
 ```
 
-**Rename Folder:**
+**Get Active Signals:**
 ```http
-PUT /folder/rename
+GET /signals/active
+```
+
+**Get Signal History:**
+```http
+GET /signals/history?status=HIT_TP&market_type=FUTURES&limit=50
+```
+
+**Live Tracking:**
+```http
+GET /signals/tracking/live
+```
+
+**Performance Summary:**
+```http
+GET /signals/performance/summary
+```
+
+**Close Signal:**
+```http
+POST /signals/close/{signal_id}?exit_price=98500&status=HIT_TP
+```
+
+### 11.3 Auto Signal Service
+
+**Start Auto Tracking:**
+```http
+POST /signals/auto/start
+```
+
+**Stop Auto Tracking:**
+```http
+POST /signals/auto/stop
+```
+
+**Get Service Status:**
+```http
+GET /signals/auto/status
+```
+
+**Check Expired Signals:**
+```http
+POST /signals/auto/check-expired?max_hours=168
+```
+
+### 11.4 Favorites Management
+
+**Add to Favorites:**
+```http
+POST /signals/favorites/add
 Content-Type: application/json
 
-{"nama_lama": "BTC", "nama_baru": "BTCUSDT"}
+{"symbol": "BTCUSDT", "market_type": "FUTURES"}
 ```
 
-**Hapus Folder:**
+**Get Favorites:**
 ```http
-DELETE /folder/hapus/{nama_folder}
+GET /signals/favorites
 ```
 
-### 9.3 Upload & File Management
+**Remove from Favorites:**
+```http
+DELETE /signals/favorites/{symbol}
+```
+
+### 11.5 Binance Integration
+
+**Real-time Prices:**
+```http
+GET /binance/prices
+```
+
+**24h Ticker:**
+```http
+GET /binance/ticker24h/{symbol}
+```
+
+**Search Symbols:**
+```http
+GET /binance/search?query=BTC&market=FUTURES
+```
+
+**Kline Data:**
+```http
+GET /binance/klines/{symbol}?interval=1h&limit=100
+```
+
+### 11.6 Hybrid Analysis (NEW)
+
+**Generate Hybrid Signal:**
+```http
+POST /hybrid/analyze/{symbol}?mode_trading=santai&interval=1h&market_type=FUTURES
+```
+
+Response:
+```json
+{
+  "status": "sukses",
+  "symbol": "BTCUSDT",
+  "harga_terkini": 97500.0,
+  "indikator_terkini": {
+    "rsi_14": 45.2,
+    "ema_20": 96800.0,
+    "ema_50": 95500.0,
+    "atr_14": 1250.0
+  },
+  "lstm_prediction": {
+    "direction": "UP",
+    "confidence": 0.72,
+    "next_candles": [98000, 98500, 99000]
+  },
+  "hybrid_signals": [
+    {
+      "tipe": "BELI",
+      "entry": 97500.0,
+      "stop_loss": 95000.0,
+      "take_profit": 102500.0,
+      "confidence": 0.75,
+      "confluence_status": "STRONG",
+      "technical_confidence": 0.68,
+      "lstm_confidence": 0.72,
+      "lstm_direction": "UP",
+      "alasan": "[Mode Santai] Sinyal BELI - Konfluensi: 5/6 kondisi terpenuhi..."
+    }
+  ],
+  "rekomendasi": {
+    "aksi": "BELI",
+    "kekuatan": "STRONG",
+    "alasan": "Technical + AI alignment bullish"
+  }
+}
+```
+
+### 11.7 Data Management (Legacy)
 
 **Upload CSV:**
 ```http
@@ -542,19 +983,7 @@ Content-Type: multipart/form-data
 berkas: <file.csv>
 ```
 
-**Daftar File:**
-```http
-GET /unggah-csv/daftar/{folder}
-```
-
-**Hapus File:**
-```http
-DELETE /unggah-csv/hapus/{folder}/{nama_file}
-```
-
-### 9.4 Preprocessing
-
-**Proses Indikator:**
+**Process Indicators:**
 ```http
 POST /pra-proses/indikator/
 Content-Type: application/json
@@ -562,9 +991,7 @@ Content-Type: application/json
 {"folder": "BTC"}
 ```
 
-### 9.5 Signal Generation
-
-**Generate Sinyal (Backtest):**
+**Backtest:**
 ```http
 POST /sinyal/generate
 Content-Type: application/json
@@ -574,25 +1001,6 @@ Content-Type: application/json
   "mode_trading": "santai",
   "confidence_minimum": 0.60
 }
-```
-
-### 9.6 Binance Real-time
-
-**Get Prices:**
-```http
-GET /binance/prices
-```
-
-**Analyze Symbol:**
-```http
-POST /binance/analyze/{symbol}?mode_trading=santai
-```
-
-### 9.7 LSTM Prediction
-
-**Get Prediction:**
-```http
-GET /lstm/predict/{symbol}
 ```
 
 ### 9.8 Response Format
@@ -800,8 +1208,87 @@ tensorflow>=2.13.0 (optional, untuk LSTM)
 4. LSTM Networks - Hochreiter & Schmidhuber (1997)
 5. Support/Resistance - Price Action Analysis
 
+### 13.5 FAQ v3.0
+
+**Q: Apa yang baru di v3.0?**
+A: Multi-signal support, SPOT vs FUTURES differentiation, entry size management, active tracking dengan real-time updates, signal history, dan smart price formatting untuk small cap coins.
+
+**Q: Bagaimana cara kerja multi-signal support?**
+A: Satu symbol bisa punya maksimal 3 signals aktif bersamaan (AKTIF, SANTAI, PASIF). Sistem akan reject jika sudah ada signal OPEN untuk mode yang sama.
+
+**Q: Apa perbedaan SPOT vs FUTURES?**
+A: SPOT hanya support BELI signals dengan TP 5x ATR dan interval 1D untuk long-term investment. FUTURES support BELI/JUAL dengan TP 3x ATR dan interval sesuai mode.
+
+**Q: Bagaimana entry size management bekerja?**
+A: User set modal total dan persentase entry. Sistem calculate entry amount dalam dollar dan track P&L berdasarkan amount tersebut. Old signals tanpa entry_amount akan fallback ke modal input di Active Tracking.
+
+**Q: Apakah auto signal service aman?**
+A: Ya, service berjalan di background dan hanya monitoring. Tidak ada auto-trading, hanya auto-close signals saat hit SL/TP berdasarkan real-time price dari Binance.
+
+**Q: Bagaimana cara backup data?**
+A: Database SQLite tersimpan di `data/database/leon_engine.db`. Copy file ini untuk backup semua signals dan favorites.
+
+**Q: Apakah bisa custom parameter trading?**
+A: Saat ini parameter fixed per mode untuk konsistensi. Future update akan support custom parameters.
+
+**Q: Kenapa confidence maksimal 80%?**
+A: Sistem dirancang dengan prinsip realistic expectations. Tidak ada signal yang 100% pasti profit dalam trading.
+
 ---
 
-*Dokumentasi Leon Liquidity Engine v2.1*
-*Sistem Cerdas untuk Analisis Trading Cryptocurrency*
-*© 2025 - Dibuat untuk tugas Sistem Cerdas*
+## CHANGELOG v3.0
+
+### 🚀 NEW FEATURES
+- ✅ Multi-signal support per symbol (different modes)
+- ✅ SPOT vs FUTURES market differentiation  
+- ✅ Entry size management dengan modal & percentage
+- ✅ Active signal tracking dengan real-time updates
+- ✅ Signal history dengan comprehensive statistics
+- ✅ Smart price formatting untuk small cap coins
+- ✅ Auto signal service untuk monitoring SL/TP
+- ✅ Advanced filtering system
+- ✅ Live market chart dengan Binance WebSocket
+- ✅ Hybrid analysis (Technical + LSTM AI)
+- ✅ Cyberpunk UI dengan neon theme
+
+### 🔧 IMPROVEMENTS
+- ✅ Database schema dengan entry size columns
+- ✅ Real-time P&L calculation dalam dollar
+- ✅ WebSocket integration untuk live prices
+- ✅ Responsive design untuk mobile
+- ✅ Error handling dan user notifications
+- ✅ Performance optimization
+- ✅ Code restructuring dengan proper MVC
+
+### 🐛 BUG FIXES
+- ✅ Filter state preservation after auto-refresh
+- ✅ Price formatting untuk decimal places
+- ✅ WebSocket reconnection handling
+- ✅ Memory leak prevention
+- ✅ Cross-browser compatibility
+
+---
+
+## ROADMAP v4.0 (Future)
+
+### 🎯 PLANNED FEATURES
+- 📋 Portfolio management dengan multiple accounts
+- 📋 Advanced charting dengan technical indicators overlay
+- 📋 Custom parameter settings per user
+- 📋 Email/Telegram notifications
+- 📋 API integration dengan exchanges (Binance, Bybit)
+- 📋 Advanced backtesting dengan walk-forward analysis
+- 📋 Machine learning model retraining
+- 📋 Multi-timeframe analysis
+- 📋 Social trading features
+- 📋 Mobile app (React Native)
+
+---
+
+*Dokumentasi Leon Liquidity Engine v3.0 CYBERPUNK*
+*Advanced Cryptocurrency Trading System*
+*© 2025 - Built with ❤️ for the future of trading*
+
+**🔥 SYSTEM STATUS: FULLY OPERATIONAL**
+**🚀 LAST UPDATE: December 2025**
+**⚡ NEXT EVOLUTION: v4.0 QUANTUM**

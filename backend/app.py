@@ -71,10 +71,15 @@ aplikasi.include_router(binance_router)
 
 @aplikasi.on_event("startup")
 async def startup_event():
-    """Initialize database saat startup"""
+    """Initialize database dan auto-start services saat startup"""
     init_db()
     print("Leon Liquidity Engine v3.0 started!")
     print("Database initialized.")
+    
+    # Auto-start signal tracking service
+    from .services.auto_signal import auto_signal_service
+    await auto_signal_service.start()
+    print("Auto Signal Tracking Service started!")
 
 
 @aplikasi.get("/cek-kesehatan")
@@ -202,6 +207,55 @@ async def hapus_folder(nama_folder: str = Query(..., description="Nama folder ya
     return {
         "nama_folder": nama_bersih,
         "pesan": f"Folder '{nama_bersih}' beserta isinya berhasil dihapus.",
+    }
+
+
+@aplikasi.get("/folder/detail/{nama_folder}")
+async def detail_folder(nama_folder: str):
+    """
+    Mengembalikan detail folder termasuk daftar file uploads dan processed.
+    """
+    import os
+    nama_bersih = nama_folder.strip()
+    path_uploads = FOLDER_DATA_BASE / nama_bersih
+    path_processed = FOLDER_HASIL_BASE / nama_bersih
+    
+    if not path_uploads.exists():
+        raise HTTPException(status_code=404, detail=f"Folder '{nama_bersih}' tidak ditemukan.")
+    
+    # Ambil file uploads
+    files_uploads = []
+    for f in sorted(path_uploads.glob("*.csv")):
+        stat = f.stat()
+        files_uploads.append({
+            "nama": f.name,
+            "ukuran": stat.st_size,
+            "ukuran_format": f"{stat.st_size / 1024:.1f} KB" if stat.st_size < 1024*1024 else f"{stat.st_size / (1024*1024):.2f} MB",
+            "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+        })
+    
+    # Ambil file processed
+    files_processed = []
+    if path_processed.exists():
+        for f in sorted(path_processed.glob("*.csv")):
+            stat = f.stat()
+            files_processed.append({
+                "nama": f.name,
+                "ukuran": stat.st_size,
+                "ukuran_format": f"{stat.st_size / 1024:.1f} KB" if stat.st_size < 1024*1024 else f"{stat.st_size / (1024*1024):.2f} MB",
+                "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+            })
+    
+    return {
+        "nama_folder": nama_bersih,
+        "uploads": {
+            "jumlah": len(files_uploads),
+            "files": files_uploads,
+        },
+        "processed": {
+            "jumlah": len(files_processed),
+            "files": files_processed,
+        },
     }
 
 
@@ -994,8 +1048,170 @@ def _generate_recommendation(prediction: dict) -> dict:
         }
 
 
-# Import datetime untuk timestamp
-from datetime import datetime
+# ============================================================================
+# ENDPOINT ML TRAINING
+# ============================================================================
+
+# Training status storage
+training_status = {
+    "is_training": False,
+    "progress": 0,
+    "current_epoch": 0,
+    "total_epochs": 0,
+    "loss": None,
+    "accuracy": None,
+    "status": "idle"
+}
+
+
+class MLTrainingRequest(BaseModel):
+    """Request body untuk ML training"""
+    folder: str = Field(..., description="Nama folder dengan data processed")
+    symbol: str = Field("BTCUSDT", description="Symbol untuk training")
+    epochs: int = Field(50, ge=10, le=500)
+    batch_size: int = Field(32, ge=8, le=128)
+    sequence_length: int = Field(60, ge=10, le=200)
+
+
+@aplikasi.post("/lstm/train")
+async def train_lstm_model(request: MLTrainingRequest):
+    """
+    Train LSTM model dengan data dari folder processed.
+    """
+    global training_status
+    
+    if training_status["is_training"]:
+        raise HTTPException(status_code=400, detail="Training sedang berjalan. Tunggu sampai selesai.")
+    
+    # Check folder exists
+    folder_path = FOLDER_HASIL_BASE / request.folder
+    if not folder_path.exists():
+        raise HTTPException(status_code=404, detail=f"Folder '{request.folder}' tidak ditemukan")
+    
+    # Get CSV files
+    csv_files = list(folder_path.glob("*.csv"))
+    if not csv_files:
+        raise HTTPException(status_code=404, detail="Tidak ada file CSV di folder")
+    
+    try:
+        # Load and combine data
+        dfs = []
+        for csv_file in csv_files:
+            df = pd.read_csv(csv_file)
+            dfs.append(df)
+        
+        combined_df = pd.concat(dfs, ignore_index=True)
+        combined_df = combined_df.sort_values('open_time').reset_index(drop=True)
+        
+        # Update training status
+        training_status = {
+            "is_training": True,
+            "progress": 0,
+            "current_epoch": 0,
+            "total_epochs": request.epochs,
+            "loss": None,
+            "accuracy": None,
+            "status": "preparing"
+        }
+        
+        # Configure and train
+        lstm_predictor.config["epochs"] = request.epochs
+        lstm_predictor.config["batch_size"] = request.batch_size
+        lstm_predictor.config["sequence_length"] = request.sequence_length
+        
+        # Model save path
+        model_name = f"{request.symbol}_{request.folder}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        model_path = Path("data/models") / f"{model_name}.keras"
+        model_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Train
+        training_status["status"] = "training"
+        metrics = lstm_predictor.train(combined_df, str(model_path))
+        
+        # Update status
+        training_status = {
+            "is_training": False,
+            "progress": 100,
+            "current_epoch": request.epochs,
+            "total_epochs": request.epochs,
+            "loss": metrics.get("val_loss"),
+            "accuracy": metrics.get("val_accuracy"),
+            "status": "completed"
+        }
+        
+        return {
+            "status": "sukses",
+            "pesan": "Training selesai",
+            "model_path": str(model_path),
+            "metrics": metrics
+        }
+        
+    except Exception as err:
+        training_status = {
+            "is_training": False,
+            "progress": 0,
+            "current_epoch": 0,
+            "total_epochs": 0,
+            "loss": None,
+            "accuracy": None,
+            "status": "error"
+        }
+        raise HTTPException(status_code=500, detail=f"Training gagal: {err}")
+
+
+@aplikasi.get("/lstm/training-status")
+async def get_training_status():
+    """Get current training status"""
+    return training_status
+
+
+@aplikasi.get("/lstm/models")
+async def list_saved_models():
+    """List semua model yang tersimpan"""
+    model_dir = Path("data/models")
+    if not model_dir.exists():
+        return {"models": []}
+    
+    models = []
+    for model_file in model_dir.glob("*.keras"):
+        config_file = model_file.with_suffix('.keras').with_name(model_file.stem + '_config.json')
+        
+        model_info = {
+            "name": model_file.stem,
+            "path": str(model_file),
+            "created": datetime.fromtimestamp(model_file.stat().st_mtime).isoformat(),
+            "size": f"{model_file.stat().st_size / 1024:.1f} KB"
+        }
+        
+        # Load config if exists
+        if config_file.exists():
+            try:
+                import json
+                with open(config_file, 'r') as f:
+                    config = json.load(f)
+                model_info["config"] = config
+            except:
+                pass
+        
+        models.append(model_info)
+    
+    return {"models": sorted(models, key=lambda x: x["created"], reverse=True)}
+
+
+@aplikasi.post("/lstm/load/{model_name}")
+async def load_saved_model(model_name: str):
+    """Load model yang tersimpan"""
+    model_path = Path("data/models") / f"{model_name}.keras"
+    
+    if not model_path.exists():
+        raise HTTPException(status_code=404, detail=f"Model '{model_name}' tidak ditemukan")
+    
+    success = lstm_predictor.load(str(model_path))
+    
+    if success:
+        return {"status": "sukses", "pesan": f"Model '{model_name}' berhasil di-load"}
+    else:
+        raise HTTPException(status_code=500, detail="Gagal load model")
 
 
 # ============================================================================
@@ -1006,8 +1222,9 @@ from datetime import datetime
 async def analisis_hybrid(
     symbol: str,
     mode_trading: str = Query("santai", description="Mode: aktif, santai, pasif"),
-    interval: str = Query("1h", description="Interval: 1h, 4h"),
-    limit: int = Query(100, ge=50, le=500, description="Jumlah candle untuk analisis")
+    interval: str = Query("1h", description="Interval: 1h, 4h, 1d"),
+    limit: int = Query(100, ge=50, le=500, description="Jumlah candle untuk analisis"),
+    market_type: str = Query("FUTURES", description="Market type: SPOT atau FUTURES")
 ):
     """
     HYBRID SIGNAL: Gabungan analisis Technical Indicators + LSTM AI Prediction.
@@ -1016,7 +1233,9 @@ async def analisis_hybrid(
     1. Technical Analysis (RSI, EMA, ATR, S/R, Divergence)
     2. LSTM Deep Learning Prediction
     
-    Confidence dihitung dari kombinasi keduanya untuk sinyal yang lebih akurat.
+    SPOT vs FUTURES:
+    - SPOT: Hanya sinyal BELI (akumulasi), TP lebih lebar untuk investor jangka panjang
+    - FUTURES: Sinyal BELI dan JUAL, untuk trading aktif
     
     Parameters:
     -----------
@@ -1024,6 +1243,7 @@ async def analisis_hybrid(
     mode_trading: str - Mode trading (aktif, santai, pasif)
     interval: str - Timeframe untuk analisis
     limit: int - Jumlah candle untuk analisis
+    market_type: str - SPOT atau FUTURES
     """
     from .services.praproses_data import tambah_indikator_ke_df
     from .services.generator_sinyal_unified import scan_sinyal_honest, TRADING_STYLES
@@ -1059,6 +1279,18 @@ async def analisis_hybrid(
         # 6. Ambil harga terkini
         harga_terkini = await binance_fetcher.get_ticker_price(symbol.upper())
         current_price = float(harga_terkini["price"])
+        
+        # Helper function untuk smart rounding berdasarkan harga
+        # Coin kecil seperti PEPE butuh lebih banyak decimal places
+        def smart_round(price):
+            if price >= 1000:
+                return round(price, 2)
+            elif price >= 1:
+                return round(price, 4)
+            elif price >= 0.01:
+                return round(price, 6)
+            else:
+                return round(price, 10)  # Untuk coin sangat kecil seperti PEPE
         
         # 7. HYBRID ANALYSIS - Gabungkan Technical + LSTM
         hybrid_signals = []
@@ -1097,8 +1329,8 @@ async def analisis_hybrid(
                 confluence_status = "WEAK"
                 confluence_bonus = -0.10
             
-            # Generate hybrid signal
-            if hybrid_confidence >= 0.60:
+            # Generate hybrid signal (lowered threshold untuk lebih banyak sinyal)
+            if hybrid_confidence >= 0.55:
                 # Tentukan arah berdasarkan confluence
                 if confluence_status == "STRONG":
                     final_direction = tech_direction
@@ -1107,61 +1339,92 @@ async def analisis_hybrid(
                 
                 final_type = "BELI" if final_direction == "UP" else "JUAL"
                 
-                # Calculate SL/TP dari technical signal
-                entry = current_price
-                atr = df_dengan_indikator['atr_14'].iloc[-1] if 'atr_14' in df_dengan_indikator.columns else current_price * 0.02
-                
-                if final_type == "BELI":
-                    stop_loss = entry - (atr * 1.5)
-                    take_profit = entry + (atr * 3.0)
+                # SPOT MARKET: Hanya sinyal BELI (akumulasi untuk investor)
+                if market_type == "SPOT" and final_type == "JUAL":
+                    # Skip sinyal JUAL untuk SPOT, investor tidak short
+                    pass
                 else:
-                    stop_loss = entry + (atr * 1.5)
-                    take_profit = entry - (atr * 3.0)
-                
-                hybrid_signal = {
-                    "tipe": final_type,
-                    "entry": round(entry, 2),
-                    "stop_loss": round(stop_loss, 2),
-                    "take_profit": round(take_profit, 2),
-                    "confidence": round(hybrid_confidence, 4),
-                    "confluence_status": confluence_status,
-                    "technical_signal": tech_type,
-                    "technical_confidence": round(tech_confidence, 4),
-                    "lstm_direction": lstm_direction,
-                    "lstm_confidence": round(lstm_confidence, 4),
-                    "alasan": f"[HYBRID {confluence_status}] Technical: {tech_type} ({tech_confidence*100:.0f}%), LSTM: {lstm_direction} ({lstm_confidence*100:.0f}%)",
-                    "timestamp": datetime.now().isoformat()
-                }
-                hybrid_signals.append(hybrid_signal)
+                    # Calculate SL/TP dari technical signal
+                    entry = current_price
+                    atr = df_dengan_indikator['atr_14'].iloc[-1] if 'atr_14' in df_dengan_indikator.columns else current_price * 0.02
+                    
+                    # SPOT: TP lebih lebar untuk investor jangka panjang
+                    if market_type == "SPOT":
+                        sl_multiplier = 2.0  # SL lebih lebar
+                        tp_multiplier = 5.0  # TP jauh lebih lebar untuk long-term
+                        market_label = "SPOT INVESTOR"
+                    else:
+                        sl_multiplier = 1.5
+                        tp_multiplier = 3.0
+                        market_label = "FUTURES"
+                    
+                    if final_type == "BELI":
+                        stop_loss = entry - (atr * sl_multiplier)
+                        take_profit = entry + (atr * tp_multiplier)
+                    else:
+                        stop_loss = entry + (atr * sl_multiplier)
+                        take_profit = entry - (atr * tp_multiplier)
+                    
+                    hybrid_signal = {
+                        "tipe": final_type,
+                        "entry": smart_round(entry),
+                        "stop_loss": smart_round(stop_loss),
+                        "take_profit": smart_round(take_profit),
+                        "confidence": round(hybrid_confidence, 4),
+                        "confluence_status": confluence_status,
+                        "technical_signal": tech_type,
+                        "technical_confidence": round(tech_confidence, 4),
+                        "lstm_direction": lstm_direction,
+                        "lstm_confidence": round(lstm_confidence, 4),
+                        "market_type": market_type,
+                        "alasan": f"[{market_label} HYBRID {confluence_status}] Technical: {tech_type} ({tech_confidence*100:.0f}%), LSTM: {lstm_direction} ({lstm_confidence*100:.0f}%)",
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    hybrid_signals.append(hybrid_signal)
         
         else:
             # Tidak ada sinyal teknikal, gunakan LSTM saja
-            if lstm_confidence >= 0.65:
+            if lstm_confidence >= 0.55:
                 final_type = "BELI" if lstm_direction == "UP" else "JUAL" if lstm_direction == "DOWN" else None
+                
+                # SPOT: Hanya BELI
+                if market_type == "SPOT" and final_type == "JUAL":
+                    final_type = None
                 
                 if final_type:
                     entry = current_price
                     atr = df_dengan_indikator['atr_14'].iloc[-1] if 'atr_14' in df_dengan_indikator.columns else current_price * 0.02
                     
-                    if final_type == "BELI":
-                        stop_loss = entry - (atr * 1.5)
-                        take_profit = entry + (atr * 3.0)
+                    # SPOT: TP lebih lebar untuk investor
+                    if market_type == "SPOT":
+                        sl_multiplier = 2.0
+                        tp_multiplier = 5.0
+                        market_label = "SPOT INVESTOR"
                     else:
-                        stop_loss = entry + (atr * 1.5)
-                        take_profit = entry - (atr * 3.0)
+                        sl_multiplier = 1.5
+                        tp_multiplier = 3.0
+                        market_label = "FUTURES"
+                    
+                    if final_type == "BELI":
+                        stop_loss = entry - (atr * sl_multiplier)
+                        take_profit = entry + (atr * tp_multiplier)
+                    else:
+                        stop_loss = entry + (atr * sl_multiplier)
+                        take_profit = entry - (atr * tp_multiplier)
                     
                     hybrid_signal = {
                         "tipe": final_type,
-                        "entry": round(entry, 2),
-                        "stop_loss": round(stop_loss, 2),
-                        "take_profit": round(take_profit, 2),
+                        "entry": smart_round(entry),
+                        "stop_loss": smart_round(stop_loss),
+                        "take_profit": smart_round(take_profit),
                         "confidence": round(lstm_confidence * 0.9, 4),  # Slight penalty for LSTM-only
                         "confluence_status": "LSTM_ONLY",
                         "technical_signal": "NONE",
                         "technical_confidence": 0,
                         "lstm_direction": lstm_direction,
                         "lstm_confidence": round(lstm_confidence, 4),
-                        "alasan": f"[LSTM ONLY] Prediksi {lstm_direction} dengan confidence {lstm_confidence*100:.0f}%",
+                        "market_type": market_type,
+                        "alasan": f"[{market_label} LSTM ONLY] Prediksi {lstm_direction} dengan confidence {lstm_confidence*100:.0f}%",
                         "timestamp": datetime.now().isoformat()
                     }
                     hybrid_signals.append(hybrid_signal)

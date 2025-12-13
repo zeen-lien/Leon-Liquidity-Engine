@@ -46,8 +46,8 @@
       --glow-pink: 0 0 20px rgba(255, 20, 147, 0.6), 0 0 40px rgba(255, 20, 147, 0.3);
       
       --text-primary: #ffffff;
-      --text-secondary: #b0b0b0;
-      --text-muted: #606060;
+      --text-secondary: #d0d0d0;
+      --text-muted: #b0b0b0;
       
       --border-neon: rgba(255, 7, 58, 0.4);
       --gradient-fire: linear-gradient(135deg, var(--neon-red), var(--neon-orange), var(--neon-yellow));
@@ -277,6 +277,17 @@
     .nav-btn.active svg {
       filter: drop-shadow(0 0 8px currentColor);
     }
+    
+    .nav-badge {
+      background: var(--neon-red);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-left: auto;
+      font-family: 'Orbitron', sans-serif;
+    }
 
     /* Sidebar Footer */
     .sidebar-footer {
@@ -386,9 +397,18 @@
         <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         <span>Live Signals</span>
       </button>
-      <button class="nav-btn" onclick="showPage('ai-prediction')">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/><path d="M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
-        <span>AI Prediction</span>
+      <button class="nav-btn" onclick="showPage('active-tracking')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <span>Active Tracking</span>
+        <span class="nav-badge" id="nav-active-count">0</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('signal-history')">
+        <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Signal History</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('market-chart')">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        <span>Market Chart</span>
       </button>
     </nav>
 
@@ -402,6 +422,18 @@
         <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
         <span>Data Manager</span>
       </button>
+      <button class="nav-btn" onclick="showPage('ml-training')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/><path d="M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+        <span>ML Training</span>
+      </button>
+    </nav>
+
+    <nav class="nav-section">
+      <div class="nav-label">Settings</div>
+      <button class="nav-btn" onclick="showPage('ai-prediction')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>AI Settings</span>
+      </button>
     </nav>
 
     <div class="sidebar-footer">
@@ -409,7 +441,7 @@
         <div class="status-dot"></div>
         <span class="status-text">SYSTEM ONLINE</span>
       </div>
-      <div class="version-text">v2.1 CYBERPUNK</div>
+      <div class="version-text">v3.0 CYBERPUNK</div>
     </div>
   </aside>
 
@@ -457,27 +489,148 @@
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value" id="stat-active-pairs">10</div>
-            <div class="stat-label">ACTIVE PAIRS</div>
+            <div class="stat-value" id="stat-active-signals">0</div>
+            <div class="stat-label">ACTIVE SIGNALS</div>
           </div>
         </div>
       </div>
 
-      <!-- Real-time Prices -->
+      <!-- Performance Summary -->
       <div class="card cyber-card">
         <div class="card-header">
           <div class="card-title">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            <span>REAL-TIME PRICES</span>
-            <span class="badge live">LIVE</span>
+            <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+            <span>SIGNAL PERFORMANCE</span>
+            <span class="badge" id="tracking-status-badge">TRACKING</span>
           </div>
-          <button class="btn-cyber" onclick="loadRealtimePrices()">
-            <svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <button class="btn-cyber" onclick="loadPerformanceSummary()">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
             <span>REFRESH</span>
           </button>
         </div>
-        <div class="price-grid" id="realtime-prices">
-          <div class="loading-cyber"><div class="cyber-spinner"></div><span>LOADING MARKET DATA...</span></div>
+        <div id="performance-summary" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
+          <div class="perf-stat">
+            <div class="perf-value" id="perf-total">0</div>
+            <div class="perf-label">TOTAL</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-lime);" id="perf-tp">0</div>
+            <div class="perf-label">HIT TP</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-red);" id="perf-sl">0</div>
+            <div class="perf-label">HIT SL</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" id="perf-pf">0</div>
+            <div class="perf-label">PROFIT FACTOR</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-lime);" id="perf-best">+0%</div>
+            <div class="perf-label">BEST TRADE</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-red);" id="perf-worst">0%</div>
+            <div class="perf-label">WORST TRADE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Watchlist Favorites -->
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>WATCHLIST</span>
+            <span class="badge live">LIVE</span>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-cyber" onclick="openAddWatchlist()">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>ADD</span>
+            </button>
+            <button class="btn-cyber" onclick="loadWatchlistPrices()">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span>REFRESH</span>
+            </button>
+          </div>
+        </div>
+        <div class="price-grid" id="watchlist-prices">
+          <div class="loading-cyber"><div class="cyber-spinner"></div><span>LOADING WATCHLIST...</span></div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="grid-2">
+        <div class="card cyber-card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              <span>QUICK SIGNAL</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">SYMBOL</label>
+            <div class="input-group">
+              <select class="cyber-select" id="quick-symbol" style="flex:1;">
+                <option value="BTCUSDT">BTC/USDT</option>
+                <option value="ETHUSDT">ETH/USDT</option>
+                <option value="BNBUSDT">BNB/USDT</option>
+                <option value="SOLUSDT">SOL/USDT</option>
+                <option value="XRPUSDT">XRP/USDT</option>
+              </select>
+              <select class="cyber-select" id="quick-market" style="width:100px;" onchange="onQuickMarketChange()">
+                <option value="FUTURES">FUTURES</option>
+                <option value="SPOT">SPOT</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" id="quick-mode-group">
+            <label class="form-label">MODE TRADING</label>
+            <div class="mode-selector" id="quick-mode-selector" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+              <button type="button" class="mode-btn" data-mode="aktif" onclick="selectQuickMode('aktif')">
+                <div style="font-size:11px;font-weight:600;">AKTIF</div>
+                <div style="font-size:9px;color:var(--text-muted);">1-4 jam</div>
+              </button>
+              <button type="button" class="mode-btn active" data-mode="santai" onclick="selectQuickMode('santai')">
+                <div style="font-size:11px;font-weight:600;">SANTAI</div>
+                <div style="font-size:9px;color:var(--text-muted);">4-12 jam</div>
+              </button>
+              <button type="button" class="mode-btn" data-mode="pasif" onclick="selectQuickMode('pasif')">
+                <div style="font-size:11px;font-weight:600;">PASIF</div>
+                <div style="font-size:9px;color:var(--text-muted);">12-24 jam</div>
+              </button>
+            </div>
+            <input type="hidden" id="quick-mode" value="santai">
+          </div>
+          <!-- Entry Size untuk Quick Signal -->
+          <div class="form-group" style="margin-top:8px;">
+            <label class="form-label" style="font-size:9px;">ENTRY SIZE</label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="number" class="cyber-input" id="quick-modal" value="1000" min="100" step="100" style="width:80px;height:32px;font-size:11px;" oninput="updateQuickEntryAmount()">
+              <input type="number" class="cyber-input" id="quick-entry-pct" value="10" min="1" max="100" step="1" style="width:50px;height:32px;font-size:11px;" oninput="updateQuickEntryAmount()">
+              <span style="font-size:11px;color:var(--neon-orange);font-family:'Orbitron';" id="quick-entry-amount">$100</span>
+            </div>
+          </div>
+          <button class="btn-cyber primary full" onclick="quickGenerateSignal()" style="margin-top:8px;">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span>GENERATE NOW</span>
+          </button>
+        </div>
+        
+        <div class="card cyber-card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>ACTIVE SIGNALS</span>
+              <span class="badge" id="dash-active-badge">0</span>
+            </div>
+          </div>
+          <div id="dash-active-signals" style="max-height:200px;overflow-y:auto;">
+            <div class="empty-state" style="padding:20px;">
+              <p style="font-size:12px;color:var(--text-muted);">Belum ada sinyal aktif</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -497,11 +650,140 @@
           <div class="card-header">
             <div class="card-title">
               <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-              <span>EQUITY CURVE</span>
+              <span>EQUITY SIMULATION</span>
               <span class="badge green">GROWTH</span>
             </div>
           </div>
+          <!-- Modal Input untuk Simulasi -->
+          <div class="equity-simulation-input" style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;">
+            <div style="flex:1;">
+              <label class="form-label" style="font-size:10px;">MODAL AWAL ($)</label>
+              <input type="number" class="cyber-input" id="equity-modal" value="1000" min="100" step="100" style="font-family:'Orbitron';">
+            </div>
+            <button class="btn-cyber primary" onclick="simulateEquity()" style="height:40px;">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span>SIMULATE</span>
+            </button>
+          </div>
+          <!-- Hasil Simulasi -->
+          <div id="equity-result" style="display:none;margin-bottom:12px;">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+              <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px;text-align:center;">
+                <div style="font-size:10px;color:var(--text-muted);">MODAL AWAL</div>
+                <div style="font-size:14px;font-family:'Orbitron';color:var(--neon-cyan);" id="eq-modal-awal">$1,000</div>
+              </div>
+              <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px;text-align:center;">
+                <div style="font-size:10px;color:var(--text-muted);">MODAL AKHIR</div>
+                <div style="font-size:14px;font-family:'Orbitron';" id="eq-modal-akhir">$1,000</div>
+              </div>
+              <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px;text-align:center;">
+                <div style="font-size:10px;color:var(--text-muted);">TOTAL PROFIT</div>
+                <div style="font-size:14px;font-family:'Orbitron';" id="eq-profit">$0</div>
+              </div>
+            </div>
+          </div>
           <div class="chart-container"><canvas id="chartEquity"></canvas></div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- ============ MARKET CHART PAGE ============ -->
+    <section class="page" id="page-market-chart">
+      <div class="page-header">
+        <h1 class="page-title">LIVE MARKET</h1>
+        <p class="page-subtitle">Real-time candlestick chart langsung dari Binance WebSocket</p>
+      </div>
+      
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+            <span>BINANCE LIVE CHART</span>
+            <span class="badge live" id="chart-status">CONNECTING...</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select class="cyber-select" id="chart-symbol" style="width:140px;" onchange="changeChartSymbol()">
+              <option value="BTCUSDT">BTC/USDT</option>
+              <option value="ETHUSDT">ETH/USDT</option>
+              <option value="BNBUSDT">BNB/USDT</option>
+              <option value="SOLUSDT">SOL/USDT</option>
+              <option value="XRPUSDT">XRP/USDT</option>
+              <option value="DOGEUSDT">DOGE/USDT</option>
+              <option value="ADAUSDT">ADA/USDT</option>
+              <option value="AVAXUSDT">AVAX/USDT</option>
+              <option value="PEPEUSDT">PEPE/USDT</option>
+            </select>
+            <select class="cyber-select" id="chart-interval" style="width:100px;" onchange="changeChartSymbol()">
+              <option value="1m">1m</option>
+              <option value="5m">5m</option>
+              <option value="15m">15m</option>
+              <option value="1h" selected>1H</option>
+              <option value="4h">4H</option>
+              <option value="1d">1D</option>
+            </select>
+          </div>
+        </div>
+        <div id="binance-chart" style="height:500px;border-radius:8px;overflow:hidden;background:#0a0a0a;">
+          <div class="loading-cyber"><div class="cyber-spinner"></div><span>LOADING CHART...</span></div>
+        </div>
+      </div>
+      
+      <!-- Real-time Price Ticker -->
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span>REAL-TIME TICKER</span>
+            <span class="badge live">LIVE</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
+          <div class="stat-mini">
+            <div class="stat-mini-value" id="mi-price" style="font-size:20px;">-</div>
+            <div class="stat-mini-label">PRICE</div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-mini-value" id="mi-change">-</div>
+            <div class="stat-mini-label">24H CHANGE</div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-mini-value" id="mi-high">-</div>
+            <div class="stat-mini-label">24H HIGH</div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-mini-value" id="mi-low">-</div>
+            <div class="stat-mini-label">24H LOW</div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-mini-value" id="mi-volume">-</div>
+            <div class="stat-mini-label">VOLUME</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Order Book & Recent Trades -->
+      <div class="grid-2">
+        <div class="card cyber-card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+              <span>ORDER BOOK</span>
+            </div>
+          </div>
+          <div id="order-book" style="max-height:300px;overflow-y:auto;">
+            <div class="loading-cyber"><div class="cyber-spinner"></div></div>
+          </div>
+        </div>
+        <div class="card cyber-card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>RECENT TRADES</span>
+            </div>
+          </div>
+          <div id="recent-trades" style="max-height:300px;overflow-y:auto;">
+            <div class="loading-cyber"><div class="cyber-spinner"></div></div>
+          </div>
         </div>
       </div>
     </section>
@@ -565,13 +847,13 @@
           </div>
         </div>
         
-        <div class="form-grid-3" style="margin-top:12px;">
+        <div class="form-grid-2" style="margin-top:12px;">
           <div class="form-group">
             <label class="form-label">MODE TRADING</label>
             <select class="form-select cyber-select" id="live-mode">
-              <option value="aktif">AKTIF (1-4H)</option>
-              <option value="santai" selected>SANTAI (4-12H)</option>
-              <option value="pasif">PASIF (12-24H)</option>
+              <option value="aktif">AKTIF (1-4H) - Interval 15m</option>
+              <option value="santai" selected>SANTAI (4-12H) - Interval 1H</option>
+              <option value="pasif">PASIF (12-24H) - Interval 4H</option>
             </select>
           </div>
           <div class="form-group">
@@ -581,25 +863,34 @@
               <option value="technical">TECHNICAL ONLY</option>
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label">INTERVAL</label>
-            <select class="form-select cyber-select" id="live-interval">
-              <option value="15m">15 Menit</option>
-              <option value="1h" selected>1 Jam</option>
-              <option value="4h">4 Jam</option>
-            </select>
-          </div>
         </div>
+        <!-- Entry Size (% dari Modal) -->
+        <div class="form-group" style="margin-top:12px;">
+          <label class="form-label">ENTRY SIZE (% dari Modal)</label>
+          <div class="input-group">
+            <input type="number" class="cyber-input" id="signal-modal" placeholder="Modal ($)" value="1000" min="100" step="100" style="width:120px;">
+            <input type="number" class="cyber-input" id="signal-entry-pct" placeholder="Entry %" value="10" min="1" max="100" step="1" style="width:80px;">
+            <span style="display:flex;align-items:center;padding:0 12px;background:rgba(255,107,0,0.1);border:1px solid var(--neon-orange);border-radius:6px;font-family:'Orbitron';font-size:12px;color:var(--neon-orange);" id="signal-entry-amount">$100</span>
+          </div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Modal total dan persentase entry per trade. Contoh: Modal $1000, Entry 10% = $100 per trade</div>
+        </div>
+        
         <div class="form-group" style="margin-top: 16px;">
           <button class="btn-cyber primary full" onclick="generateLiveSignal()">
             <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
             <span>GENERATE SIGNAL</span>
           </button>
         </div>
-        <div class="info-box" style="margin-top: 16px;">
+        <div class="info-box" style="margin-top: 16px;" id="info-futures">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
           <div>
-            <strong>HYBRID Signal</strong> menggabungkan Technical (RSI, EMA, ATR) + AI (LSTM). Support <strong>SPOT</strong> dan <strong>FUTURES</strong> market. Cari coin apapun yang ada di Binance!
+            <strong>FUTURES</strong> - Trading aktif dengan leverage. Sinyal BELI dan JUAL. Cocok untuk trader yang aktif monitoring.
+          </div>
+        </div>
+        <div class="info-box" style="margin-top: 16px;display:none;border-color:var(--neon-cyan);" id="info-spot">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>SPOT</strong> - Investasi jangka panjang. Hanya sinyal BELI (akumulasi). TP lebih lebar untuk investor. Tidak perlu monitoring aktif.
           </div>
         </div>
       </div>
@@ -615,6 +906,194 @@
           <div class="empty-state">
             <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
             <p>Klik GENERATE SIGNAL untuk memulai analisis</p>
+          </div>
+        </div>
+      </div>
+      
+    </section>
+
+    <!-- ============ ACTIVE TRACKING PAGE ============ -->
+    <section class="page" id="page-active-tracking">
+      <div class="page-header">
+        <h1 class="page-title">ACTIVE TRACKING</h1>
+        <p class="page-subtitle">Real-time monitoring semua sinyal yang sedang berjalan</p>
+      </div>
+
+      <!-- Controls -->
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span>TRACKING CONTROL</span>
+            <span class="badge live" id="active-signals-badge">0 OPEN</span>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <label style="font-size:11px;color:var(--text-secondary);">MODAL $</label>
+              <input type="number" class="cyber-input" id="tracking-modal" value="1000" min="100" step="100" style="width:120px;height:36px;font-family:'Orbitron';font-size:14px;">
+            </div>
+            <button class="btn-cyber primary" id="btn-auto-tracking" onclick="toggleAutoTracking()">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+              <span id="auto-tracking-text">START AUTO</span>
+            </button>
+            <button class="btn-cyber" onclick="loadActiveSignals()">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span>REFRESH</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Stats Summary -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+          <div class="perf-stat">
+            <div class="perf-value" id="track-total-open">0</div>
+            <div class="perf-label">TOTAL OPEN</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-lime);" id="track-total-profit">$0</div>
+            <div class="perf-label">UNREALIZED P&L</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-lime);" id="track-winning">0</div>
+            <div class="perf-label">WINNING</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-red);" id="track-losing">0</div>
+            <div class="perf-label">LOSING</div>
+          </div>
+        </div>
+        
+        <div class="info-box">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>Auto Tracking</strong> memantau sinyal OPEN secara real-time via WebSocket. Sinyal otomatis close saat hit SL/TP. Set modal untuk simulasi profit/loss.
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Signals Grid -->
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span>OPEN POSITIONS</span>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <select class="cyber-select" id="track-filter-market" onchange="filterActiveSignals()" style="width:110px;">
+              <option value="all">All Market</option>
+              <option value="FUTURES">FUTURES</option>
+              <option value="SPOT">SPOT</option>
+            </select>
+            <select class="cyber-select" id="track-filter-mode" onchange="filterActiveSignals()" style="width:110px;">
+              <option value="all">All Modes</option>
+              <option value="aktif">AKTIF</option>
+              <option value="santai">SANTAI</option>
+              <option value="pasif">PASIF</option>
+            </select>
+            <select class="cyber-select" id="track-filter-type" onchange="filterActiveSignals()" style="width:100px;">
+              <option value="all">All Types</option>
+              <option value="BELI">BELI</option>
+              <option value="JUAL">JUAL</option>
+            </select>
+          </div>
+        </div>
+        <div id="active-signals-list">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <p>Belum ada sinyal aktif. Generate sinyal dari Live Signals untuk memulai tracking.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SIGNAL HISTORY PAGE ============ -->
+    <section class="page" id="page-signal-history">
+      <div class="page-header">
+        <h1 class="page-title">SIGNAL HISTORY</h1>
+        <p class="page-subtitle">Riwayat semua sinyal trading yang sudah selesai (HIT TP/SL)</p>
+      </div>
+
+      <!-- Stats Summary -->
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+            <span>PERFORMANCE SUMMARY</span>
+          </div>
+          <button class="btn-cyber" onclick="loadSignalHistory()">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>REFRESH</span>
+          </button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;">
+          <div class="perf-stat">
+            <div class="perf-value" id="hist-total">0</div>
+            <div class="perf-label">TOTAL CLOSED</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-lime);" id="hist-tp">0</div>
+            <div class="perf-label">HIT TP</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-red);" id="hist-sl">0</div>
+            <div class="perf-label">HIT SL</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" id="hist-winrate">0%</div>
+            <div class="perf-label">WIN RATE</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-lime);" id="hist-profit">$0</div>
+            <div class="perf-label">TOTAL PROFIT</div>
+          </div>
+          <div class="perf-stat">
+            <div class="perf-value" style="color:var(--neon-red);" id="hist-loss">$0</div>
+            <div class="perf-label">TOTAL LOSS</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter -->
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+            <span>FILTER</span>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <select class="cyber-select" id="hist-filter-status" onchange="loadSignalHistory()" style="width:120px;">
+              <option value="all">All Status</option>
+              <option value="HIT_TP">HIT TP</option>
+              <option value="HIT_SL">HIT SL</option>
+              <option value="EXPIRED">EXPIRED</option>
+              <option value="CANCELLED">CANCELLED</option>
+            </select>
+            <select class="cyber-select" id="hist-filter-market" onchange="loadSignalHistory()" style="width:110px;">
+              <option value="all">All Market</option>
+              <option value="FUTURES">FUTURES</option>
+              <option value="SPOT">SPOT</option>
+            </select>
+            <select class="cyber-select" id="hist-filter-type" onchange="loadSignalHistory()" style="width:100px;">
+              <option value="all">All Types</option>
+              <option value="BELI">BELI</option>
+              <option value="JUAL">JUAL</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Table -->
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>CLOSED SIGNALS</span>
+          </div>
+        </div>
+        <div id="signal-history-table" style="overflow-x:auto;">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p>Belum ada riwayat sinyal. Sinyal akan muncul setelah hit TP/SL.</p>
           </div>
         </div>
       </div>
@@ -875,6 +1354,189 @@
           <div class="loading-cyber"><div class="cyber-spinner"></div><span>SCANNING FOLDERS...</span></div>
         </div>
       </div>
+      
+      <!-- Folder Detail Modal -->
+      <div class="card cyber-card" id="folder-detail-card" style="display:none;">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span id="folder-detail-title">FOLDER CONTENT</span>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-cyber" onclick="renameCurrentFolder()">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span>RENAME</span>
+            </button>
+            <button class="btn-cyber" style="border-color:var(--neon-red);color:var(--neon-red);" onclick="deleteCurrentFolder()">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>DELETE</span>
+            </button>
+            <button class="btn-cyber" onclick="closeFolderDetail()">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="folder-detail-content">
+          <!-- File list akan di-render di sini -->
+        </div>
+      </div>
+    </section>
+    
+    <!-- ============ ML TRAINING PAGE ============ -->
+    <section class="page" id="page-ml-training">
+      <div class="page-header">
+        <h1 class="page-title">ML TRAINING CENTER</h1>
+        <p class="page-subtitle">Train LSTM model untuk prediksi harga cryptocurrency</p>
+      </div>
+      
+      <!-- ML Status -->
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="stat-card cyber">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="ml-status">OFFLINE</div>
+            <div class="stat-label">MODEL STATUS</div>
+          </div>
+        </div>
+        <div class="stat-card cyber">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="ml-accuracy">0%</div>
+            <div class="stat-label">ACCURACY</div>
+          </div>
+        </div>
+        <div class="stat-card cyber">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="ml-epochs">0</div>
+            <div class="stat-label">EPOCHS TRAINED</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="grid-2">
+        <!-- Training Config -->
+        <div class="card cyber-card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>TRAINING CONFIG</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">DATA FOLDER</label>
+            <select class="form-select cyber-select" id="ml-folder">
+              <option value="">-- SELECT PROCESSED FOLDER --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">TARGET SYMBOL</label>
+            <input type="text" class="cyber-input" id="ml-symbol" placeholder="BTCUSDT" value="BTCUSDT">
+          </div>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">EPOCHS</label>
+              <input type="number" class="cyber-input" id="ml-epochs-input" value="50" min="10" max="500">
+            </div>
+            <div class="form-group">
+              <label class="form-label">BATCH SIZE</label>
+              <input type="number" class="cyber-input" id="ml-batch" value="32" min="8" max="128">
+            </div>
+            <div class="form-group">
+              <label class="form-label">SEQUENCE LEN</label>
+              <input type="number" class="cyber-input" id="ml-sequence" value="60" min="10" max="200">
+            </div>
+          </div>
+          <button class="btn-cyber primary full" onclick="startMLTraining()">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>START TRAINING</span>
+          </button>
+        </div>
+        
+        <!-- Training Progress -->
+        <div class="card cyber-card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+              <span>TRAINING PROGRESS</span>
+            </div>
+          </div>
+          <div id="ml-progress-container">
+            <div class="progress-bar-container" style="margin-bottom:16px;">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="ml-progress-pct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="ml-progress-bar" style="width:0%;"></div>
+              </div>
+            </div>
+            <div class="ml-log" id="ml-training-log" style="height:200px;overflow-y:auto;background:rgba(0,0,0,0.3);border:1px solid rgba(255,107,0,0.2);border-radius:8px;padding:12px;font-family:monospace;font-size:11px;">
+              <div style="color:var(--text-muted);">Training log akan muncul di sini...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Model Info -->
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>CARA TRAINING MODEL</span>
+          </div>
+        </div>
+        <div class="info-box" style="margin-bottom:12px;">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>Step 1:</strong> Upload data CSV historis ke Data Manager (format Binance Vision)
+          </div>
+        </div>
+        <div class="info-box" style="margin-bottom:12px;">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>Step 2:</strong> Process data dengan indikator (RSI, EMA, ATR) di Data Manager
+          </div>
+        </div>
+        <div class="info-box" style="margin-bottom:12px;">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>Step 3:</strong> Pilih folder processed dan konfigurasi training di atas
+          </div>
+        </div>
+        <div class="info-box">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>Step 4:</strong> Klik START TRAINING dan tunggu sampai selesai (bisa makan waktu 5-30 menit tergantung data)
+          </div>
+        </div>
+      </div>
+      
+      <!-- Saved Models -->
+      <div class="card cyber-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>SAVED MODELS</span>
+          </div>
+          <button class="btn-cyber" onclick="loadSavedModels()">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>REFRESH</span>
+          </button>
+        </div>
+        <div id="saved-models-list">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+            <p>Belum ada model yang tersimpan. Train model untuk memulai.</p>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -1128,6 +1790,7 @@
 
     /* ============ GRIDS ============ */
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px; }
     .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
 
     /* ============ BUTTONS ============ */
@@ -1486,6 +2149,54 @@
       margin-top: 4px;
     }
 
+    /* ============ PERFORMANCE STATS ============ */
+    .perf-stat {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 107, 0, 0.2);
+      border-radius: 8px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+    
+    .perf-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--neon-orange);
+    }
+    
+    .perf-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 8px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* ============ MODE SELECTOR BUTTONS ============ */
+    .mode-btn {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 8px 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+    
+    .mode-btn:hover {
+      border-color: var(--neon-orange);
+      background: rgba(255, 107, 0, 0.1);
+    }
+    
+    .mode-btn.active {
+      border-color: var(--neon-orange);
+      background: rgba(255, 107, 0, 0.2);
+      color: var(--neon-orange);
+      box-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
+    }
+
     /* ============ CHART CONTAINER ============ */
     .chart-container {
       position: relative;
@@ -1826,6 +2537,333 @@
       color: var(--text-primary);
     }
 
+    /* ============ FILE LIST ============ */
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: rgba(0, 255, 247, 0.03);
+      border: 1px solid rgba(0, 255, 247, 0.2);
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .file-item:hover {
+      background: rgba(0, 255, 247, 0.08);
+      border-color: var(--neon-cyan);
+    }
+    
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .file-name-text {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .file-size {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    
+    .file-actions {
+      display: flex;
+      gap: 6px;
+    }
+    
+    .btn-mini {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      background: transparent;
+      border: 1px solid rgba(0, 255, 247, 0.4);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-mini svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--neon-cyan);
+      fill: none;
+      stroke-width: 2;
+    }
+    
+    .btn-mini:hover {
+      background: rgba(0, 255, 247, 0.15);
+      border-color: var(--neon-cyan);
+    }
+    
+    .btn-mini.danger {
+      border-color: rgba(255, 7, 58, 0.4);
+    }
+    
+    .btn-mini.danger svg {
+      stroke: var(--neon-red);
+    }
+    
+    .btn-mini.danger:hover {
+      background: rgba(255, 7, 58, 0.15);
+      border-color: var(--neon-red);
+    }
+    
+    /* ============ WATCHLIST CARD ============ */
+    .watchlist-card {
+      position: relative;
+      min-width: 120px;
+    }
+    
+    .btn-remove-watchlist {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      background: rgba(255, 7, 58, 0.2);
+      border: 1px solid rgba(255, 7, 58, 0.4);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-remove-watchlist svg {
+      width: 10px;
+      height: 10px;
+      stroke: var(--neon-red);
+      fill: none;
+      stroke-width: 2;
+    }
+    
+    .watchlist-card:hover .btn-remove-watchlist {
+      opacity: 1;
+    }
+    
+    .btn-remove-watchlist:hover {
+      background: rgba(255, 7, 58, 0.4);
+      border-color: var(--neon-red);
+    }
+    
+    /* ============ ACTIVE SIGNALS ============ */
+    .active-signals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    
+    .active-signal-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 107, 0, 0.4);
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .active-signal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--neon-orange), var(--neon-yellow));
+    }
+    
+    .active-signal-card:hover {
+      border-color: var(--neon-orange);
+      box-shadow: 0 0 30px rgba(255, 107, 0, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .active-signal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 107, 0, 0.2);
+    }
+    
+    .active-signal-symbol {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--neon-orange);
+      text-shadow: 0 0 10px rgba(255, 107, 0, 0.5);
+    }
+    
+    .active-signal-type {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .signal-pnl-section .label {
+      font-size: 10px;
+      color: var(--neon-orange);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    
+    .signal-pnl-section .value {
+      color: var(--neon-cyan);
+    }
+    
+    .current-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    
+    .active-signal-prices {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+    }
+    
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .price-label {
+      font-size: 11px;
+      color: var(--neon-orange);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    
+    .price-value {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .active-signal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      margin-top: 8px;
+      border-top: 1px solid rgba(255, 107, 0, 0.2);
+    }
+    
+    .signal-duration {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      color: var(--neon-cyan);
+      padding: 3px 8px;
+      background: rgba(0, 255, 247, 0.1);
+      border-radius: 4px;
+    }
+    
+    .signal-confidence {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--neon-yellow);
+    }
+
+    /* ============ PROGRESS BAR ============ */
+    .progress-bar-container {
+      width: 100%;
+    }
+    
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 107, 0, 0.2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--gradient-fire);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    
+    /* ============ STATS MINI GRID ============ */
+    .stats-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 12px;
+    }
+    
+    .stat-mini {
+      text-align: center;
+      padding: 12px;
+      background: rgba(255, 107, 0, 0.05);
+      border: 1px solid rgba(255, 107, 0, 0.2);
+      border-radius: 8px;
+    }
+    
+    .stat-mini-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--neon-orange);
+      margin-bottom: 4px;
+    }
+    
+    .stat-mini-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .stat-mini.green .stat-mini-value { color: var(--neon-lime); }
+    .stat-mini.cyan .stat-mini-value { color: var(--neon-cyan); }
+    .stat-mini.red .stat-mini-value { color: var(--neon-red); }
+
     /* ============ MOBILE NAV BUTTON ============ */
     .mobile-nav-btn {
       display: none;
@@ -1877,6 +2915,7 @@
 
     @media (max-width: 1024px) {
       .grid-2 { grid-template-columns: 1fr; }
+      .form-grid-2 { grid-template-columns: 1fr; }
       .form-grid-3 { grid-template-columns: 1fr; }
       .comparison-grid { grid-template-columns: 1fr; }
     }
@@ -1956,7 +2995,12 @@
     }
 
     function showError(message) {
-      Toast.fire({ icon: 'error', title: message, iconColor: '#ff0044' });
+      // Handle object errors
+      let msg = message;
+      if (typeof message === 'object') {
+        msg = message.detail || message.message || JSON.stringify(message);
+      }
+      Toast.fire({ icon: 'error', title: msg, iconColor: '#ff0044' });
     }
 
     function showInfo(message) {
@@ -2001,6 +3045,32 @@
         document.getElementById('sidebar').classList.remove('open');
         document.getElementById('overlay').classList.remove('active');
       }
+      
+      // Re-init chart saat Market Chart page ditampilkan
+      if (pageId === 'market-chart') {
+        setTimeout(() => {
+          const container = document.getElementById('binance-chart');
+          if (container && container.clientWidth > 0) {
+            // Jika chart belum ada atau container kosong, init ulang
+            if (!binanceChart || container.children.length === 0 || container.querySelector('.loading-cyber')) {
+              initBinanceChart();
+            } else {
+              // Resize chart ke ukuran container yang benar
+              binanceChart.applyOptions({ width: container.clientWidth });
+            }
+          }
+        }, 100);
+      }
+      
+      // Refresh active signals saat Active Tracking page ditampilkan
+      if (pageId === 'active-tracking') {
+        loadActiveSignals();
+      }
+      
+      // Load signal history saat Signal History page ditampilkan
+      if (pageId === 'signal-history') {
+        loadSignalHistory();
+      }
     }
 
     function toggleSidebar() {
@@ -2012,6 +3082,16 @@
     const CRYPTO_COLORS = {'BTC':'#ff9500','ETH':'#00d4ff','BNB':'#f0b90b','SOL':'#14f195','XRP':'#00aae4','DOGE':'#ffcc00','ADA':'#ff1493','AVAX':'#e84142','DOT':'#e6007a','MATIC':'#8247e5','PEPE':'#39ff14','MANTA':'#00fff7','BCH':'#8dc351','ZEC':'#f4b728'};
     const WS_SYMBOLS = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT','ADAUSDT','AVAXUSDT','DOTUSDT','MATICUSDT'];
     let priceWS = null;
+    
+    // Smart format price berdasarkan nilai - untuk coin kecil seperti PEPE
+    function smartFormatPrice(price) {
+      if (!price || isNaN(price)) return '-';
+      const p = parseFloat(price);
+      if (p >= 1000) return p.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      if (p >= 1) return p.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4});
+      if (p >= 0.01) return p.toFixed(6);
+      return p.toFixed(10); // Untuk coin sangat kecil seperti PEPE
+    }
     let lastPrices = {};
     
     async function loadRealtimePrices() {
@@ -2140,18 +3220,52 @@
       }
     }
 
+    // Calculate entry amount dari modal dan persentase
+    function updateEntryAmount() {
+      const modal = parseFloat(document.getElementById('signal-modal')?.value) || 1000;
+      const pct = parseFloat(document.getElementById('signal-entry-pct')?.value) || 10;
+      const amount = modal * (pct / 100);
+      const amountEl = document.getElementById('signal-entry-amount');
+      if (amountEl) {
+        amountEl.textContent = '$$' + amount.toFixed(0);
+      }
+      return { modal, pct, amount };
+    }
+    
+    // Auto update saat input berubah
+    document.addEventListener('DOMContentLoaded', () => {
+      const modalInput = document.getElementById('signal-modal');
+      const pctInput = document.getElementById('signal-entry-pct');
+      if (modalInput) modalInput.addEventListener('input', updateEntryAmount);
+      if (pctInput) pctInput.addEventListener('input', updateEntryAmount);
+    });
+    
     // ============ LIVE SIGNALS (HYBRID) ============
     async function generateLiveSignal() {
       const symbol = document.getElementById('live-symbol').value || selectedSymbol;
       const mode = document.getElementById('live-mode').value;
       const signalType = document.getElementById('live-signal-type')?.value || 'technical';
-      const interval = document.getElementById('live-interval')?.value || '1h';
+      
+      // Get entry size settings
+      const entrySettings = updateEntryAmount();
+      
+      // Interval otomatis berdasarkan mode dan market
+      // SPOT: gunakan interval 1d untuk investor long-term
+      let interval;
+      if (currentMarket === 'SPOT') {
+        interval = '1d';  // Daily untuk SPOT investor
+      } else {
+        interval = MODE_INTERVALS[mode] || '1h';
+      }
+      
       const container = document.getElementById('live-signals-table');
-      container.innerHTML = `<div class="loading-cyber"><div class="cyber-spinner"></div><span>ANALYZING ${symbol} (${currentMarket})...</span></div>`;
+      const marketLabel = currentMarket === 'SPOT' ? 'SPOT INVESTOR' : 'FUTURES';
+      const entryAmountDisplay = (entrySettings && entrySettings.amount) ? entrySettings.amount.toFixed(0) : '100';
+      container.innerHTML = `<div class="loading-cyber"><div class="cyber-spinner"></div><span>ANALYZING ${symbol} [${marketLabel}] Entry: $${entryAmountDisplay}...</span></div>`;
       
       try {
         // Use hybrid endpoint with market type
-        const endpoint = `/hybrid/analyze/${symbol}?mode_trading=${mode}&interval=${interval}`;
+        const endpoint = `/hybrid/analyze/${symbol}?mode_trading=${mode}&interval=${interval}&market_type=${currentMarket}`;
         const res = await fetch(endpoint, { method: 'POST' });
         const data = await res.json();
         
@@ -2178,20 +3292,35 @@
               </div>
             </div>`;
             
+            // Store all signals for saving - include entry amount
+            window.generatedSignals = data.hybrid_signals.map(s => {
+              return {
+                ...s,
+                symbol: symbol,
+                market_type: currentMarket,
+                mode_trading: mode,
+                modal_total: entrySettings.modal,
+                entry_pct: entrySettings.pct,
+                entry_amount: entrySettings.amount
+              };
+            });
+            window.lastGeneratedSignal = window.generatedSignals[0];
+            
             // Hybrid Signals Table
-            html += '<table class="cyber-table"><thead><tr><th>SIGNAL</th><th>CONFLUENCE</th><th>ENTRY</th><th>SL</th><th>TP</th><th>CONF</th><th>TECH</th><th>LSTM</th></tr></thead><tbody>';
-            data.hybrid_signals.forEach(s => {
+            html += '<table class="cyber-table"><thead><tr><th>SIGNAL</th><th>CONFLUENCE</th><th>ENTRY</th><th>SL</th><th>TP</th><th>CONF</th><th>TECH</th><th>LSTM</th><th>ACTION</th></tr></thead><tbody>';
+            data.hybrid_signals.forEach((s, idx) => {
               const confColor = s.confluence_status === 'STRONG' ? 'var(--neon-lime)' : s.confluence_status === 'WEAK' ? 'var(--neon-orange)' : 'var(--neon-cyan)';
               const confIcon = s.confluence_status === 'STRONG' ? '★★' : s.confluence_status === 'WEAK' ? '★☆' : '☆';
               html += `<tr>
                 <td class="${s.tipe === 'BELI' ? 'signal-buy' : 'signal-sell'}">${s.tipe}</td>
                 <td style="color:${confColor};font-weight:700;">${confIcon} ${s.confluence_status}</td>
-                <td>${s.entry?.toFixed(2) || '-'}</td>
-                <td style="color:var(--neon-red)">${s.stop_loss?.toFixed(2) || '-'}</td>
-                <td style="color:var(--neon-lime)">${s.take_profit?.toFixed(2) || '-'}</td>
+                <td>${smartFormatPrice(s.entry)}</td>
+                <td style="color:var(--neon-red)">${smartFormatPrice(s.stop_loss)}</td>
+                <td style="color:var(--neon-lime)">${smartFormatPrice(s.take_profit)}</td>
                 <td style="font-weight:700;color:${s.confidence >= 0.7 ? 'var(--neon-lime)' : 'var(--neon-yellow)'}">${(s.confidence*100).toFixed(0)}%</td>
-                <td style="font-size:11px">${s.technical_signal} (${(s.technical_confidence*100).toFixed(0)}%)</td>
-                <td style="font-size:11px">${s.lstm_direction} (${(s.lstm_confidence*100).toFixed(0)}%)</td>
+                <td style="font-size:11px">${s.technical_signal || '-'} (${s.technical_confidence ? (s.technical_confidence*100).toFixed(0)+'%' : '-'})</td>
+                <td style="font-size:11px">${s.lstm_direction || '-'} (${s.lstm_confidence ? (s.lstm_confidence*100).toFixed(0)+'%' : '-'})</td>
+                <td><button class="btn-mini" onclick="saveSignalByIndex(${idx})" title="Save & Track"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></button></td>
               </tr>`;
             });
             html += '</tbody></table>';
@@ -2205,9 +3334,9 @@
               html += `<tr>
                 <td><strong>${s.pair || symbol}</strong></td>
                 <td class="${s.tipe === 'BELI' ? 'signal-buy' : 'signal-sell'}">${s.tipe}</td>
-                <td>${s.entry?.toFixed(2) || '-'}</td>
-                <td>${s.stop_loss?.toFixed(2) || '-'}</td>
-                <td>${s.take_profit?.toFixed(2) || '-'}</td>
+                <td>${smartFormatPrice(s.entry)}</td>
+                <td>${smartFormatPrice(s.stop_loss)}</td>
+                <td>${smartFormatPrice(s.take_profit)}</td>
                 <td>${s.confidence ? (s.confidence * 100).toFixed(0) + '%' : '-'}</td>
                 <td style="font-size: 11px; color: var(--text-secondary);">${s.alasan || '-'}</td>
               </tr>`;
@@ -2223,6 +3352,668 @@
       } catch (err) {
         container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Gagal generate sinyal</p></div>`;
         showError('Gagal generate sinyal');
+      }
+    }
+    
+    // ============ ACTIVE SIGNALS TRACKING ============
+    let autoTrackingEnabled = false;
+    let activeSignalsInterval = null;
+    
+    async function loadActiveSignals() {
+      const container = document.getElementById('active-signals-list');
+      const badge = document.getElementById('active-signals-badge');
+      const navBadge = document.getElementById('nav-active-count');
+      const modalInput = document.getElementById('tracking-modal');
+      const modal = modalInput ? parseFloat(modalInput.value) || 1000 : 1000;
+      
+      try {
+        const res = await fetch('/signals/tracking/live');
+        const data = await res.json();
+        
+        const openCount = data.jumlah || 0;
+        badge.textContent = `${openCount} OPEN`;
+        if (navBadge) navBadge.textContent = openCount;
+        
+        if (data.signals && data.signals.length > 0) {
+          // Fetch current prices untuk semua symbols
+          const pricePromises = data.signals.map(s => 
+            fetch(`/binance/ticker24h/${s.symbol}`).then(r => r.json()).catch(() => null)
+          );
+          const priceResults = await Promise.all(pricePromises);
+          
+          let html = '<div class="active-signals-grid">';
+          data.signals.forEach((s, idx) => {
+            const typeColor = s.signal_type === 'BELI' ? 'var(--neon-lime)' : 'var(--neon-red)';
+            const typeIcon = s.signal_type === 'BELI' ? '↑' : '↓';
+            
+            // Get current price - dengan fallback ke entry price
+            let currentPrice = s.entry_price || 0;
+            if (priceResults[idx] && priceResults[idx].status === 'sukses' && priceResults[idx].data) {
+              const lastPrice = parseFloat(priceResults[idx].data.lastPrice);
+              if (!isNaN(lastPrice) && lastPrice > 0) {
+                currentPrice = lastPrice;
+              }
+            }
+            
+            // Hitung P&L dari entry - dengan safety check
+            let pnlPercent = 0;
+            if (s.entry_price && s.entry_price > 0 && currentPrice > 0) {
+              if (s.signal_type === 'BELI') {
+                pnlPercent = ((currentPrice - s.entry_price) / s.entry_price) * 100;
+              } else {
+                pnlPercent = ((s.entry_price - currentPrice) / s.entry_price) * 100;
+              }
+            }
+            
+            // Hitung P&L dalam dollar - gunakan entry_amount dari signal jika ada
+            const entryAmount = s.entry_amount || modal;
+            const pnlDollar = entryAmount * (pnlPercent / 100);
+            const pnlColor = pnlPercent >= 0 ? 'var(--neon-lime)' : 'var(--neon-red)';
+            const pnlSign = pnlPercent >= 0 ? '+' : '';
+            
+            // Progress bar ke TP atau SL - dengan safety check
+            let progressToTP = 0;
+            let progressToSL = 0;
+            if (s.entry_price && s.take_profit && s.stop_loss) {
+              if (s.signal_type === 'BELI') {
+                const tpRange = s.take_profit - s.entry_price;
+                const slRange = s.entry_price - s.stop_loss;
+                if (tpRange > 0) progressToTP = Math.min(100, Math.max(0, ((currentPrice - s.entry_price) / tpRange) * 100));
+                if (slRange > 0) progressToSL = Math.min(100, Math.max(0, ((s.entry_price - currentPrice) / slRange) * 100));
+              } else {
+                const tpRange = s.entry_price - s.take_profit;
+                const slRange = s.stop_loss - s.entry_price;
+                if (tpRange > 0) progressToTP = Math.min(100, Math.max(0, ((s.entry_price - currentPrice) / tpRange) * 100));
+                if (slRange > 0) progressToSL = Math.min(100, Math.max(0, ((currentPrice - s.entry_price) / slRange) * 100));
+              }
+            }
+            
+            // Format numbers safely
+            const formatPrice = (p) => {
+              if (!p || isNaN(p)) return '-';
+              return p.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 6});
+            };
+            
+            // Format waktu entry
+            let entryTime = '-';
+            if (s.created_at) {
+              const entryDate = new Date(s.created_at);
+              entryTime = entryDate.toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
+            }
+            
+            // Mode badge color
+            const modeColors = { 'aktif': 'var(--neon-red)', 'santai': 'var(--neon-orange)', 'pasif': 'var(--neon-cyan)' };
+            const modeColor = modeColors[s.mode_trading] || 'var(--neon-orange)';
+            const modeLabel = (s.mode_trading || 'santai').toUpperCase();
+            
+            html += `<div class="active-signal-card" data-symbol="${s.symbol}" data-mode="${s.mode_trading}" data-market="${s.market_type || 'FUTURES'}" data-entry="${s.entry_price}" data-type="${s.signal_type}" data-tp="${s.take_profit}" data-sl="${s.stop_loss}" data-entry-amount="${s.entry_amount || modal}">
+              <div class="active-signal-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="active-signal-symbol">${s.symbol}</span>
+                  <span style="font-size:9px;padding:2px 6px;border-radius:4px;background:${s.market_type === 'SPOT' ? 'var(--neon-cyan)' : 'var(--neon-pink)'}20;color:${s.market_type === 'SPOT' ? 'var(--neon-cyan)' : 'var(--neon-pink)'};">${s.market_type || 'FUTURES'}</span>
+                  <span style="font-size:9px;padding:2px 6px;border-radius:4px;background:${modeColor}20;color:${modeColor};border:1px solid ${modeColor};">${modeLabel}</span>
+                </div>
+                <span class="active-signal-type" style="color:${typeColor}">${typeIcon} ${s.signal_type}</span>
+              </div>
+              
+              <!-- Entry Info -->
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:4px;">
+                <span style="font-size:11px;color:var(--neon-orange);font-weight:600;">ENTRY TIME</span>
+                <span style="font-size:11px;font-family:'Orbitron';color:var(--neon-cyan);">${entryTime}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:8px;">
+                <span style="font-size:11px;color:var(--neon-orange);font-weight:600;">ENTRY SIZE</span>
+                <span style="font-size:11px;font-family:'Orbitron';color:var(--neon-yellow);">$${entryAmount.toFixed(0)}</span>
+              </div>
+              
+              <!-- Current Price & P&L -->
+              <div class="signal-pnl-section">
+                <div class="current-price-row">
+                  <span class="label">HARGA SEKARANG</span>
+                  <span class="value" style="font-size:16px;font-family:'Orbitron';">${formatPrice(currentPrice)}</span>
+                </div>
+                <div class="pnl-display" style="background:${pnlPercent >= 0 ? 'rgba(57,255,20,0.1)' : 'rgba(255,7,58,0.1)'};border:1px solid ${pnlColor};border-radius:8px;padding:10px;text-align:center;margin:8px 0;">
+                  <div style="font-size:11px;color:var(--neon-orange);font-weight:600;">UNREALIZED P&L</div>
+                  <div style="font-size:22px;font-family:'Orbitron';font-weight:700;color:${pnlColor};">${pnlSign}$${Math.abs(pnlDollar).toFixed(2)}</div>
+                  <div style="font-size:12px;color:${pnlColor};">${pnlSign}${pnlPercent.toFixed(2)}%</div>
+                </div>
+              </div>
+              
+              <!-- Progress Bars -->
+              <div class="signal-progress-section" style="margin:8px 0;">
+                <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px;">
+                  <span style="color:var(--neon-lime);">TP ${progressToTP.toFixed(0)}%</span>
+                  <span style="color:var(--neon-red);">SL ${progressToSL.toFixed(0)}%</span>
+                </div>
+                <div style="display:flex;gap:4px;height:6px;">
+                  <div style="flex:1;background:rgba(57,255,20,0.2);border-radius:3px;overflow:hidden;">
+                    <div style="width:${progressToTP}%;height:100%;background:var(--neon-lime);transition:width 0.3s;"></div>
+                  </div>
+                  <div style="flex:1;background:rgba(255,7,58,0.2);border-radius:3px;overflow:hidden;">
+                    <div style="width:${progressToSL}%;height:100%;background:var(--neon-red);transition:width 0.3s;"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Price Levels -->
+              <div class="active-signal-prices">
+                <div class="price-row">
+                  <span class="price-label">Entry</span>
+                  <span class="price-value">${formatPrice(s.entry_price)}</span>
+                </div>
+                <div class="price-row">
+                  <span class="price-label" style="color:var(--neon-lime)">TP (${s.tp_distance_pct || 0}%)</span>
+                  <span class="price-value" style="color:var(--neon-lime)">${formatPrice(s.take_profit)}</span>
+                </div>
+                <div class="price-row">
+                  <span class="price-label" style="color:var(--neon-red)">SL (${s.sl_distance_pct || 0}%)</span>
+                  <span class="price-value" style="color:var(--neon-red)">${formatPrice(s.stop_loss)}</span>
+                </div>
+              </div>
+              
+              <div class="active-signal-footer">
+                <span class="signal-duration">${s.duration || '-'}</span>
+                <span class="signal-confidence">${s.confidence ? (s.confidence * 100).toFixed(0) : 0}% conf</span>
+              </div>
+            </div>`;
+          });
+          html += '</div>';
+          container.innerHTML = html;
+          
+          // Store data untuk WebSocket updates
+          activeSignalsData = data.signals;
+          
+          // Calculate and update tracking stats
+          updateTrackingStats(data.signals, priceResults, modal);
+          
+          // Auto start WebSocket untuk realtime updates (tidak perlu toggle manual)
+          if (data.signals.length > 0 && !activeSignalsWS) {
+            wsReconnectAttempts = 0;
+            autoTrackingEnabled = true;
+            updateAutoTrackingUI(true);
+            startActiveSignalsWS();
+          } else if (autoTrackingEnabled && data.signals.length > 0) {
+            // Restart WS jika sudah enabled tapi WS mati
+            if (!activeSignalsWS || activeSignalsWS.readyState !== WebSocket.OPEN) {
+              wsReconnectAttempts = 0;
+              startActiveSignalsWS();
+            }
+          }
+        } else {
+          container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>Belum ada sinyal aktif</p></div>';
+          activeSignalsData = [];
+          updateTrackingStats([], [], modal);
+        }
+        
+        // Update auto tracking status
+        if (data.auto_tracking) {
+          updateAutoTrackingUI(data.auto_tracking.is_running);
+        }
+        
+        // Re-apply filter setelah load (preserve filter state)
+        filterActiveSignals();
+      } catch (err) {
+        console.error('Failed to load active signals:', err);
+        container.innerHTML = '<div class="empty-state"><p>Gagal load active signals</p></div>';
+      }
+    }
+    
+    // WebSocket untuk real-time price update Active Signals
+    let activeSignalsWS = null;
+    let activeSignalsData = []; // Store signal data untuk update
+    let wsReconnectAttempts = 0;
+    const MAX_RECONNECT_ATTEMPTS = 5;
+    
+    async function toggleAutoTracking() {
+      try {
+        const endpoint = autoTrackingEnabled ? '/signals/auto/stop' : '/signals/auto/start';
+        const res = await fetch(endpoint, { method: 'POST' });
+        const data = await res.json();
+        
+        autoTrackingEnabled = !autoTrackingEnabled;
+        updateAutoTrackingUI(autoTrackingEnabled);
+        
+        if (autoTrackingEnabled) {
+          showSuccess('Auto tracking dimulai - harga update real-time');
+          wsReconnectAttempts = 0;
+          // Start WebSocket untuk real-time updates
+          startActiveSignalsWS();
+          // Backup polling setiap 60 detik
+          activeSignalsInterval = setInterval(loadActiveSignals, 60000);
+        } else {
+          showInfo('Auto tracking dihentikan');
+          stopActiveSignalsWS();
+          if (activeSignalsInterval) {
+            clearInterval(activeSignalsInterval);
+            activeSignalsInterval = null;
+          }
+        }
+      } catch (err) {
+        showError('Gagal toggle auto tracking');
+      }
+    }
+    
+    function startActiveSignalsWS() {
+      // Guard: jangan start jika tidak ada signals
+      if (!activeSignalsData || activeSignalsData.length === 0) {
+        console.log('No active signals, skipping WebSocket');
+        return;
+      }
+      
+      // Guard: jangan reconnect terlalu banyak
+      if (wsReconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+        console.log('Max reconnect attempts reached, stopping');
+        return;
+      }
+      
+      // Close existing connection
+      if (activeSignalsWS) {
+        try {
+          activeSignalsWS.close();
+        } catch (e) {}
+        activeSignalsWS = null;
+      }
+      
+      // Build streams untuk semua active signals
+      const symbols = activeSignalsData.map(s => s.symbol.toLowerCase());
+      if (symbols.length === 0) return;
+      
+      const streams = symbols.map(s => `${s}@ticker`).join('/');
+      
+      try {
+        activeSignalsWS = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+        
+        activeSignalsWS.onopen = () => {
+          console.log('Active signals WS connected');
+          wsReconnectAttempts = 0; // Reset on successful connect
+        };
+        
+        activeSignalsWS.onmessage = (e) => {
+          try {
+            const msg = JSON.parse(e.data);
+            if (msg.data) {
+              const ticker = msg.data;
+              const symbol = ticker.s; // e.g., BTCUSDT
+              const currentPrice = parseFloat(ticker.c); // Current price
+              
+              // Update UI untuk symbol ini
+              updateActiveSignalPrice(symbol, currentPrice);
+              
+              // Update dashboard juga
+              updateDashboardSignalPrice(symbol, currentPrice);
+            }
+          } catch (err) {}
+        };
+        
+        activeSignalsWS.onerror = (err) => {
+          console.log('Active signals WS error');
+        };
+        
+        activeSignalsWS.onclose = () => {
+          console.log('Active signals WS closed');
+          // Reconnect jika masih auto tracking dan ada signals
+          if (autoTrackingEnabled && activeSignalsData.length > 0) {
+            wsReconnectAttempts++;
+            if (wsReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+              setTimeout(startActiveSignalsWS, 3000);
+            }
+          }
+        };
+      } catch (err) {
+        console.error('Failed to create WebSocket:', err);
+      }
+    }
+    
+    function stopActiveSignalsWS() {
+      wsReconnectAttempts = MAX_RECONNECT_ATTEMPTS; // Prevent reconnect
+      if (activeSignalsWS) {
+        try {
+          activeSignalsWS.close();
+        } catch (e) {}
+        activeSignalsWS = null;
+      }
+    }
+    
+    // Update dashboard signal price realtime
+    function updateDashboardSignalPrice(symbol, currentPrice) {
+      const container = document.getElementById('dash-active-signals');
+      if (!container) return;
+      
+      const signal = activeSignalsData.find(s => s.symbol === symbol);
+      if (!signal) return;
+      
+      // Find the row for this symbol
+      const rows = container.querySelectorAll('[data-dash-symbol]');
+      rows.forEach(row => {
+        if (row.dataset.dashSymbol === symbol) {
+          const priceEl = row.querySelector('.dash-current-price');
+          const pnlEl = row.querySelector('.dash-pnl');
+          if (priceEl) priceEl.textContent = smartFormatPrice(currentPrice);
+          
+          if (pnlEl && signal.entry_price > 0) {
+            let pnlPercent = 0;
+            if (signal.signal_type === 'BELI') {
+              pnlPercent = ((currentPrice - signal.entry_price) / signal.entry_price) * 100;
+            } else {
+              pnlPercent = ((signal.entry_price - currentPrice) / signal.entry_price) * 100;
+            }
+            const pnlColor = pnlPercent >= 0 ? 'var(--neon-lime)' : 'var(--neon-red)';
+            const pnlSign = pnlPercent >= 0 ? '+' : '';
+            pnlEl.style.color = pnlColor;
+            pnlEl.textContent = `${pnlSign}${pnlPercent.toFixed(2)}%`;
+          }
+        }
+      });
+    }
+    
+    function updateActiveSignalPrice(symbol, currentPrice) {
+      const modal = parseFloat(document.getElementById('tracking-modal')?.value) || 1000;
+      
+      // Find signal data
+      const signal = activeSignalsData.find(s => s.symbol === symbol);
+      if (!signal) return;
+      
+      // Find card element
+      const card = document.querySelector(`.active-signal-card[data-symbol="${symbol}"]`);
+      if (!card) return;
+      
+      // Calculate P&L
+      let pnlPercent = 0;
+      if (signal.entry_price && signal.entry_price > 0) {
+        if (signal.signal_type === 'BELI') {
+          pnlPercent = ((currentPrice - signal.entry_price) / signal.entry_price) * 100;
+        } else {
+          pnlPercent = ((signal.entry_price - currentPrice) / signal.entry_price) * 100;
+        }
+      }
+      
+      // Gunakan entry_amount dari signal atau dari data attribute
+      const entryAmount = signal.entry_amount || parseFloat(card.dataset.entryAmount) || modal;
+      const pnlDollar = entryAmount * (pnlPercent / 100);
+      const pnlColor = pnlPercent >= 0 ? 'var(--neon-lime)' : 'var(--neon-red)';
+      const pnlSign = pnlPercent >= 0 ? '+' : '';
+      
+      // Calculate progress
+      let progressToTP = 0;
+      let progressToSL = 0;
+      if (signal.entry_price && signal.take_profit && signal.stop_loss) {
+        if (signal.signal_type === 'BELI') {
+          const tpRange = signal.take_profit - signal.entry_price;
+          const slRange = signal.entry_price - signal.stop_loss;
+          if (tpRange > 0) progressToTP = Math.min(100, Math.max(0, ((currentPrice - signal.entry_price) / tpRange) * 100));
+          if (slRange > 0) progressToSL = Math.min(100, Math.max(0, ((signal.entry_price - currentPrice) / slRange) * 100));
+        } else {
+          const tpRange = signal.entry_price - signal.take_profit;
+          const slRange = signal.stop_loss - signal.entry_price;
+          if (tpRange > 0) progressToTP = Math.min(100, Math.max(0, ((signal.entry_price - currentPrice) / tpRange) * 100));
+          if (slRange > 0) progressToSL = Math.min(100, Math.max(0, ((currentPrice - signal.entry_price) / slRange) * 100));
+        }
+      }
+      
+      // Update DOM elements
+      const priceEl = card.querySelector('.signal-pnl-section .value');
+      if (priceEl) {
+        priceEl.textContent = currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 6});
+      }
+      
+      const pnlDisplay = card.querySelector('.pnl-display');
+      if (pnlDisplay) {
+        pnlDisplay.style.background = pnlPercent >= 0 ? 'rgba(57,255,20,0.1)' : 'rgba(255,7,58,0.1)';
+        pnlDisplay.style.borderColor = pnlColor;
+        pnlDisplay.innerHTML = `
+          <div style="font-size:11px;color:var(--neon-orange);font-weight:600;">UNREALIZED P&L</div>
+          <div style="font-size:22px;font-family:'Orbitron';font-weight:700;color:${pnlColor};">${pnlSign}$${Math.abs(pnlDollar).toFixed(2)}</div>
+          <div style="font-size:12px;color:${pnlColor};">${pnlSign}${pnlPercent.toFixed(2)}%</div>
+        `;
+      }
+      
+      // Update progress bars
+      const progressSection = card.querySelector('.signal-progress-section');
+      if (progressSection) {
+        progressSection.innerHTML = `
+          <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px;">
+            <span style="color:var(--neon-lime);">TP ${progressToTP.toFixed(0)}%</span>
+            <span style="color:var(--neon-red);">SL ${progressToSL.toFixed(0)}%</span>
+          </div>
+          <div style="display:flex;gap:4px;height:6px;">
+            <div style="flex:1;background:rgba(57,255,20,0.2);border-radius:3px;overflow:hidden;">
+              <div style="width:${progressToTP}%;height:100%;background:var(--neon-lime);transition:width 0.3s;"></div>
+            </div>
+            <div style="flex:1;background:rgba(255,7,58,0.2);border-radius:3px;overflow:hidden;">
+              <div style="width:${progressToSL}%;height:100%;background:var(--neon-red);transition:width 0.3s;"></div>
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    function updateAutoTrackingUI(isRunning) {
+      const btn = document.getElementById('btn-auto-tracking');
+      const text = document.getElementById('auto-tracking-text');
+      
+      if (isRunning) {
+        btn.classList.add('primary');
+        text.textContent = 'STOP AUTO';
+        autoTrackingEnabled = true;
+      } else {
+        btn.classList.remove('primary');
+        text.textContent = 'START AUTO';
+        autoTrackingEnabled = false;
+      }
+    }
+    
+    function updateTrackingStats(signals, priceResults, modal) {
+      // Update tracking page stats
+      const totalOpenEl = document.getElementById('track-total-open');
+      const totalProfitEl = document.getElementById('track-total-profit');
+      const winningEl = document.getElementById('track-winning');
+      const losingEl = document.getElementById('track-losing');
+      
+      if (!totalOpenEl) return; // Page not loaded yet
+      
+      let totalPnl = 0;
+      let winning = 0;
+      let losing = 0;
+      
+      signals.forEach((s, idx) => {
+        let currentPrice = s.entry_price || 0;
+        if (priceResults && priceResults[idx] && priceResults[idx].status === 'sukses' && priceResults[idx].data) {
+          const lastPrice = parseFloat(priceResults[idx].data.lastPrice);
+          if (!isNaN(lastPrice) && lastPrice > 0) {
+            currentPrice = lastPrice;
+          }
+        }
+        
+        let pnlPercent = 0;
+        if (s.entry_price && s.entry_price > 0 && currentPrice > 0) {
+          if (s.signal_type === 'BELI') {
+            pnlPercent = ((currentPrice - s.entry_price) / s.entry_price) * 100;
+          } else {
+            pnlPercent = ((s.entry_price - currentPrice) / s.entry_price) * 100;
+          }
+        }
+        
+        // Gunakan entry_amount dari signal jika ada, fallback ke modal
+        const entryAmount = s.entry_amount || modal;
+        const pnlDollar = entryAmount * (pnlPercent / 100);
+        totalPnl += pnlDollar;
+        
+        if (pnlPercent >= 0) winning++;
+        else losing++;
+      });
+      
+      totalOpenEl.textContent = signals.length;
+      totalProfitEl.textContent = (totalPnl >= 0 ? '+' : '') + '$' + totalPnl.toFixed(2);
+      totalProfitEl.style.color = totalPnl >= 0 ? 'var(--neon-lime)' : 'var(--neon-red)';
+      winningEl.textContent = winning;
+      losingEl.textContent = losing;
+    }
+    
+    // Filter active signals berdasarkan market, mode, dan type
+    function filterActiveSignals() {
+      const marketFilter = document.getElementById('track-filter-market')?.value || 'all';
+      const modeFilter = document.getElementById('track-filter-mode')?.value || 'all';
+      const typeFilter = document.getElementById('track-filter-type')?.value || 'all';
+      
+      const cards = document.querySelectorAll('.active-signal-card');
+      let visibleCount = 0;
+      
+      cards.forEach(card => {
+        const cardMarket = card.dataset.market || 'FUTURES';
+        const cardMode = card.dataset.mode || 'santai';
+        const cardType = card.dataset.type || 'BELI';
+        
+        // Cek semua filter
+        const matchMarket = marketFilter === 'all' || cardMarket === marketFilter;
+        const matchMode = modeFilter === 'all' || cardMode === modeFilter;
+        const matchType = typeFilter === 'all' || cardType === typeFilter;
+        
+        if (matchMarket && matchMode && matchType) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Update badge dengan jumlah yang terfilter
+      const badge = document.getElementById('active-signals-badge');
+      if (badge) {
+        const totalCards = cards.length;
+        if (marketFilter === 'all' && modeFilter === 'all' && typeFilter === 'all') {
+          badge.textContent = `${totalCards} OPEN`;
+        } else {
+          badge.textContent = `${visibleCount}/${totalCards} FILTERED`;
+        }
+      }
+      
+      // Tampilkan empty state jika tidak ada yang match
+      const container = document.getElementById('active-signals-list');
+      const grid = container?.querySelector('.active-signals-grid');
+      if (grid && visibleCount === 0 && cards.length > 0) {
+        // Ada sinyal tapi tidak ada yang match filter
+        let emptyMsg = grid.querySelector('.filter-empty-msg');
+        if (!emptyMsg) {
+          emptyMsg = document.createElement('div');
+          emptyMsg.className = 'filter-empty-msg';
+          emptyMsg.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);';
+          emptyMsg.innerHTML = '<p>Tidak ada sinyal yang cocok dengan filter</p>';
+          grid.appendChild(emptyMsg);
+        }
+        emptyMsg.style.display = '';
+      } else if (grid) {
+        const emptyMsg = grid.querySelector('.filter-empty-msg');
+        if (emptyMsg) emptyMsg.style.display = 'none';
+      }
+    }
+    
+    async function saveSignalToTrack(signalIndex = 0) {
+      const signal = window.lastGeneratedSignal;
+      if (!signal) {
+        showError('Tidak ada sinyal untuk disimpan');
+        return;
+      }
+      
+      // Validate required fields
+      const entryPrice = signal.entry || signal.entry_price || 0;
+      const stopLoss = signal.stop_loss || 0;
+      const takeProfit = signal.take_profit || 0;
+      
+      if (entryPrice <= 0 || stopLoss <= 0 || takeProfit <= 0) {
+        showError('Data sinyal tidak valid (entry/SL/TP harus > 0)');
+        console.error('Invalid signal data:', { entryPrice, stopLoss, takeProfit, signal });
+        return;
+      }
+      
+      try {
+        const payload = {
+          symbol: signal.symbol,
+          market_type: signal.market_type || 'FUTURES',
+          signal_type: signal.tipe || 'BELI',
+          entry_price: entryPrice,
+          stop_loss: stopLoss,
+          take_profit: takeProfit,
+          confidence: signal.confidence || 0.5,
+          mode_trading: signal.mode_trading || 'santai',
+          alasan: signal.alasan || '',
+          confluence_status: signal.confluence_status || '',
+          technical_confidence: signal.technical_confidence || 0,
+          lstm_confidence: signal.lstm_confidence || 0,
+          lstm_direction: signal.lstm_direction || '',
+          // Entry size untuk tracking profit/loss dalam dollar
+          modal_total: signal.modal_total || null,
+          entry_pct: signal.entry_pct || null,
+          entry_amount: signal.entry_amount || null,
+        };
+        
+        const res = await fetch('/signals/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          showSuccess(`Sinyal ${signal.symbol} disimpan untuk tracking`);
+          loadActiveSignals();
+          loadDashboardActiveSignals();
+        } else {
+          const err = await res.json();
+          showError(err.detail || err.message || 'Gagal menyimpan sinyal');
+        }
+      } catch (err) {
+        console.error('Save signal error:', err);
+        showError('Gagal menyimpan sinyal: ' + (err.message || 'Network error'));
+      }
+    }
+    
+    // Fungsi untuk save signal berdasarkan index dari tabel
+    async function saveSignalByIndex(idx) {
+      if (!window.generatedSignals || !window.generatedSignals[idx]) {
+        showError('Sinyal tidak ditemukan');
+        return;
+      }
+      
+      const signal = window.generatedSignals[idx];
+      
+      try {
+        const payload = {
+          symbol: signal.symbol,
+          market_type: signal.market_type || 'FUTURES',
+          signal_type: signal.tipe,
+          entry_price: signal.entry,
+          stop_loss: signal.stop_loss,
+          take_profit: signal.take_profit,
+          confidence: signal.confidence,
+          mode_trading: signal.mode_trading || 'santai',
+          alasan: signal.alasan,
+          confluence_status: signal.confluence_status,
+          technical_confidence: signal.technical_confidence,
+          lstm_confidence: signal.lstm_confidence,
+          lstm_direction: signal.lstm_direction,
+          // Entry size untuk tracking profit/loss dalam dollar
+          modal_total: signal.modal_total || null,
+          entry_pct: signal.entry_pct || null,
+          entry_amount: signal.entry_amount || null,
+        };
+        
+        const res = await fetch('/signals/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          showSuccess(`Sinyal ${signal.symbol} disimpan untuk tracking`);
+          loadActiveSignals();
+          loadDashboardActiveSignals();
+        } else {
+          const err = await res.json();
+          showError(err.detail || 'Gagal menyimpan sinyal');
+        }
+      } catch (err) {
+        showError('Gagal menyimpan sinyal');
       }
     }
 
@@ -2291,6 +4082,8 @@
     }
 
     // ============ DATA MANAGER ============
+    let currentOpenFolder = null;
+    
     async function loadFolders() {
       try {
         const res = await fetch('/folder/daftar');
@@ -2312,7 +4105,7 @@
         if (folders.length > 0) {
           let html = '<div class="folder-grid">';
           folders.forEach(f => {
-            html += `<div class="folder-card">
+            html += `<div class="folder-card" onclick="openFolderDetail('${f}')">
               <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               <div class="folder-name">${f}</div>
             </div>`;
@@ -2324,6 +4117,227 @@
         }
       } catch (err) {
         showError('Failed to load folders');
+      }
+    }
+    
+    async function openFolderDetail(folderName) {
+      currentOpenFolder = folderName;
+      const card = document.getElementById('folder-detail-card');
+      const title = document.getElementById('folder-detail-title');
+      const content = document.getElementById('folder-detail-content');
+      
+      title.textContent = folderName;
+      content.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>LOADING FILES...</span></div>';
+      card.style.display = 'block';
+      
+      try {
+        const res = await fetch(`/folder/detail/${encodeURIComponent(folderName)}`);
+        const data = await res.json();
+        
+        let html = '';
+        
+        // Uploads section
+        html += `<div style="margin-bottom:16px;"><div class="form-label" style="margin-bottom:8px;">UPLOADS (${data.uploads.jumlah} files)</div>`;
+        if (data.uploads.files.length > 0) {
+          html += '<div class="file-list">';
+          data.uploads.files.forEach(f => {
+            html += `<div class="file-item">
+              <div class="file-info">
+                <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--neon-cyan);fill:none;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span class="file-name-text">${f.nama}</span>
+                <span class="file-size">${f.ukuran_format}</span>
+              </div>
+              <div class="file-actions">
+                <button class="btn-mini" onclick="previewFile('${folderName}','${f.nama}','upload')" title="Preview">
+                  <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+                <button class="btn-mini danger" onclick="deleteFile('${folderName}','${f.nama}')" title="Delete">
+                  <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </div>`;
+          });
+          html += '</div>';
+        } else {
+          html += '<div style="color:var(--text-muted);font-size:12px;">No files uploaded yet</div>';
+        }
+        html += '</div>';
+        
+        // Processed section
+        html += `<div><div class="form-label" style="margin-bottom:8px;">PROCESSED (${data.processed.jumlah} files)</div>`;
+        if (data.processed.files.length > 0) {
+          html += '<div class="file-list">';
+          data.processed.files.forEach(f => {
+            html += `<div class="file-item" style="border-color:rgba(57,255,20,0.3);">
+              <div class="file-info">
+                <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--neon-lime);fill:none;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+                <span class="file-name-text">${f.nama}</span>
+                <span class="file-size">${f.ukuran_format}</span>
+              </div>
+              <div class="file-actions">
+                <button class="btn-mini" onclick="previewFile('${folderName}','${f.nama.replace('.processed.csv','.csv')}','processed')" title="Preview">
+                  <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>`;
+          });
+          html += '</div>';
+        } else {
+          html += '<div style="color:var(--text-muted);font-size:12px;">No processed files yet. Click PROCESS INDICATORS to generate.</div>';
+        }
+        html += '</div>';
+        
+        content.innerHTML = html;
+      } catch (err) {
+        content.innerHTML = '<div class="empty-state"><p>Failed to load folder content</p></div>';
+        showError('Failed to load folder detail');
+      }
+    }
+    
+    function closeFolderDetail() {
+      document.getElementById('folder-detail-card').style.display = 'none';
+      currentOpenFolder = null;
+    }
+    
+    async function deleteFile(folder, filename) {
+      const result = await Swal.fire({
+        title: 'DELETE FILE?',
+        text: `Are you sure you want to delete "${filename}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'DELETE',
+        cancelButtonText: 'CANCEL',
+        confirmButtonColor: '#ff073a'
+      });
+      
+      if (result.isConfirmed) {
+        try {
+          const res = await fetch(`/unggah-csv/hapus?nama_berkas=${encodeURIComponent(filename)}&folder=${encodeURIComponent(folder)}`, {
+            method: 'DELETE'
+          });
+          
+          if (res.ok) {
+            showSuccess('File deleted');
+            openFolderDetail(folder);
+          } else {
+            showError('Failed to delete file');
+          }
+        } catch (err) {
+          showError('Failed to delete file');
+        }
+      }
+    }
+    
+    async function previewFile(folder, filename, jenis) {
+      showLoading('LOADING PREVIEW...');
+      
+      try {
+        const res = await fetch(`/unggah-csv/preview?nama_berkas=${encodeURIComponent(filename)}&folder=${encodeURIComponent(folder)}&jenis=${jenis}&limit=20`);
+        const data = await res.json();
+        
+        hideLoading();
+        
+        let tableHtml = '<div style="overflow-x:auto;"><table class="cyber-table" style="font-size:11px;"><thead><tr>';
+        data.kolom.slice(0, 8).forEach(col => {
+          tableHtml += `<th>${col}</th>`;
+        });
+        tableHtml += '</tr></thead><tbody>';
+        
+        data.contoh.forEach(row => {
+          tableHtml += '<tr>';
+          data.kolom.slice(0, 8).forEach(col => {
+            let val = row[col];
+            if (typeof val === 'number') val = val.toFixed ? val.toFixed(4) : val;
+            tableHtml += `<td>${val || '-'}</td>`;
+          });
+          tableHtml += '</tr>';
+        });
+        tableHtml += '</tbody></table></div>';
+        
+        Swal.fire({
+          title: filename,
+          html: `
+            <div style="text-align:left;margin-bottom:12px;">
+              <span style="color:var(--neon-cyan);">Rows:</span> ${data.jumlah_baris} | 
+              <span style="color:var(--neon-cyan);">Source:</span> ${data.sumber}
+            </div>
+            ${tableHtml}
+          `,
+          width: '90%',
+          showConfirmButton: true,
+          confirmButtonText: 'CLOSE'
+        });
+      } catch (err) {
+        hideLoading();
+        showError('Failed to load preview');
+      }
+    }
+    
+    async function renameCurrentFolder() {
+      if (!currentOpenFolder) return;
+      
+      const { value: newName } = await Swal.fire({
+        title: 'RENAME FOLDER',
+        input: 'text',
+        inputValue: currentOpenFolder,
+        inputPlaceholder: 'New folder name',
+        showCancelButton: true,
+        confirmButtonText: 'RENAME',
+        cancelButtonText: 'CANCEL'
+      });
+      
+      if (newName && newName !== currentOpenFolder) {
+        try {
+          const res = await fetch('/folder/rename', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nama_lama: currentOpenFolder, nama_baru: newName })
+          });
+          
+          if (res.ok) {
+            showSuccess('Folder renamed');
+            currentOpenFolder = newName;
+            document.getElementById('folder-detail-title').textContent = newName;
+            loadFolders();
+          } else {
+            const err = await res.json();
+            showError(err.detail || 'Failed to rename folder');
+          }
+        } catch (err) {
+          showError('Failed to rename folder');
+        }
+      }
+    }
+    
+    async function deleteCurrentFolder() {
+      if (!currentOpenFolder) return;
+      
+      const result = await Swal.fire({
+        title: 'DELETE FOLDER?',
+        text: `Are you sure you want to delete "${currentOpenFolder}" and all its files?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'DELETE ALL',
+        cancelButtonText: 'CANCEL',
+        confirmButtonColor: '#ff073a'
+      });
+      
+      if (result.isConfirmed) {
+        try {
+          const res = await fetch(`/folder/hapus?nama_folder=${encodeURIComponent(currentOpenFolder)}`, {
+            method: 'DELETE'
+          });
+          
+          if (res.ok) {
+            showSuccess('Folder deleted');
+            closeFolderDetail();
+            loadFolders();
+          } else {
+            showError('Failed to delete folder');
+          }
+        } catch (err) {
+          showError('Failed to delete folder');
+        }
       }
     }
 
@@ -2478,8 +4492,8 @@
 
       const ctxEquity = document.getElementById('chartEquity');
       if (ctxEquity) {
-        const labels = ['Start', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10'];
-        const data = [10000, 10250, 10100, 10400, 10350, 10600, 10550, 10800, 11000, 10900, 11200];
+        const labels = ['Start'];
+        const data = [1000];
         
         chartEquity = new Chart(ctxEquity, {
           type: 'line',
@@ -2505,10 +4519,71 @@
             plugins: { legend: { display: false } },
             scales: {
               x: { grid: { color: 'rgba(255, 7, 58, 0.1)' }, ticks: { color: '#ff9500', font: { family: 'Orbitron', size: 9 } } },
-              y: { grid: { color: 'rgba(255, 7, 58, 0.1)' }, ticks: { color: '#ff9500', font: { family: 'Orbitron', size: 9 } } }
+              y: { grid: { color: 'rgba(255, 7, 58, 0.1)' }, ticks: { color: '#ff9500', font: { family: 'Orbitron', size: 9 }, callback: (v) => '$' + v.toLocaleString() } }
             }
           }
         });
+      }
+    }
+    
+    // Fungsi simulasi equity berdasarkan history sinyal
+    async function simulateEquity() {
+      const modalAwal = parseFloat(document.getElementById('equity-modal').value) || 1000;
+      
+      try {
+        // Ambil history sinyal yang sudah closed
+        const res = await fetch('/signals/history?limit=100');
+        const data = await res.json();
+        
+        if (!data.signals || data.signals.length === 0) {
+          showInfo('Belum ada history sinyal untuk simulasi');
+          return;
+        }
+        
+        // Filter hanya yang sudah closed (HIT_TP atau HIT_SL)
+        const closedSignals = data.signals.filter(s => s.status === 'HIT_TP' || s.status === 'HIT_SL').reverse();
+        
+        if (closedSignals.length === 0) {
+          showInfo('Belum ada sinyal yang sudah closed untuk simulasi');
+          return;
+        }
+        
+        // Hitung equity curve
+        let equity = modalAwal;
+        const labels = ['Start'];
+        const equityData = [modalAwal];
+        
+        closedSignals.forEach((s, idx) => {
+          const pnlPercent = s.pnl_percent || 0;
+          const profit = equity * (pnlPercent / 100);
+          equity += profit;
+          labels.push(`T${idx + 1}`);
+          equityData.push(Math.round(equity * 100) / 100);
+        });
+        
+        // Update chart
+        if (chartEquity) {
+          chartEquity.data.labels = labels;
+          chartEquity.data.datasets[0].data = equityData;
+          chartEquity.update();
+        }
+        
+        // Update hasil simulasi
+        const modalAkhir = equityData[equityData.length - 1];
+        const totalProfit = modalAkhir - modalAwal;
+        const profitPercent = ((modalAkhir - modalAwal) / modalAwal) * 100;
+        
+        document.getElementById('equity-result').style.display = 'block';
+        document.getElementById('eq-modal-awal').textContent = '$' + modalAwal.toLocaleString();
+        document.getElementById('eq-modal-akhir').textContent = '$' + modalAkhir.toLocaleString();
+        document.getElementById('eq-modal-akhir').style.color = modalAkhir >= modalAwal ? 'var(--neon-lime)' : 'var(--neon-red)';
+        document.getElementById('eq-profit').textContent = (totalProfit >= 0 ? '+' : '') + '$' + totalProfit.toLocaleString() + ' (' + profitPercent.toFixed(1) + '%)';
+        document.getElementById('eq-profit').style.color = totalProfit >= 0 ? 'var(--neon-lime)' : 'var(--neon-red)';
+        
+        showSuccess(`Simulasi selesai: ${closedSignals.length} trades`);
+      } catch (err) {
+        console.error('Simulate equity error:', err);
+        showError('Gagal simulasi equity');
       }
     }
 
@@ -2524,6 +4599,25 @@
       document.getElementById('btn-futures').classList.toggle('primary', market === 'FUTURES');
       document.getElementById('btn-spot').style.borderColor = market === 'SPOT' ? 'var(--neon-orange)' : 'var(--neon-red)';
       document.getElementById('btn-futures').style.borderColor = market === 'FUTURES' ? 'var(--neon-orange)' : 'var(--neon-red)';
+      
+      // Toggle info boxes
+      document.getElementById('info-futures').style.display = market === 'FUTURES' ? '' : 'none';
+      document.getElementById('info-spot').style.display = market === 'SPOT' ? '' : 'none';
+      
+      // Update mode options untuk SPOT (long-term only)
+      const modeSelect = document.getElementById('live-mode');
+      if (market === 'SPOT') {
+        modeSelect.innerHTML = `
+          <option value="pasif" selected>INVESTOR (Long-term) - Interval 1D</option>
+        `;
+      } else {
+        modeSelect.innerHTML = `
+          <option value="aktif">AKTIF (1-4H) - Interval 15m</option>
+          <option value="santai" selected>SANTAI (4-12H) - Interval 1H</option>
+          <option value="pasif">PASIF (12-24H) - Interval 4H</option>
+        `;
+      }
+      
       loadFavorites();
       showInfo(`Market diubah ke ${market}`);
     }
@@ -2601,14 +4695,39 @@
         const data = await res.json();
         
         const container = document.getElementById('favorites-list');
+        const quickSelect = document.getElementById('quick-symbol');
+        
         if (data.favorites && data.favorites.length > 0) {
           let html = '';
           data.favorites.forEach(f => {
             const base = f.symbol.replace('USDT', '');
             const isActive = f.symbol === selectedSymbol ? 'active' : '';
-            html += `<span class="fav-tag ${isActive}" onclick="selectSymbol('${f.symbol}')">${base}</span>`;
+            const marketLabel = f.market_type === 'SPOT' ? 'S' : 'F';
+            const marketColor = f.market_type === 'SPOT' ? 'var(--neon-cyan)' : 'var(--neon-orange)';
+            html += `<span class="fav-tag ${isActive}" onclick="selectSymbol('${f.symbol}')">
+              ${base}
+              <span style="font-size:8px;color:${marketColor};margin-left:2px;">${marketLabel}</span>
+            </span>`;
           });
           container.innerHTML = html;
+          
+          // Update Quick Signal dropdown dengan favorites
+          if (quickSelect) {
+            let optionsHtml = '';
+            data.favorites.forEach(f => {
+              const base = f.symbol.replace('USDT', '');
+              optionsHtml += `<option value="${f.symbol}">${base}/USDT</option>`;
+            });
+            // Tambah default coins jika tidak ada di favorites
+            const defaultCoins = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT'];
+            defaultCoins.forEach(coin => {
+              if (!data.favorites.find(f => f.symbol === coin)) {
+                const base = coin.replace('USDT', '');
+                optionsHtml += `<option value="${coin}">${base}/USDT</option>`;
+              }
+            });
+            quickSelect.innerHTML = optionsHtml;
+          }
         } else {
           container.innerHTML = '<span style="color:var(--text-muted);font-size:11px;">Belum ada favorit. Cari dan tambahkan coin!</span>';
         }
@@ -2637,26 +4756,939 @@
       }
     }
     
-    async function loadActiveSignals() {
+    async function loadPerformanceSummary() {
+      try {
+        const res = await fetch('/signals/performance/summary');
+        const data = await res.json();
+        
+        if (data.all_time) {
+          const at = data.all_time;
+          document.getElementById('perf-total').textContent = at.total_closed || 0;
+          document.getElementById('perf-tp').textContent = at.hit_tp || 0;
+          document.getElementById('perf-sl').textContent = at.hit_sl || 0;
+          document.getElementById('perf-pf').textContent = at.profit_factor || '0';
+          document.getElementById('perf-best').textContent = '+' + (at.best_trade || 0).toFixed(1) + '%';
+          document.getElementById('perf-worst').textContent = (at.worst_trade || 0).toFixed(1) + '%';
+        }
+        
+        // Update tracking status badge
+        const badge = document.getElementById('tracking-status-badge');
+        if (data.tracking_status && data.tracking_status.is_running) {
+          badge.textContent = 'LIVE';
+          badge.classList.add('live');
+        } else {
+          badge.textContent = 'OFFLINE';
+          badge.classList.remove('live');
+        }
+      } catch (err) {
+        console.error('Load performance summary error:', err);
+      }
+    }
+    
+    // ============ SIGNAL HISTORY ============
+    async function loadSignalHistory() {
+      const statusFilter = document.getElementById('hist-filter-status')?.value || 'all';
+      const marketFilter = document.getElementById('hist-filter-market')?.value || 'all';
+      const typeFilter = document.getElementById('hist-filter-type')?.value || 'all';
+      
+      const container = document.getElementById('signal-history-table');
+      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>Loading history...</span></div>';
+      
+      try {
+        let url = '/signals/history?limit=50';
+        if (statusFilter !== 'all') url += `&status=${statusFilter}`;
+        if (marketFilter !== 'all') url += `&market_type=${marketFilter}`;
+        if (typeFilter !== 'all') url += `&signal_type=${typeFilter}`;
+        
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data.status === 'sukses') {
+          // Update stats
+          const stats = data.stats || {};
+          document.getElementById('hist-total').textContent = stats.total_closed || 0;
+          document.getElementById('hist-tp').textContent = stats.hit_tp || 0;
+          document.getElementById('hist-sl').textContent = stats.hit_sl || 0;
+          document.getElementById('hist-winrate').textContent = (stats.win_rate || 0).toFixed(1) + '%';
+          document.getElementById('hist-profit').textContent = '+$' + (stats.total_profit || 0).toFixed(2);
+          document.getElementById('hist-loss').textContent = '-$' + (stats.total_loss || 0).toFixed(2);
+          
+          // Render table
+          if (data.signals && data.signals.length > 0) {
+            let html = '<table class="cyber-table"><thead><tr>';
+            html += '<th>SYMBOL</th><th>TYPE</th><th>STATUS</th><th>ENTRY</th><th>EXIT</th><th>P&L %</th><th>P&L $</th><th>ENTRY SIZE</th><th>DURATION</th><th>CLOSED</th>';
+            html += '</tr></thead><tbody>';
+            
+            data.signals.forEach(s => {
+              const statusColor = s.status === 'HIT_TP' ? 'var(--neon-lime)' : s.status === 'HIT_SL' ? 'var(--neon-red)' : 'var(--neon-orange)';
+              const pnlColor = (s.pnl_percent || 0) >= 0 ? 'var(--neon-lime)' : 'var(--neon-red)';
+              const pnlSign = (s.pnl_percent || 0) >= 0 ? '+' : '';
+              const closedDate = s.closed_at ? new Date(s.closed_at).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-';
+              
+              html += `<tr>
+                <td><strong>${s.symbol}</strong><br><span style="font-size:9px;color:var(--text-muted);">${s.market_type} | ${(s.mode_trading || 'santai').toUpperCase()}</span></td>
+                <td class="${s.signal_type === 'BELI' ? 'signal-buy' : 'signal-sell'}">${s.signal_type}</td>
+                <td style="color:${statusColor};font-weight:600;">${s.status}</td>
+                <td>${smartFormatPrice(s.entry_price)}</td>
+                <td>${smartFormatPrice(s.exit_price)}</td>
+                <td style="color:${pnlColor};font-weight:600;">${pnlSign}${(s.pnl_percent || 0).toFixed(2)}%</td>
+                <td style="color:${pnlColor};font-weight:600;">${pnlSign}$${Math.abs(s.pnl_dollar || 0).toFixed(2)}</td>
+                <td style="color:var(--neon-yellow);">$${s.entry_amount ? s.entry_amount.toFixed(0) : '-'}</td>
+                <td>${s.duration}</td>
+                <td style="font-size:11px;">${closedDate}</td>
+              </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+          } else {
+            container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>Tidak ada riwayat sinyal dengan filter ini</p></div>';
+          }
+        }
+      } catch (err) {
+        console.error('Load signal history error:', err);
+        container.innerHTML = '<div class="empty-state"><p>Gagal load riwayat sinyal</p></div>';
+      }
+    }
+    
+    async function loadDashboardActiveSignals() {
       try {
         const res = await fetch('/signals/active');
         const data = await res.json();
         
-        // Update active pairs count
-        document.getElementById('stat-active-pairs').textContent = data.length || 0;
+        // Update active pairs count di dashboard
+        document.getElementById('stat-active-signals').textContent = data.length || 0;
+        document.getElementById('dash-active-badge').textContent = data.length || 0;
+        
+        // Update dashboard active signals list
+        const container = document.getElementById('dash-active-signals');
+        if (data && data.length > 0) {
+          // Fetch current prices
+          const pricePromises = data.slice(0, 5).map(s => 
+            fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${s.symbol}`)
+              .then(r => r.json())
+              .catch(() => null)
+          );
+          const prices = await Promise.all(pricePromises);
+          
+          let html = '';
+          data.slice(0, 5).forEach((s, idx) => {
+            const typeColor = s.signal_type === 'BELI' ? 'var(--neon-lime)' : 'var(--neon-red)';
+            const typeIcon = s.signal_type === 'BELI' ? '↑' : '↓';
+            
+            // Get current price
+            let currentPrice = s.entry_price || 0;
+            if (prices[idx] && prices[idx].price) {
+              currentPrice = parseFloat(prices[idx].price);
+            }
+            
+            // Calculate P&L
+            let pnlPercent = 0;
+            if (s.entry_price && s.entry_price > 0 && currentPrice > 0) {
+              if (s.signal_type === 'BELI') {
+                pnlPercent = ((currentPrice - s.entry_price) / s.entry_price) * 100;
+              } else {
+                pnlPercent = ((s.entry_price - currentPrice) / s.entry_price) * 100;
+              }
+            }
+            const pnlColor = pnlPercent >= 0 ? 'var(--neon-lime)' : 'var(--neon-red)';
+            const pnlSign = pnlPercent >= 0 ? '+' : '';
+            
+            // Format entry time
+            let entryTime = '-';
+            if (s.created_at) {
+              const d = new Date(s.created_at);
+              entryTime = d.toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
+            }
+            
+            html += `<div data-dash-symbol="${s.symbol}" style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="color:${typeColor};font-weight:700;font-size:16px;">${typeIcon}</span>
+                <div>
+                  <div style="font-family:'Orbitron';font-size:12px;font-weight:600;">${s.symbol.replace('USDT','')}</div>
+                  <div style="font-size:9px;color:var(--text-muted);">Entry ${entryTime}</div>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <div class="dash-current-price" style="font-size:11px;font-family:'Orbitron';color:var(--neon-cyan);">${smartFormatPrice(currentPrice)}</div>
+                <div class="dash-pnl" style="font-size:12px;font-weight:600;color:${pnlColor};">${pnlSign}${pnlPercent.toFixed(2)}%</div>
+              </div>
+            </div>`;
+          });
+          container.innerHTML = html;
+          
+          // Store data untuk WebSocket updates
+          activeSignalsData = data;
+          
+          // Auto start WebSocket jika ada signals
+          if (data.length > 0 && !activeSignalsWS) {
+            wsReconnectAttempts = 0;
+            startActiveSignalsWS();
+          }
+        } else {
+          container.innerHTML = '<div class="empty-state" style="padding:20px;"><p style="font-size:12px;color:var(--text-muted);">Belum ada sinyal aktif</p></div>';
+          activeSignalsData = [];
+        }
       } catch (err) {
-        console.error('Load active signals error:', err);
+        console.error('Load dashboard active signals error:', err);
       }
     }
-
+    
+    // ============ WATCHLIST FUNCTIONS ============
+    let watchlistSymbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT'];
+    let watchlistWS = null;
+    
+    async function loadWatchlistPrices() {
+      const container = document.getElementById('watchlist-prices');
+      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>LOADING WATCHLIST...</span></div>';
+      
+      try {
+        // Load from favorites first
+        const favRes = await fetch('/signals/favorites');
+        const favData = await favRes.json();
+        if (favData.favorites && favData.favorites.length > 0) {
+          watchlistSymbols = favData.favorites.map(f => f.symbol);
+        }
+        
+        let html = '';
+        for (const symbol of watchlistSymbols) {
+          const shortName = symbol.replace('USDT', '');
+          const color = CRYPTO_COLORS[shortName] || '#fff';
+          html += `<div class="price-card watchlist-card" data-symbol="${shortName}" style="border-color:${color}60;position:relative;">
+            <button class="btn-remove-watchlist" onclick="event.stopPropagation();removeFromWatchlist('${symbol}')" title="Remove">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <span class="price-symbol" style="color:${color};text-shadow:0 0 10px ${color}">${shortName}</span>
+              <span class="price-value" style="color:${color}">Loading...</span>
+              <span class="price-change" style="font-size:10px;color:var(--text-muted)">--</span>
+            </div>
+          </div>`;
+        }
+        container.innerHTML = html;
+        
+        // Connect WebSocket for watchlist
+        connectWatchlistWS();
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><p>Failed to load watchlist</p></div>';
+      }
+    }
+    
+    function connectWatchlistWS() {
+      if (watchlistWS) watchlistWS.close();
+      if (watchlistSymbols.length === 0) return;
+      
+      const streams = watchlistSymbols.map(s => `${s.toLowerCase()}@ticker`).join('/');
+      watchlistWS = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+      
+      watchlistWS.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg.data) {
+            const t = msg.data;
+            updatePriceCard(t.s.replace('USDT',''), parseFloat(t.c), parseFloat(t.P));
+          }
+        } catch(err) {}
+      };
+      
+      watchlistWS.onerror = () => console.log('Watchlist WS error');
+      watchlistWS.onclose = () => setTimeout(connectWatchlistWS, 5000);
+    }
+    
+    async function openAddWatchlist() {
+      const { value: symbol } = await Swal.fire({
+        title: 'ADD TO WATCHLIST',
+        input: 'text',
+        inputPlaceholder: 'Symbol (e.g., BTCUSDT, ETHUSDT)',
+        showCancelButton: true,
+        confirmButtonText: 'ADD',
+        cancelButtonText: 'CANCEL'
+      });
+      
+      if (symbol) {
+        try {
+          const res = await fetch('/signals/favorites/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ symbol: symbol.toUpperCase(), market_type: 'FUTURES' })
+          });
+          
+          if (res.ok) {
+            showSuccess(`${symbol.toUpperCase()} added to watchlist`);
+            loadWatchlistPrices();
+          } else {
+            const err = await res.json();
+            showError(err.detail || 'Failed to add');
+          }
+        } catch (err) {
+          showError('Failed to add to watchlist');
+        }
+      }
+    }
+    
+    async function removeFromWatchlist(symbol) {
+      try {
+        await fetch(`/signals/favorites/${symbol}`, { method: 'DELETE' });
+        showSuccess(`${symbol} removed`);
+        loadWatchlistPrices();
+      } catch (err) {
+        showError('Failed to remove');
+      }
+    }
+    
+    // ============ QUICK SIGNAL ============
+    let selectedQuickMode = 'santai';
+    
+    function selectQuickMode(mode) {
+      selectedQuickMode = mode;
+      document.getElementById('quick-mode').value = mode;
+      
+      // Update button states
+      document.querySelectorAll('#quick-mode-selector .mode-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.mode === mode) {
+          btn.classList.add('active');
+        }
+      });
+    }
+    
+    // Handle market type change di Dashboard Quick Signal
+    function onQuickMarketChange() {
+      const market = document.getElementById('quick-market').value;
+      const modeGroup = document.getElementById('quick-mode-group');
+      const modeSelector = document.getElementById('quick-mode-selector');
+      
+      if (market === 'SPOT') {
+        // SPOT: Hanya mode investor (pasif)
+        modeSelector.innerHTML = `
+          <button type="button" class="mode-btn active" data-mode="pasif" onclick="selectQuickMode('pasif')" style="grid-column:1/-1;">
+            <div style="font-size:11px;font-weight:600;">INVESTOR</div>
+            <div style="font-size:9px;color:var(--text-muted);">Long-term (Daily)</div>
+          </button>
+        `;
+        document.getElementById('quick-mode').value = 'pasif';
+        selectedQuickMode = 'pasif';
+      } else {
+        // FUTURES: Semua mode
+        modeSelector.innerHTML = `
+          <button type="button" class="mode-btn" data-mode="aktif" onclick="selectQuickMode('aktif')">
+            <div style="font-size:11px;font-weight:600;">AKTIF</div>
+            <div style="font-size:9px;color:var(--text-muted);">1-4 jam</div>
+          </button>
+          <button type="button" class="mode-btn active" data-mode="santai" onclick="selectQuickMode('santai')">
+            <div style="font-size:11px;font-weight:600;">SANTAI</div>
+            <div style="font-size:9px;color:var(--text-muted);">4-12 jam</div>
+          </button>
+          <button type="button" class="mode-btn" data-mode="pasif" onclick="selectQuickMode('pasif')">
+            <div style="font-size:11px;font-weight:600;">PASIF</div>
+            <div style="font-size:9px;color:var(--text-muted);">12-24 jam</div>
+          </button>
+        `;
+        document.getElementById('quick-mode').value = 'santai';
+        selectedQuickMode = 'santai';
+      }
+    }
+    
+    // Mode ke interval mapping
+    const MODE_INTERVALS = {
+      'aktif': '15m',   // Scalping - 15 menit
+      'santai': '1h',   // Day trading - 1 jam
+      'pasif': '4h'     // Swing - 4 jam
+    };
+    
+    // Update Quick Entry Amount
+    function updateQuickEntryAmount() {
+      const modal = parseFloat(document.getElementById('quick-modal')?.value) || 1000;
+      const pct = parseFloat(document.getElementById('quick-entry-pct')?.value) || 10;
+      const amount = modal * (pct / 100);
+      const amountEl = document.getElementById('quick-entry-amount');
+      if (amountEl) {
+        amountEl.textContent = '$' + amount.toFixed(0);
+      }
+      return { modal, pct, amount };
+    }
+    
+    async function quickGenerateSignal() {
+      const symbol = document.getElementById('quick-symbol').value.toUpperCase();
+      const market = document.getElementById('quick-market').value;
+      const mode = document.getElementById('quick-mode').value || 'santai';
+      
+      // Get entry size
+      const entrySettings = updateQuickEntryAmount();
+      
+      // Interval berdasarkan market type
+      let interval;
+      if (market === 'SPOT') {
+        interval = '1d';  // Daily untuk SPOT investor
+      } else {
+        interval = MODE_INTERVALS[mode] || '1h';
+      }
+      
+      if (!symbol) {
+        showError('Masukkan symbol');
+        return;
+      }
+      
+      const marketLabel = market === 'SPOT' ? 'SPOT INVESTOR' : 'FUTURES';
+      showLoading(`ANALYZING ${symbol} [${marketLabel}] Entry: $${entrySettings.amount.toFixed(0)}...`);
+      
+      try {
+        const res = await fetch(`/hybrid/analyze/${symbol}?mode_trading=${mode}&interval=${interval}&market_type=${market}`, { method: 'POST' });
+        const data = await res.json();
+        
+        hideLoading();
+        
+        if (data.status === 'sukses' && data.hybrid_signals && data.hybrid_signals.length > 0) {
+          const s = data.hybrid_signals[0];
+          const confluenceColor = s.confluence_status === 'STRONG' ? 'var(--neon-lime)' : s.confluence_status === 'WEAK' ? 'var(--neon-orange)' : 'var(--neon-cyan)';
+          
+          Swal.fire({
+            title: `${symbol.replace('USDT','')} SIGNAL`,
+            html: `
+              <div style="text-align:left;font-family:'Rajdhani',sans-serif;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                  <div style="font-size:28px;font-weight:bold;color:${s.tipe === 'BELI' ? '#39ff14' : '#ff073a'};">${s.tipe}</div>
+                  <div style="font-size:12px;padding:4px 8px;border-radius:4px;background:${confluenceColor}20;color:${confluenceColor};border:1px solid ${confluenceColor};">${s.confluence_status}</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                  <div style="background:rgba(0,0,0,0.3);padding:8px;border-radius:4px;">
+                    <div style="font-size:10px;color:#888;">ENTRY</div>
+                    <div style="font-size:16px;font-weight:600;color:#00fff7;">${smartFormatPrice(s.entry)}</div>
+                  </div>
+                  <div style="background:rgba(0,0,0,0.3);padding:8px;border-radius:4px;">
+                    <div style="font-size:10px;color:#888;">CONFIDENCE</div>
+                    <div style="font-size:16px;font-weight:600;color:#ff9500;">${(s.confidence*100).toFixed(0)}%</div>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div style="background:rgba(255,7,58,0.1);padding:8px;border-radius:4px;border:1px solid rgba(255,7,58,0.3);">
+                    <div style="font-size:10px;color:#ff073a;">STOP LOSS</div>
+                    <div style="font-size:14px;font-weight:600;color:#ff073a;">${smartFormatPrice(s.stop_loss)}</div>
+                  </div>
+                  <div style="background:rgba(57,255,20,0.1);padding:8px;border-radius:4px;border:1px solid rgba(57,255,20,0.3);">
+                    <div style="font-size:10px;color:#39ff14;">TAKE PROFIT</div>
+                    <div style="font-size:14px;font-weight:600;color:#39ff14;">${smartFormatPrice(s.take_profit)}</div>
+                  </div>
+                </div>
+                <div style="margin-top:12px;font-size:11px;color:#888;padding:8px;background:rgba(255,255,255,0.03);border-radius:4px;">
+                  ${s.alasan || ''}
+                </div>
+              </div>
+            `,
+            confirmButtonText: 'SAVE & TRACK',
+            confirmButtonColor: '#39ff14',
+            showCancelButton: true,
+            cancelButtonText: 'CLOSE',
+            cancelButtonColor: '#333',
+            background: '#0a0a0a',
+            color: '#fff'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              console.log('Saving signal:', s, 'mode:', mode, 'entry:', entrySettings);
+              window.lastGeneratedSignal = { 
+                ...s, 
+                symbol: symbol, 
+                market_type: market, 
+                mode_trading: mode,
+                tipe: s.tipe || 'BELI',
+                modal_total: entrySettings.modal,
+                entry_pct: entrySettings.pct,
+                entry_amount: entrySettings.amount
+              };
+              saveSignalToTrack(0);
+            }
+          });
+        } else {
+          // Show more detail why no signal
+          const techConf = data.technical_analysis?.confidence || 0;
+          const lstmConf = data.lstm_prediction?.confidence || 0;
+          const lstmDir = data.lstm_prediction?.direction || 'NEUTRAL';
+          
+          Swal.fire({
+            title: `${symbol.replace('USDT','')} - NO SIGNAL`,
+            html: `
+              <div style="text-align:left;font-family:'Rajdhani',sans-serif;">
+                <div style="font-size:14px;color:#ff9500;margin-bottom:12px;">Tidak ada sinyal yang memenuhi kriteria saat ini</div>
+                <div style="font-size:12px;color:#888;">
+                  <div>Technical Confidence: ${(techConf*100).toFixed(0)}%</div>
+                  <div>LSTM Direction: ${lstmDir}</div>
+                  <div>LSTM Confidence: ${(lstmConf*100).toFixed(0)}%</div>
+                </div>
+                <div style="margin-top:12px;font-size:11px;color:#666;">
+                  Coba lagi nanti atau gunakan timeframe berbeda
+                </div>
+              </div>
+            `,
+            confirmButtonText: 'OK',
+            background: '#0a0a0a',
+            color: '#fff'
+          });
+        }
+      } catch (err) {
+        hideLoading();
+        console.error('Generate signal error:', err);
+        showError('Gagal generate signal: ' + (err.message || 'Network error'));
+      }
+    }
+    
+    // ============ BINANCE LIVE CHART ============
+    let binanceChart = null;
+    let candleSeries = null;
+    let chartWS = null;
+    let marketInfoWS = null;
+    let currentChartSymbol = 'BTCUSDT';
+    let currentChartInterval = '1h';
+    
+    async function initBinanceChart() {
+      const container = document.getElementById('binance-chart');
+      if (!container) return;
+      
+      currentChartSymbol = document.getElementById('chart-symbol')?.value || 'BTCUSDT';
+      currentChartInterval = document.getElementById('chart-interval')?.value || '1h';
+      
+      // Check if container is visible and has width
+      const containerWidth = container.clientWidth || container.offsetWidth || 800;
+      if (containerWidth < 100) {
+        console.log('Chart container not visible yet, will retry when page shown');
+        return;
+      }
+      
+      container.innerHTML = '<div class="loading-cyber"><div class="cyber-spinner"></div><span>LOADING CHART...</span></div>';
+      
+      // Load lightweight-charts library
+      if (typeof LightweightCharts === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js';
+        script.onload = () => {
+          console.log('LightweightCharts loaded');
+          setupChart(container);
+        };
+        script.onerror = () => {
+          console.error('Failed to load LightweightCharts');
+          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--neon-red);">Failed to load chart library. Please refresh.</div>';
+        };
+        document.head.appendChild(script);
+      } else {
+        setupChart(container);
+      }
+    }
+    
+    function setupChart(container) {
+      container.innerHTML = '';
+      
+      // Get actual width, fallback to 800 if 0
+      const chartWidth = container.clientWidth || container.offsetWidth || 800;
+      
+      // Create chart
+      binanceChart = LightweightCharts.createChart(container, {
+        width: chartWidth,
+        height: 500,
+        layout: {
+          background: { type: 'solid', color: '#0a0a0a' },
+          textColor: '#ff9500',
+        },
+        grid: {
+          vertLines: { color: 'rgba(255, 7, 58, 0.1)' },
+          horzLines: { color: 'rgba(255, 7, 58, 0.1)' },
+        },
+        crosshair: {
+          mode: LightweightCharts.CrosshairMode.Normal,
+        },
+        rightPriceScale: {
+          borderColor: 'rgba(255, 7, 58, 0.3)',
+        },
+        timeScale: {
+          borderColor: 'rgba(255, 7, 58, 0.3)',
+          timeVisible: true,
+          secondsVisible: false,
+        },
+      });
+      
+      // Add candlestick series
+      candleSeries = binanceChart.addCandlestickSeries({
+        upColor: '#39ff14',
+        downColor: '#ff073a',
+        borderUpColor: '#39ff14',
+        borderDownColor: '#ff073a',
+        wickUpColor: '#39ff14',
+        wickDownColor: '#ff073a',
+      });
+      
+      // Load historical data
+      loadHistoricalCandles();
+      
+      // Start WebSocket for real-time updates
+      startChartWS();
+      
+      // Start market info WS
+      startMarketInfoWS(currentChartSymbol);
+      
+      // Resize handler
+      window.addEventListener('resize', () => {
+        if (binanceChart) {
+          binanceChart.applyOptions({ width: container.clientWidth });
+        }
+      });
+      
+      document.getElementById('chart-status').textContent = 'LIVE';
+      document.getElementById('chart-status').style.background = 'var(--neon-lime)';
+    }
+    
+    async function loadHistoricalCandles() {
+      try {
+        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${currentChartSymbol}&interval=${currentChartInterval}&limit=500`);
+        const data = await res.json();
+        
+        const candles = data.map(d => ({
+          time: d[0] / 1000,
+          open: parseFloat(d[1]),
+          high: parseFloat(d[2]),
+          low: parseFloat(d[3]),
+          close: parseFloat(d[4]),
+        }));
+        
+        if (candleSeries) {
+          candleSeries.setData(candles);
+        }
+      } catch (err) {
+        console.error('Load historical candles error:', err);
+      }
+    }
+    
+    function startChartWS() {
+      if (chartWS) chartWS.close();
+      
+      const stream = `${currentChartSymbol.toLowerCase()}@kline_${currentChartInterval}`;
+      chartWS = new WebSocket(`wss://stream.binance.com:9443/ws/${stream}`);
+      
+      chartWS.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg.k) {
+            const k = msg.k;
+            const candle = {
+              time: k.t / 1000,
+              open: parseFloat(k.o),
+              high: parseFloat(k.h),
+              low: parseFloat(k.l),
+              close: parseFloat(k.c),
+            };
+            if (candleSeries) {
+              candleSeries.update(candle);
+            }
+          }
+        } catch (err) {}
+      };
+      
+      chartWS.onerror = () => {
+        document.getElementById('chart-status').textContent = 'ERROR';
+        document.getElementById('chart-status').style.background = 'var(--neon-red)';
+      };
+      
+      chartWS.onclose = () => {
+        document.getElementById('chart-status').textContent = 'DISCONNECTED';
+        setTimeout(startChartWS, 3000);
+      };
+    }
+    
+    function changeChartSymbol() {
+      currentChartSymbol = document.getElementById('chart-symbol')?.value || 'BTCUSDT';
+      currentChartInterval = document.getElementById('chart-interval')?.value || '1h';
+      
+      document.getElementById('chart-status').textContent = 'LOADING...';
+      
+      // Reload chart
+      loadHistoricalCandles();
+      startChartWS();
+      startMarketInfoWS(currentChartSymbol);
+      loadOrderBook();
+      loadRecentTrades();
+    }
+    
+    async function loadOrderBook() {
+      const container = document.getElementById('order-book');
+      if (!container) return;
+      
+      try {
+        const res = await fetch(`https://api.binance.com/api/v3/depth?symbol=${currentChartSymbol}&limit=10`);
+        const data = await res.json();
+        
+        let html = '<table style="width:100%;font-size:11px;"><thead><tr><th style="color:var(--neon-lime)">BID</th><th>QTY</th><th style="color:var(--neon-red)">ASK</th><th>QTY</th></tr></thead><tbody>';
+        
+        for (let i = 0; i < 10; i++) {
+          const bid = data.bids[i] || ['-', '-'];
+          const ask = data.asks[i] || ['-', '-'];
+          html += `<tr>
+            <td style="color:var(--neon-lime)">${parseFloat(bid[0]).toFixed(2)}</td>
+            <td>${parseFloat(bid[1]).toFixed(4)}</td>
+            <td style="color:var(--neon-red)">${parseFloat(ask[0]).toFixed(2)}</td>
+            <td>${parseFloat(ask[1]).toFixed(4)}</td>
+          </tr>`;
+        }
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Failed to load</p>';
+      }
+    }
+    
+    async function loadRecentTrades() {
+      const container = document.getElementById('recent-trades');
+      if (!container) return;
+      
+      try {
+        const res = await fetch(`https://api.binance.com/api/v3/trades?symbol=${currentChartSymbol}&limit=15`);
+        const data = await res.json();
+        
+        let html = '<table style="width:100%;font-size:11px;"><thead><tr><th>PRICE</th><th>QTY</th><th>TIME</th></tr></thead><tbody>';
+        
+        data.reverse().forEach(t => {
+          const color = t.isBuyerMaker ? 'var(--neon-red)' : 'var(--neon-lime)';
+          const time = new Date(t.time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          html += `<tr>
+            <td style="color:${color}">${parseFloat(t.price).toFixed(2)}</td>
+            <td>${parseFloat(t.qty).toFixed(4)}</td>
+            <td style="color:var(--text-muted)">${time}</td>
+          </tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Failed to load</p>';
+      }
+    }
+    
+    function startMarketInfoWS(symbol) {
+      if (marketInfoWS) marketInfoWS.close();
+      
+      const stream = `${symbol.toLowerCase()}@ticker`;
+      marketInfoWS = new WebSocket(`wss://stream.binance.com:9443/ws/${stream}`);
+      
+      marketInfoWS.onmessage = (e) => {
+        try {
+          const t = JSON.parse(e.data);
+          const lastPrice = parseFloat(t.c) || 0;
+          const change = parseFloat(t.P) || 0;
+          const highPrice = parseFloat(t.h) || 0;
+          const lowPrice = parseFloat(t.l) || 0;
+          const volume = parseFloat(t.v) || 0;
+          
+          const priceEl = document.getElementById('mi-price');
+          if (priceEl && lastPrice > 0) {
+            priceEl.textContent = lastPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            priceEl.style.color = change >= 0 ? 'var(--neon-lime)' : 'var(--neon-red)';
+          }
+          
+          const changeEl = document.getElementById('mi-change');
+          if (changeEl) {
+            changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+            changeEl.style.color = change >= 0 ? 'var(--neon-lime)' : 'var(--neon-red)';
+          }
+          
+          const highEl = document.getElementById('mi-high');
+          if (highEl && highPrice > 0) highEl.textContent = highPrice.toLocaleString('en-US', {minimumFractionDigits: 2});
+          
+          const lowEl = document.getElementById('mi-low');
+          if (lowEl && lowPrice > 0) lowEl.textContent = lowPrice.toLocaleString('en-US', {minimumFractionDigits: 2});
+          
+          const volEl = document.getElementById('mi-volume');
+          if (volEl && volume > 0) volEl.textContent = (volume / 1000000).toFixed(2) + 'M';
+        } catch (err) {}
+      };
+      
+      marketInfoWS.onerror = () => console.log('Market info WS error');
+      marketInfoWS.onclose = () => console.log('Market info WS closed');
+    }
+    
+    // Alias untuk backward compatibility
+    function initTradingViewChart() { initBinanceChart(); }
+    function updateTradingViewChart() { changeChartSymbol(); }
+    function loadMarketInfo() { startMarketInfoWS(currentChartSymbol); loadOrderBook(); loadRecentTrades(); }
+    
+    // ============ ML TRAINING FUNCTIONS ============
+    let mlTrainingInterval = null;
+    
+    async function loadMLFolders() {
+      try {
+        const res = await fetch('/folder/daftar');
+        const data = await res.json();
+        
+        const select = document.getElementById('ml-folder');
+        if (select) {
+          select.innerHTML = '<option value="">-- SELECT PROCESSED FOLDER --</option>';
+          (data.folder || []).forEach(f => {
+            select.innerHTML += `<option value="${f}">${f}</option>`;
+          });
+        }
+      } catch (err) {
+        console.error('Load ML folders error:', err);
+      }
+    }
+    
+    async function startMLTraining() {
+      const folder = document.getElementById('ml-folder').value;
+      const symbol = document.getElementById('ml-symbol').value;
+      const epochs = document.getElementById('ml-epochs-input').value;
+      const batch = document.getElementById('ml-batch').value;
+      const sequence = document.getElementById('ml-sequence').value;
+      
+      if (!folder) {
+        showError('Pilih folder data terlebih dahulu');
+        return;
+      }
+      
+      const logContainer = document.getElementById('ml-training-log');
+      const progressBar = document.getElementById('ml-progress-bar');
+      const progressPct = document.getElementById('ml-progress-pct');
+      
+      logContainer.innerHTML = '<div style="color:var(--neon-cyan);">[INFO] Starting training...</div>';
+      progressBar.style.width = '0%';
+      progressPct.textContent = '0%';
+      
+      try {
+        const res = await fetch('/lstm/train', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            folder,
+            symbol,
+            epochs: parseInt(epochs),
+            batch_size: parseInt(batch),
+            sequence_length: parseInt(sequence)
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (data.status === 'sukses' || data.status === 'started') {
+          logContainer.innerHTML += `<div style="color:var(--neon-lime);">[SUCCESS] ${data.pesan || 'Training started'}</div>`;
+          
+          // Poll for progress
+          mlTrainingInterval = setInterval(async () => {
+            try {
+              const statusRes = await fetch('/lstm/training-status');
+              const statusData = await statusRes.json();
+              
+              if (statusData.progress) {
+                const pct = statusData.progress;
+                progressBar.style.width = pct + '%';
+                progressPct.textContent = pct + '%';
+                
+                if (statusData.current_epoch) {
+                  logContainer.innerHTML += `<div>[EPOCH ${statusData.current_epoch}] Loss: ${statusData.loss?.toFixed(4) || '-'}</div>`;
+                  logContainer.scrollTop = logContainer.scrollHeight;
+                }
+                
+                if (pct >= 100 || statusData.status === 'completed') {
+                  clearInterval(mlTrainingInterval);
+                  logContainer.innerHTML += `<div style="color:var(--neon-lime);">[COMPLETE] Training finished!</div>`;
+                  document.getElementById('ml-status').textContent = 'READY';
+                  document.getElementById('ml-accuracy').textContent = (statusData.accuracy * 100).toFixed(1) + '%';
+                  document.getElementById('ml-epochs').textContent = epochs;
+                  loadSavedModels();
+                }
+              }
+            } catch (err) {
+              // Training might still be running
+            }
+          }, 2000);
+          
+        } else {
+          logContainer.innerHTML += `<div style="color:var(--neon-red);">[ERROR] ${data.detail || data.pesan || 'Training failed'}</div>`;
+        }
+      } catch (err) {
+        logContainer.innerHTML += `<div style="color:var(--neon-red);">[ERROR] ${err.message}</div>`;
+      }
+    }
+    
+    async function loadSavedModels() {
+      const container = document.getElementById('saved-models-list');
+      
+      try {
+        const res = await fetch('/lstm/models');
+        const data = await res.json();
+        
+        if (data.models && data.models.length > 0) {
+          let html = '<div class="file-list">';
+          data.models.forEach(m => {
+            html += `<div class="file-item">
+              <div class="file-info">
+                <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--neon-pink);fill:none;"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+                <span class="file-name-text">${m.name}</span>
+                <span class="file-size">${m.accuracy ? (m.accuracy*100).toFixed(1)+'%' : '-'}</span>
+              </div>
+              <div class="file-actions">
+                <button class="btn-mini" onclick="loadModel('${m.name}')" title="Load Model">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+              </div>
+            </div>`;
+          });
+          html += '</div>';
+          container.innerHTML = html;
+        } else {
+          container.innerHTML = '<div class="empty-state"><p>Belum ada model tersimpan</p></div>';
+        }
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><p>Belum ada model tersimpan</p></div>';
+      }
+    }
+    
+    async function loadModel(modelName) {
+      showLoading('Loading model...');
+      try {
+        const res = await fetch(`/lstm/load/${modelName}`, { method: 'POST' });
+        const data = await res.json();
+        hideLoading();
+        
+        if (data.status === 'sukses') {
+          showSuccess(`Model ${modelName} loaded`);
+          document.getElementById('ml-status').textContent = 'READY';
+        } else {
+          showError(data.detail || 'Failed to load model');
+        }
+      } catch (err) {
+        hideLoading();
+        showError('Failed to load model');
+      }
+    }
+    
     // ============ INIT ============
     document.addEventListener('DOMContentLoaded', () => {
-      loadRealtimePrices();
+      loadWatchlistPrices();
       loadFolders();
       initCharts();
       loadFavorites();
       loadStatistics();
+      loadPerformanceSummary();
       loadActiveSignals();
+      loadDashboardActiveSignals();
+      loadMLFolders();
+      
+      // Init Binance chart
+      setTimeout(() => {
+        initBinanceChart();
+        loadOrderBook();
+        loadRecentTrades();
+      }, 500);
+      
+      // Auto refresh order book dan trades setiap 5 detik
+      setInterval(() => {
+        loadOrderBook();
+        loadRecentTrades();
+      }, 5000);
+      
+      // Auto refresh active signals setiap 5 detik (lebih cepat untuk real-time feel)
+      setInterval(() => {
+        loadActiveSignals();
+        loadDashboardActiveSignals();
+      }, 5000);
+      
+      // Auto refresh statistics setiap 30 detik
+      setInterval(() => {
+        loadStatistics();
+        loadPerformanceSummary();
+      }, 30000);
     });
   </script>
 </body>
