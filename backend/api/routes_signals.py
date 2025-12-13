@@ -166,46 +166,7 @@ async def get_active_signals(db: Session = Depends(get_db)):
     ]
 
 
-@router.get("/history")
-async def get_signal_history(
-    limit: int = Query(50, ge=1, le=500),
-    symbol: Optional[str] = None,
-    status: Optional[str] = None,
-    db: Session = Depends(get_db)
-):
-    """Ambil history sinyal dengan filter"""
-    query = db.query(Signal)
-    
-    if symbol:
-        query = query.filter(Signal.symbol == symbol.upper())
-    
-    if status:
-        query = query.filter(Signal.status == SignalStatus[status])
-    
-    signals = query.order_by(Signal.created_at.desc()).limit(limit).all()
-    
-    return {
-        "jumlah": len(signals),
-        "signals": [
-            {
-                "id": s.id,
-                "symbol": s.symbol,
-                "market_type": s.market_type.value,
-                "signal_type": s.signal_type.value,
-                "entry_price": s.entry_price,
-                "stop_loss": s.stop_loss,
-                "take_profit": s.take_profit,
-                "confidence": s.confidence,
-                "status": s.status.value,
-                "created_at": s.created_at.isoformat(),
-                "closed_at": s.closed_at.isoformat() if s.closed_at else None,
-                "pnl_percent": s.pnl_percent,
-                "duration_minutes": s.duration_minutes,
-                "alasan": s.alasan,
-            }
-            for s in signals
-        ]
-    }
+# Duplicate endpoint removed - using the comprehensive one below
 
 
 @router.post("/close/{signal_id}")

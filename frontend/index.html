@@ -4803,7 +4803,7 @@
         const res = await fetch(url);
         const data = await res.json();
         
-        if (data.status === 'sukses') {
+        if (data.stats && data.signals) {
           // Update stats
           const stats = data.stats || {};
           document.getElementById('hist-total').textContent = stats.total_closed || 0;
